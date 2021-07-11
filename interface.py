@@ -2,7 +2,7 @@
 Interface graphique pour observer les resultats obtenu du programme main.py
 """
 
-from new_main import (traitements_informations, generique_variation_valeur_brutes,
+from main import (traitements_informations, generique_variation_valeur_brutes,
                     generique_potentiel, moyenne_donnees_brute_pays, evolutions_sum_annees,
                     tableau_top, tableau_top_pays_hebdo)
 
