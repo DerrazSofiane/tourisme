@@ -285,7 +285,7 @@ def tableau_top_pays_mensuel(recapitualitf_desc_4s, fichier):
     top_progression = variation.sort_values(by=list(variation.columns), 
                                             ascending=False).head(3).index.to_list()
     
-    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["2 semaines"]
+    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["4 semaines"]
     top_potentiel =  list(concat_tableau.sort_values(by=["potentiel"]).head(3).index)
     
     def nettoyage_str(x):
@@ -333,7 +333,7 @@ def tableau_top_pays_trimestre(recapitualitf_desc_12s, fichier):
     top_progression = variation.sort_values(by=list(variation.columns), 
                                             ascending=False).head(3).index.to_list()
     
-    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["2 semaines"]
+    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["12 semaines"]
     top_potentiel =  list(concat_tableau.sort_values(by=["potentiel"]).head(3).index)
     
     def nettoyage_str(x):
