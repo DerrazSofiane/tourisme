@@ -380,6 +380,25 @@ def evolutions_sum_annees(fichier, annee):
     
     return evolution_annee
 
+def comparaison_brute_mois_n(fichier, mois, annee):
+    """ Fonction de comparaison des valeurs brutes en fonction du mois sur 
+    une période de N a N-1
+    """
+    tableau_date = pd.DataFrame()
+    for i in range(0,4):
+        mois_map = fichier["Semaine"].map(lambda x: x.month) == mois
+        tableau_mois = fichier[mois_map]
+        annee_map = tableau_mois["Semaine"].map(lambda x: x.year) == annee-i
+        tableau_annee_mois = tableau_mois[annee_map]
+        tableau_date = pd.concat([tableau_date, tableau_annee_mois])
+
+    def index_annee(x):
+        x = str(x)[:4]
+        return x
+    tableau_date["annee"] = tableau_date["Semaine"].apply(index_annee)
+    tableau_brut = tableau_date.groupby("annee").sum()
+    
+    return tableau_brut
 
 if __name__ == "__main__":
     csv_generique = r"C:/Users/ristarz/Desktop/tourisme2/GÉNÉRIQUES/CSV/DE-IT-NL-GB-US-BE-CH-ES-FR_Generique-Paris-Hebdo_20210607_1049.csv"

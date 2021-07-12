@@ -5,7 +5,7 @@ Interface graphique pour observer les resultats obtenu du programme main.py
 from main import (traitements_informations, generique_variation_valeur_brutes,
                     generique_potentiel, moyenne_donnees_brute_pays, evolutions_sum_annees,
                     tableau_top, tableau_top_pays_hebdo, tableau_top_pays_mensuel,
-                    tableau_top_pays_trimestre)
+                    tableau_top_pays_trimestre, comparaison_brute_mois_n)
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -193,14 +193,46 @@ elif mode == "Par pays":
                         st.pyplot()
                 
             if st.sidebar.checkbox("MENSUEL") and uploaded_file != "None":
-                    st.title("Top potentiel mensuel")
-                    top_pays = tableau_top_pays_mensuel(recapitualitf_4s, fichier)
-                    st.write(top_pays)
-                     
+                st.title("Top potentiel mensuel")
+                top_pays = tableau_top_pays_mensuel(recapitualitf_4s, fichier)
+                st.write(top_pays)
+                mois = [i for i in range(1,13)]
+                mois_str = ["janvier",	"février",	"mars",	"avril", "mai", "juin",	"juillet", "août", "septembre",
+                	"octobre", "novembre", "décembre"]
+                mode_mois = st.sidebar.selectbox(
+                        "Quel mois?",
+                        (mois)
+                        )
+                derniere_3annee = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
+                derniere_3annee.sort(reverse=True)
+                mode_annee = st.sidebar.selectbox(
+                        "Quelle annee?",
+                        (derniere_3annee)
+                        )
+                tableau_brute_n = comparaison_brute_mois_n(fichier, int(mode_mois), int(mode_annee))
+                st.title(f"Valeurs brutes du mois {mode_mois} l’année {mode_annee} et du mois {mode_mois} de l’année {mode_annee} -1")
+                tableau_brute_n = tableau_brute_n.T
+                str_annee = [str(i) for i in derniere_3annee]
+                derniere_annee_annee1 = tableau_brute_n[str_annee[0:2]]
+                
+                derniere_annee_melt = pd.melt(derniere_annee_annee1.reset_index(), id_vars="index", var_name="annee", value_name="valeur")
+                st.write(sns.barplot(x="index", y="valeur", hue="annee", data=derniere_annee_melt.sort_values(by=["annee"])))
+                
+                
+                st.pyplot()
+                st.title(f"Valeurs brutes du mois {mode_mois} l’année {str(int(mode_annee-1))} et du mois {mode_mois} de l’année {str(int(mode_annee-1))} -1")
+
+                derniere_annee_annee2 = tableau_brute_n[[str_annee[0], str_annee[-1]]]
+                
+                derniere_annee_melt2 = pd.melt(derniere_annee_annee2.reset_index(), id_vars="index", var_name="annee", value_name="valeur")
+                st.write(sns.barplot(x="index", y="valeur", hue="annee", data=derniere_annee_melt2.sort_values(by=["annee"])))
+
+                st.pyplot()
+                
             if st.sidebar.checkbox("TRIMESTRE") and uploaded_file != "None":
-                    st.title("Top potentiel trimestre")
-                    top_pays = tableau_top_pays_trimestre(recapitualitf_12s, fichier)
-                    st.write(top_pays)
+                st.title("Top potentiel trimestre")
+                top_pays = tableau_top_pays_trimestre(recapitualitf_12s, fichier)
+                st.write(top_pays)
                 
     except:
         pass
