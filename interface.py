@@ -166,10 +166,9 @@ elif mode == "Par pays":
 
             if st.sidebar.checkbox("HEBDOMADAIRES") and uploaded_file != "None":
                 recapitualitf_2s, recapitualitf_4s, recapitualitf_12s = moyenne_donnees_brute_pays(fichier, date_calendar)
-                st.title("Top potentiel")
+                st.title("Top potentiel hebdo")
                 top_pays = tableau_top_pays_hebdo(recapitualitf_2s, fichier)
                 st.write(top_pays)
-                
                 #if st.checkbox("Voulez vous mettre un commentaire ?"):
                     #commentaire_top_hebdo = st.text_area("Emplacement du commentaire", "")
 
@@ -191,18 +190,17 @@ elif mode == "Par pays":
                         last.fillna(0, inplace=True)
                         plt.plot(last)
                         plt.legend(last.columns)
-                        
                         st.pyplot()
                 
-                if st.sidebar.checkbox("MENSUEL") and uploaded_file != "None":
-                     st.title("Top potentiel")
-                     top_pays = tableau_top_pays_mensuel(recapitualitf_2s, fichier)
-                     st.write(top_pays)
+            if st.sidebar.checkbox("MENSUEL") and uploaded_file != "None":
+                    st.title("Top potentiel mensuel")
+                    top_pays = tableau_top_pays_mensuel(recapitualitf_4s, fichier)
+                    st.write(top_pays)
                      
-                if st.sidebar.checkbox("TRIMESTRE") and uploaded_file != "None":
-                     st.title("Top potentiel")
-                     top_pays = tableau_top_pays_trimestre(recapitualitf_2s, fichier)
-                     st.write(top_pays)
+            if st.sidebar.checkbox("TRIMESTRE") and uploaded_file != "None":
+                    st.title("Top potentiel trimestre")
+                    top_pays = tableau_top_pays_trimestre(recapitualitf_12s, fichier)
+                    st.write(top_pays)
                 
     except:
         pass

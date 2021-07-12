@@ -356,9 +356,8 @@ def tableau_top_pays_trimestre(recapitualitf_desc_12s, fichier):
         top_pays[nom] = top_pays[nom].apply(nettoyage_str)    
     
     return top_pays
-    
-    
 
+# SUM ANNEE
 def evolutions_sum_annees(fichier, annee):
     """ Fonction retournant un tableau les valeurs brutes
     des 3 dernieres année.
