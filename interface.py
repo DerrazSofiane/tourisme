@@ -4,7 +4,8 @@ Interface graphique pour observer les resultats obtenu du programme main.py
 
 from main import (traitements_informations, generique_variation_valeur_brutes,
                     generique_potentiel, moyenne_donnees_brute_pays, evolutions_sum_annees,
-                    tableau_top, tableau_top_pays_hebdo)
+                    tableau_top, tableau_top_pays_hebdo, tableau_top_pays_mensuel,
+                    tableau_top_pays_trimestre)
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -161,6 +162,8 @@ elif mode == "Par pays":
                 commentaire_recapitualitf_desc = st.text_area("Emplacement du commentaire", "")
                 st.write(commentaire_recapitualitf_desc.style.set_precision(2))
             
+            recapitualitf_2s, recapitualitf_4s, recapitualitf_12s = moyenne_donnees_brute_pays(fichier, date_calendar)
+
             if st.sidebar.checkbox("HEBDOMADAIRES") and uploaded_file != "None":
                 recapitualitf_2s, recapitualitf_4s, recapitualitf_12s = moyenne_donnees_brute_pays(fichier, date_calendar)
                 st.title("Top potentiel")
@@ -190,8 +193,17 @@ elif mode == "Par pays":
                         plt.legend(last.columns)
                         
                         st.pyplot()
-                                
-
+                
+                if st.sidebar.checkbox("MENSUEL") and uploaded_file != "None":
+                     st.title("Top potentiel")
+                     top_pays = tableau_top_pays_mensuel(recapitualitf_2s, fichier)
+                     st.write(top_pays)
+                     
+                if st.sidebar.checkbox("TRIMESTRE") and uploaded_file != "None":
+                     st.title("Top potentiel")
+                     top_pays = tableau_top_pays_trimestre(recapitualitf_2s, fichier)
+                     st.write(top_pays)
+                
     except:
         pass
 

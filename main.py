@@ -115,7 +115,7 @@ def generique_potentiel(variation, valeurs_brutes):
     return recapitualitf
 
 
-def tableau_top(recapitulatif):
+def tableau_top(recapitualitf):
     """ Fonction ressortant un tableau regroupant:
         - top volume : les 3 plus grosses valeurs brutes 
             (en moyenne sur la période)
@@ -129,13 +129,13 @@ def tableau_top(recapitulatif):
            "Top POTENTIEL": []}
     
     # Récupération du top 3 pour chaque top
-    top_progression = recapitulatif.sort_values(by=["2 semaines"], 
+    top_progression = recapitualitf.sort_values(by=["2 semaines"], 
                                                 ascending=False).head(3)
     top_pays_progress = list(top_progression.index)
-    top_volume = recapitulatif.sort_values(by=["taille"], 
+    top_volume = recapitualitf.sort_values(by=["taille"], 
                                                 ascending=False).head(3)
     top_pays_volume = list(top_volume.index)
-    top_potentiel = recapitulatif.sort_values(by=["Top POTENTIEL"], 
+    top_potentiel = recapitualitf.sort_values(by=["Top POTENTIEL"], 
                                                 ascending=False).head(3)
     top_pays_potentiel = list(top_potentiel.index)
     
@@ -227,17 +227,135 @@ def tableau_top_pays_hebdo(recapitualitf_desc_2s, fichier):
     top = {"top volume": [],
            "top progression": [],
            "Top POTENTIEL": []} 
-    
+    recapitualitf_desc_2s = recapitualitf_desc_2s.sort_index()
+    recapitualitf_desc_2s.fillna(0, inplace=True)
     #TODO VOIR PARTIE PROGRESSION
-    variation = moyenne_variation(fichier, 1).T
+    variation = (moyenne_variation(fichier, 1).T).sort_index()
+    variation.fillna(0, inplace=True)
+    concat_tableau = pd.concat([variation, recapitualitf_desc_2s], axis=1)
     top_volume = recapitualitf_desc_2s.head(3).index.to_list()
     top_progression = variation.sort_values(by=list(variation.columns), 
                                             ascending=False).head(3).index.to_list()
-    top_potentiel = recapitualitf_desc_2s*variation.sort_values(by=list(variation.columns), 
-                                            ascending=False)
     
+    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["2 semaines"]
+    top_potentiel =  list(concat_tableau.sort_values(by=["potentiel"]).head(3).index)
     
+    def nettoyage_str(x):
+        """ Fonction qui permet de remplacer les "[" ainsi que les "]"
+        pour avoir un tableau identique à celui du pdf du client
+        """
+        x = str(x)
+        if "[" and "]" in x:
+            x = x.replace("[", "").replace("]", "")
+        return x
+
+
+    top["top volume"].append(top_volume)
+    top["top progression"].append(top_progression)
+    top["Top POTENTIEL"].append(top_potentiel)
+    colonnes = list(top.keys())
+    top_pays = pd.DataFrame(top, columns=colonnes)
     
+    for nom in colonnes:
+        top_pays[nom] = top_pays[nom].apply(nettoyage_str)    
+    
+    return top_pays
+
+# TOP PAYS MENSUEL
+def tableau_top_pays_mensuel(recapitualitf_desc_4s, fichier):
+    """ Fonction ressortant un tableau regroupant:
+        - top volume : les 3 plus grosses valeurs brutes 
+            (en moyenne sur la période)
+        - top progression : les 3 variations les plus fortes 
+            (en moyennes sur la période)
+        - top potentiel : les 3 plus gros produit VOLUME X PROGRESSION 
+            (en moyenne sur la période)
+        de façon HEBDOMADAIRE
+    """
+    top = {"top volume": [],
+           "top progression": [],
+           "Top POTENTIEL": []} 
+    recapitualitf_desc_4s = recapitualitf_desc_4s.sort_index()
+    recapitualitf_desc_4s.fillna(0, inplace=True)
+    #TODO VOIR PARTIE PROGRESSION
+    variation = (moyenne_variation(fichier, 1).T).sort_index()
+    variation.fillna(0, inplace=True)
+    concat_tableau = pd.concat([variation, recapitualitf_desc_4s], axis=1)
+    top_volume = recapitualitf_desc_4s.head(3).index.to_list()
+    top_progression = variation.sort_values(by=list(variation.columns), 
+                                            ascending=False).head(3).index.to_list()
+    
+    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["2 semaines"]
+    top_potentiel =  list(concat_tableau.sort_values(by=["potentiel"]).head(3).index)
+    
+    def nettoyage_str(x):
+        """ Fonction qui permet de remplacer les "[" ainsi que les "]"
+        pour avoir un tableau identique à celui du pdf du client
+        """
+        x = str(x)
+        if "[" and "]" in x:
+            x = x.replace("[", "").replace("]", "")
+        return x
+
+
+    top["top volume"].append(top_volume)
+    top["top progression"].append(top_progression)
+    top["Top POTENTIEL"].append(top_potentiel)
+    colonnes = list(top.keys())
+    top_pays = pd.DataFrame(top, columns=colonnes)
+    
+    for nom in colonnes:
+        top_pays[nom] = top_pays[nom].apply(nettoyage_str)    
+    
+    return top_pays
+
+# TOP PAYS TRIMESTRE
+def tableau_top_pays_trimestre(recapitualitf_desc_12s, fichier):
+    """ Fonction ressortant un tableau regroupant:
+        - top volume : les 3 plus grosses valeurs brutes 
+            (en moyenne sur la période)
+        - top progression : les 3 variations les plus fortes 
+            (en moyennes sur la période)
+        - top potentiel : les 3 plus gros produit VOLUME X PROGRESSION 
+            (en moyenne sur la période)
+        de façon HEBDOMADAIRE
+    """
+    top = {"top volume": [],
+           "top progression": [],
+           "Top POTENTIEL": []} 
+    recapitualitf_desc_12s = recapitualitf_desc_12s.sort_index()
+    recapitualitf_desc_12s.fillna(0, inplace=True)
+    #TODO VOIR PARTIE PROGRESSION
+    variation = (moyenne_variation(fichier, 1).T).sort_index()
+    variation.fillna(0, inplace=True)
+    concat_tableau = pd.concat([variation, recapitualitf_desc_12s], axis=1)
+    top_volume = recapitualitf_desc_12s.head(3).index.to_list()
+    top_progression = variation.sort_values(by=list(variation.columns), 
+                                            ascending=False).head(3).index.to_list()
+    
+    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["2 semaines"]
+    top_potentiel =  list(concat_tableau.sort_values(by=["potentiel"]).head(3).index)
+    
+    def nettoyage_str(x):
+        """ Fonction qui permet de remplacer les "[" ainsi que les "]"
+        pour avoir un tableau identique à celui du pdf du client
+        """
+        x = str(x)
+        if "[" and "]" in x:
+            x = x.replace("[", "").replace("]", "")
+        return x
+
+
+    top["top volume"].append(top_volume)
+    top["top progression"].append(top_progression)
+    top["Top POTENTIEL"].append(top_potentiel)
+    colonnes = list(top.keys())
+    top_pays = pd.DataFrame(top, columns=colonnes)
+    
+    for nom in colonnes:
+        top_pays[nom] = top_pays[nom].apply(nettoyage_str)    
+    
+    return top_pays
     
     
 
@@ -265,8 +383,8 @@ def evolutions_sum_annees(fichier, annee):
 
 
 if __name__ == "__main__":
-    csv_generique = r"C:/Users/ristarz/Desktop/tourisme/GÉNÉRIQUES/CSV/DE-IT-NL-GB-US-BE-CH-ES-FR_Generique-Paris-Hebdo_20210607_1049.csv"
-    csv_pays = r"C:/Users/ristarz/Desktop/tourisme/PAR PAYS/CSV/BE_ATF-OutreMer-Hebdo_hebdo_20210607_1048.csv"
+    csv_generique = r"C:/Users/ristarz/Desktop/tourisme2/GÉNÉRIQUES/CSV/DE-IT-NL-GB-US-BE-CH-ES-FR_Generique-Paris-Hebdo_20210607_1049.csv"
+    csv_pays = r"C:/Users/ristarz/Desktop/tourisme2/PAR PAYS/CSV/BE_ATF-OutreMer-Hebdo_hebdo_20210607_1048.csv"
     fichier = traitements_informations(csv_pays)
     variation, valeurs_brutes = generique_variation_valeur_brutes(fichier)
     recapitualitf_desc = moyenne_donnees_brute_pays(fichier, 
