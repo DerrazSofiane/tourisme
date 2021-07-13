@@ -77,7 +77,6 @@ if mode == "Générique":
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points')
-                plt.xticks(45)
                 st.pyplot()
 
 
