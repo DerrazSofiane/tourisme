@@ -14,10 +14,15 @@ import pandas as pd
 import numpy as np
 import datetime
 from calendar import monthrange
+import os
+from pptx import Presentation
+
+
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 st.title("OBSERVATOIRE DU TOURISME SUR INTERNET")
 st.image("https://nicolasbaudy.files.wordpress.com/2020/02/cropped-logo-new-2.png", use_column_width=False)
+
 
 # Sélection du mode
 st.sidebar.write("# Bienvenue :computer:")
@@ -29,6 +34,13 @@ mode = st.sidebar.selectbox(
 # MODE GENERIQUE
 st.sidebar.success(f"Vous avez choisi le mode {mode}")
 if mode == "Générique":
+    # objet powerpoint
+    prs = Presentation()
+    try:
+        os.mkdir("images_generique")
+    except:
+        pass
+    
     my_expander = st.sidebar.beta_expander("Ouvrir", expanded=True)
     with my_expander:
         st.write("2- DONNÉES : chargez le fichier à analyser :open_file_folder:")
@@ -57,9 +69,7 @@ if mode == "Générique":
             st.title("Récapitulatif :white_check_mark:")
             st.write(recapitulatif.T.style.set_precision(2))
             
-            if st.checkbox("Voulez vous mettre un commentaire ?"):
-                commentaire_calculs = st.text_area("Emplacement du commentaire", "")
-
+            
 
 # GRAPHIQUE GENERIQUE
         if st.sidebar.checkbox("Graphique Générique") and uploaded_file != "None":
@@ -118,14 +128,43 @@ if mode == "Générique":
 
                 st.pyplot()
 
-                if st.checkbox("Voulez vous mettre un commentaire ?"):
-                    commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
+            if st.checkbox("Voulez vous mettre un commentaire ?"):
+                commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
+       
+            if st.button("générer un power point Générique"):
+                prs = Presentation()
+                bullet_slide_layout = prs.slide_layouts[1]
+                
+                slide = prs.slides.add_slide(bullet_slide_layout)
+                shapes = slide.shapes
+                
+                title_shape = shapes.title
+                body_shape = shapes.placeholders[1]
+                
+                title_shape.text = 'TOURISME TEST'
+                
+                tf = body_shape.text_frame
+                tf.text = '1er slide avec top 3'
+                
+                p = tf.add_paragraph()
+                p.text = 'Use _TextFrame.text for first bullet'
+                p.level = 1
+                
+                p = tf.add_paragraph()
+                p.text = 'Use _TextFrame.add_paragraph() for subsequent bullets'
+                p.level = 2
+                
+                prs.save('test.pptx')
     except:
         pass
 
 
 # MODE PAR PAYS
 elif mode == "Par pays":
+    try:
+        os.mkdir("images_par_pays")
+    except:
+        pass
     my_expander = st.sidebar.beta_expander("Ouvrir", expanded=True)
     with my_expander:
         st.write("Choisir un fichier :open_file_folder:")
