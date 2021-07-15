@@ -59,7 +59,7 @@ if mode == "Générique":
         if st.sidebar.checkbox("Calcul Générique") and uploaded_file != "None":
             st.title("Top Potentiel")
             st.write(top_3)
-            st.write(top_3.style.set_precision(2))
+            #st.write(top_3.style.set_precision(2))
             st.title("Moyenne des valeurs brutes des 2 dernières semaines")
             st.write(valeurs_brutes.set_index(list(fichier.columns)[0]).style.set_precision(2))
             st.title("Moyenne des variations des 4 dernières semaines")
