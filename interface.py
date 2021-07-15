@@ -63,7 +63,7 @@ if mode == "Générique":
             st.title("Moyenne des valeurs brutes des 2 dernières semaines")
             st.write(valeurs_brutes.set_index(list(fichier.columns)[0]))
             st.title("Moyenne des variations des 4 dernières semaines")
-            st.write(variation.style)
+            st.write(variation)
 
             
             st.title("Récapitulatif :white_check_mark:")
@@ -185,19 +185,19 @@ elif mode == "Par pays":
             st.title("Moyenne des données brutes sur les 2 dernières semaines, des 4 dernières semaines, des 12 dernières semaines")
 
             cols = st.beta_columns(3)
-            cols[0].table(recapitualitf_2s.style.set_precision(2))
-            cols[1].table(recapitualitf_4s.style.set_precision(2))
-            cols[2].table(recapitualitf_12s.style.set_precision(2))
+            cols[0].table(recapitualitf_2s)
+            cols[1].table(recapitualitf_4s)
+            cols[2].table(recapitualitf_12s)
 
             st.title("TOP 6")
 
             cols = st.beta_columns(3)
-            cols[0].table(recapitualitf_2s.head(6).style.set_precision(2))
-            cols[1].table(recapitualitf_4s.head(6).style.set_precision(2))
-            cols[2].table(recapitualitf_12s.head(6).style.set_precision(2))
+            cols[0].table(recapitualitf_2s.head(6))
+            cols[1].table(recapitualitf_4s.head(6))
+            cols[2].table(recapitualitf_12s.head(6))
             if st.checkbox("Voulez vous mettre un commentaire ?"):
                 commentaire_recapitualitf_desc = st.text_area("Emplacement du commentaire", "")
-                st.write(commentaire_recapitualitf_desc.style.set_precision(2))
+                st.write(commentaire_recapitualitf_desc)
             
             recapitualitf_2s, recapitualitf_4s, recapitualitf_12s = moyenne_donnees_brute_pays(fichier, date_calendar)
 
