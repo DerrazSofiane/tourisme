@@ -16,13 +16,13 @@ import datetime
 from calendar import monthrange
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-st.title("OBSERVATOIRE DU TOURISME SUR INTERNET :chart:")
-st.write("Cette interface permet de visualiser les calculs ainsi que les graphiques relatif en temps réel")
+st.title("OBSERVATOIRE DU TOURISME SUR INTERNET")
+st.image("https://nicolasbaudy.files.wordpress.com/2020/02/cropped-logo-new-2.png", use_column_width=False)
 
 # Sélection du mode
-st.sidebar.write("# Bienvenue dans la sélection du mode :computer:")
+st.sidebar.write("# Bienvenue :computer:")
 mode = st.sidebar.selectbox(
-    "Quel mode voulez vous?",
+    "1- ANALYSE : choisissez le mode => Générique // Par Pays ",
     ("Générique", "Par pays")
 )
 
@@ -31,14 +31,14 @@ st.sidebar.success(f"Vous avez choisi le mode {mode}")
 if mode == "Générique":
     my_expander = st.sidebar.beta_expander("Ouvrir", expanded=True)
     with my_expander:
-        st.write("Choisir un fichier :open_file_folder:")
+        st.write("2- DONNÉES : chargez le fichier à analyser :open_file_folder:")
         uploaded_file = st.file_uploader("")
 
     try:
         fichier = traitements_informations(uploaded_file)
         # Affiche l'intituler de l'objet 
         nom_objet = list(fichier.columns)[0]
-        st.sidebar.write(f"Vous êtes sur : **{nom_objet}** :heavy_check_mark:")
+        st.sidebar.write(f"Vous analysez: **{nom_objet}** :heavy_check_mark:")
         variation, valeurs_brutes = generique_variation_valeur_brutes(fichier)
         recapitulatif = generique_potentiel(variation, valeurs_brutes)
         top_3 = tableau_top(recapitulatif)
@@ -46,16 +46,17 @@ if mode == "Générique":
 
 # CALCUL GENERIQUE
         if st.sidebar.checkbox("Calcul Générique") and uploaded_file != "None":
-            st.title("Moyenne des variations des 2 dernières semaines")
-            st.write(variation.head(2).style.set_precision(2))
-            st.title("Moyenne des variations des 4 dernières semaines")
-            st.write(variation.style.set_precision(2))
-            st.title("Moyenne des valeurs brutes des 2 dernières semaines")
-            st.write(valeurs_brutes.set_index(list(fichier.columns)[0]).style.set_precision(2))
-            st.title("Récapitulatif :white_check_mark:")
-            st.write(recapitulatif.T.style.set_precision(2))
             st.title("Top Potentiel")
             st.write(top_3.style.set_precision(2))
+            st.title("Moyenne des valeurs brutes des 2 dernières semaines")
+            st.write(valeurs_brutes.set_index(list(fichier.columns)[0]).style.set_precision(2))
+            st.title("Moyenne des variations des 4 dernières semaines")
+            st.write(variation.style.set_precision(2))
+
+            
+            st.title("Récapitulatif :white_check_mark:")
+            st.write(recapitulatif.T.style.set_precision(2))
+            
             if st.checkbox("Voulez vous mettre un commentaire ?"):
                 commentaire_calculs = st.text_area("Emplacement du commentaire", "")
 
@@ -78,7 +79,7 @@ if mode == "Générique":
                         xytext = (0, 1), 
                         textcoords = 'offset points')
                 st.pyplot()
-
+                
 
             if st.sidebar.checkbox("Evolution en % de S/S-1"):
                 evolution = variation.head(2).reset_index()
@@ -138,9 +139,9 @@ elif mode == "Par pays":
         derniere_date = pd.unique(fichier[colonnes[0]])[-1]
         conv_derniere_date = datetime.datetime.combine(derniere_date, my_time)
         # Ressort une date au format datetime.date
-        date_calendar = st.sidebar.date_input('start date', value=conv_derniere_date)
+        date_calendar = st.sidebar.date_input("sélectionner la date d'analyse", value=conv_derniere_date)
 
-        if st.sidebar.checkbox("Moyenne des données brutes") and uploaded_file != "None":
+        if st.sidebar.checkbox("1- Les Top") and uploaded_file != "None":
             recapitualitf_2s, recapitualitf_4s, recapitualitf_12s = moyenne_donnees_brute_pays(fichier, date_calendar)
             st.title("Moyenne des données brutes sur les 2 dernières semaines, des 4 dernières semaines, des 12 dernières semaines")
 
@@ -162,6 +163,7 @@ elif mode == "Par pays":
             recapitualitf_2s, recapitualitf_4s, recapitualitf_12s = moyenne_donnees_brute_pays(fichier, date_calendar)
 
             if st.sidebar.checkbox("HEBDOMADAIRES") and uploaded_file != "None":
+
                 recapitualitf_2s, recapitualitf_4s, recapitualitf_12s = moyenne_donnees_brute_pays(fichier, date_calendar)
                 st.title("Top potentiel hebdo")
                 top_pays = tableau_top_pays_hebdo(recapitualitf_2s, fichier)
@@ -191,8 +193,9 @@ elif mode == "Par pays":
                 
             if st.sidebar.checkbox("MENSUEL") and uploaded_file != "None":
                 st.title("Top potentiel mensuel")
-                top_pays = tableau_top_pays_mensuel(recapitualitf_4s, fichier)
-                st.write(top_pays)
+                
+                top_pays_mensuel = tableau_top_pays_mensuel(recapitualitf_4s, fichier)
+                st.write(top_pays_mensuel)
                 mois = [i for i in range(1,13)]
                 mois_str = ["janvier",	"février",	"mars",	"avril", "mai", "juin",	"juillet", "août", "septembre",
                 	"octobre", "novembre", "décembre"]
@@ -234,7 +237,5 @@ elif mode == "Par pays":
     except:
         pass
 
-st.sidebar.write("")
-st.sidebar.write("Âdhavan Algorithmics")
 
 

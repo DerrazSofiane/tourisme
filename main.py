@@ -124,9 +124,9 @@ def tableau_top(recapitualitf):
         - top potentiel : les 3 plus gros produit VOLUME X PROGRESSION 
             (en moyenne sur la période)
     """
-    top = {"top volume": [],
-           "top progression": [],
-           "Top POTENTIEL": []}
+    top = {"top Volume": [],
+           "top Progression": [],
+           "Top Potentiel": []}
     
     # Récupération du top 3 pour chaque top
     top_progression = recapitualitf.sort_values(by=["2 semaines"], 
@@ -149,9 +149,9 @@ def tableau_top(recapitualitf):
         return x
 
 
-    top["top volume"].append(top_pays_volume)
-    top["top progression"].append(top_pays_progress)
-    top["Top POTENTIEL"].append(top_pays_potentiel)
+    top["top Volume"].append(top_pays_volume)
+    top["top Progression"].append(top_pays_progress)
+    top["Top Potentiel"].append(top_pays_potentiel)
     colonnes = list(top.keys())
     top_pays = pd.DataFrame(top, columns=colonnes)
     
@@ -195,20 +195,20 @@ def moyenne_donnees_brute_pays(fichier, periode):
     recapitualitf_2s = pd.DataFrame()
     recapitualitf_4s = pd.DataFrame()
     recapitualitf_12s = pd.DataFrame()
-    recapitualitf_2s["2 semaines"] = semaines_2S
-    recapitualitf_4s["4 semaines"] = semaines_4S
-    recapitualitf_12s["12 semaines"] = semaines_12S
+    recapitualitf_2s["TOP 2 SEMAINES"] = semaines_2S
+    recapitualitf_4s["TOP 4 SEMAINES"] = semaines_4S
+    recapitualitf_12s["TOP 12 SEMAINES"] = semaines_12S
 
     recapitualitf_desc_2s = recapitualitf_2s.sort_values(
-        by="2 semaines", 
+        by="TOP 2 SEMAINES", 
         ascending=False)
     
     recapitualitf_desc_4s = recapitualitf_4s.sort_values(
-        by="4 semaines", 
+        by="TOP 4 SEMAINES", 
         ascending=False)
     
     recapitualitf_desc_12s = recapitualitf_12s.sort_values(
-        by="12 semaines", 
+        by="TOP 12 SEMAINES", 
         ascending=False)
 
     return recapitualitf_desc_2s, recapitualitf_desc_4s, recapitualitf_desc_12s
@@ -224,9 +224,9 @@ def tableau_top_pays_hebdo(recapitualitf_desc_2s, fichier):
             (en moyenne sur la période)
         de façon HEBDOMADAIRE
     """
-    top = {"top volume": [],
-           "top progression": [],
-           "Top POTENTIEL": []} 
+    top = {"top Volume": [],
+           "top Progression": [],
+           "Top Potentiel": []} 
     recapitualitf_desc_2s = recapitualitf_desc_2s.sort_index()
     recapitualitf_desc_2s.fillna(0, inplace=True)
     #TODO VOIR PARTIE PROGRESSION
@@ -237,7 +237,7 @@ def tableau_top_pays_hebdo(recapitualitf_desc_2s, fichier):
     top_progression = variation.sort_values(by=list(variation.columns), 
                                             ascending=False).head(3).index.to_list()
     
-    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["2 semaines"]
+    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["TOP 2 SEMAINES"]
     top_potentiel =  list(concat_tableau.sort_values(by=["potentiel"]).head(3).index)
     
     def nettoyage_str(x):
@@ -250,9 +250,9 @@ def tableau_top_pays_hebdo(recapitualitf_desc_2s, fichier):
         return x
 
 
-    top["top volume"].append(top_volume)
-    top["top progression"].append(top_progression)
-    top["Top POTENTIEL"].append(top_potentiel)
+    top["top Volume"].append(top_volume)
+    top["top Progression"].append(top_progression)
+    top["Top Potentiel"].append(top_potentiel)
     colonnes = list(top.keys())
     top_pays = pd.DataFrame(top, columns=colonnes)
     
@@ -272,9 +272,9 @@ def tableau_top_pays_mensuel(recapitualitf_desc_4s, fichier):
             (en moyenne sur la période)
         de façon HEBDOMADAIRE
     """
-    top = {"top volume": [],
-           "top progression": [],
-           "Top POTENTIEL": []} 
+    top = {"top Volume": [],
+           "top Progression": [],
+           "Top Potentiel": []} 
     recapitualitf_desc_4s = recapitualitf_desc_4s.sort_index()
     recapitualitf_desc_4s.fillna(0, inplace=True)
     #TODO VOIR PARTIE PROGRESSION
@@ -285,7 +285,7 @@ def tableau_top_pays_mensuel(recapitualitf_desc_4s, fichier):
     top_progression = variation.sort_values(by=list(variation.columns), 
                                             ascending=False).head(3).index.to_list()
     
-    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["4 semaines"]
+    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["TOP 4 SEMAINES"]
     top_potentiel =  list(concat_tableau.sort_values(by=["potentiel"]).head(3).index)
     
     def nettoyage_str(x):
@@ -298,9 +298,9 @@ def tableau_top_pays_mensuel(recapitualitf_desc_4s, fichier):
         return x
 
 
-    top["top volume"].append(top_volume)
-    top["top progression"].append(top_progression)
-    top["Top POTENTIEL"].append(top_potentiel)
+    top["top Volume"].append(top_volume)
+    top["top Progression"].append(top_progression)
+    top["Top Potentiel"].append(top_potentiel)
     colonnes = list(top.keys())
     top_pays = pd.DataFrame(top, columns=colonnes)
     
@@ -321,8 +321,8 @@ def tableau_top_pays_trimestre(recapitualitf_desc_12s, fichier):
         de façon HEBDOMADAIRE
     """
     top = {"top volume": [],
-           "top progression": [],
-           "Top POTENTIEL": []} 
+           "top Progression": [],
+           "Top Potentiel": []} 
     recapitualitf_desc_12s = recapitualitf_desc_12s.sort_index()
     recapitualitf_desc_12s.fillna(0, inplace=True)
     #TODO VOIR PARTIE PROGRESSION
@@ -333,7 +333,7 @@ def tableau_top_pays_trimestre(recapitualitf_desc_12s, fichier):
     top_progression = variation.sort_values(by=list(variation.columns), 
                                             ascending=False).head(3).index.to_list()
     
-    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["12 semaines"]
+    concat_tableau["potentiel"] = concat_tableau[list(concat_tableau.columns)[0]]*concat_tableau["TOP 12 SEMAINES"]
     top_potentiel =  list(concat_tableau.sort_values(by=["potentiel"]).head(3).index)
     
     def nettoyage_str(x):
@@ -346,9 +346,9 @@ def tableau_top_pays_trimestre(recapitualitf_desc_12s, fichier):
         return x
 
 
-    top["top volume"].append(top_volume)
-    top["top progression"].append(top_progression)
-    top["Top POTENTIEL"].append(top_potentiel)
+    top["top Volume"].append(top_volume)
+    top["top Progression"].append(top_progression)
+    top["Top Potentiel"].append(top_potentiel)
     colonnes = list(top.keys())
     top_pays = pd.DataFrame(top, columns=colonnes)
     
