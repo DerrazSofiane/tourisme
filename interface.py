@@ -58,6 +58,7 @@ if mode == "Générique":
 # CALCUL GENERIQUE
         if st.sidebar.checkbox("Calcul Générique") and uploaded_file != "None":
             st.title("Top Potentiel")
+            st.write(top_3)
             st.write(top_3.style.set_precision(2))
             st.title("Moyenne des valeurs brutes des 2 dernières semaines")
             st.write(valeurs_brutes.set_index(list(fichier.columns)[0]).style.set_precision(2))
@@ -130,7 +131,7 @@ if mode == "Générique":
             if st.checkbox("Voulez vous mettre un commentaire ?"):
                 commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
        
-            """if st.button("générer un power point Générique"):
+            if st.button("générer un power point Générique"):
                 prs = Presentation()
                 bullet_slide_layout = prs.slide_layouts[1]
                 
@@ -153,7 +154,7 @@ if mode == "Générique":
                 p.text = 'Use _TextFrame.add_paragraph() for subsequent bullets'
                 p.level = 2
                 
-                prs.save('test.pptx')"""
+                prs.save('test.pptx')
     except:
         pass
 
