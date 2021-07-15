@@ -261,7 +261,7 @@ def tableau_top_pays_hebdo(recapitualitf_desc_2s, fichier):
     
     return top_pays
 
-# TOP PAYS MENSUEL
+# TOP PAYS MENSUEL 
 def tableau_top_pays_mensuel(recapitualitf_desc_4s, fichier):
     """ Fonction ressortant un tableau regroupant:
         - top volume : les 3 plus grosses valeurs brutes 

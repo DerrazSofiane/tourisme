@@ -34,8 +34,7 @@ mode = st.sidebar.selectbox(
 # MODE GENERIQUE
 st.sidebar.success(f"Vous avez choisi le mode {mode}")
 if mode == "Générique":
-    # objet powerpoint
-    prs = Presentation()
+
     try:
         os.mkdir("images_generique")
     except:
@@ -131,7 +130,7 @@ if mode == "Générique":
             if st.checkbox("Voulez vous mettre un commentaire ?"):
                 commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
        
-            if st.button("générer un power point Générique"):
+            """if st.button("générer un power point Générique"):
                 prs = Presentation()
                 bullet_slide_layout = prs.slide_layouts[1]
                 
@@ -154,7 +153,7 @@ if mode == "Générique":
                 p.text = 'Use _TextFrame.add_paragraph() for subsequent bullets'
                 p.level = 2
                 
-                prs.save('test.pptx')
+                prs.save('test.pptx')"""
     except:
         pass
 
