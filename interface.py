@@ -154,7 +154,7 @@ if mode == "Générique":
                 p.text = 'Use _TextFrame.add_paragraph() for subsequent bullets'
                 p.level = 2
                 
-                prs.save('test.pptx')
+                prs.save(os.getcwd+'/'+'test.pptx')
     except:
         pass
 
