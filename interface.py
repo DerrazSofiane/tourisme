@@ -61,13 +61,13 @@ if mode == "Générique":
             st.write(top_3)
             #st.write(top_3.style.set_precision(2))
             st.title("Moyenne des valeurs brutes des 2 dernières semaines")
-            st.write(valeurs_brutes.set_index(list(fichier.columns)[0]).style.set_precision(2))
+            st.write(valeurs_brutes.set_index(list(fichier.columns)[0]))
             st.title("Moyenne des variations des 4 dernières semaines")
-            st.write(variation.style.set_precision(2))
+            st.write(variation.style)
 
             
             st.title("Récapitulatif :white_check_mark:")
-            st.write(recapitulatif.T.style.set_precision(2))
+            st.write(recapitulatif.T)
             
             
 
