@@ -9,7 +9,7 @@ import datetime
 from calendar import monthrange
 import os
 
-from main2 import (traitements_informations, generique_variation, 
+from main import (traitements_informations, generique_variation, 
                   generique_volume, generique_potentiel, moyenne_donnees_brutes,
                   sommes_periode_choisie, sommes_annees_top6, tops_pays,
                   valeurs_brutes_3annees)
