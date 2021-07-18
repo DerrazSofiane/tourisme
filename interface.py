@@ -1,6 +1,3 @@
-"""
-Interface graphique pour observer les resultats obtenu du programme main.py
-"""
 
 from main import (traitements_informations, generique_variation_valeur_brutes,
                     generique_potentiel, moyenne_donnees_brute_pays, evolutions_sum_annees,
@@ -286,6 +283,3 @@ elif mode == "Par pays":
                 
     except:
         pass
-
-
-

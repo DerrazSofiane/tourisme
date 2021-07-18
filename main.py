@@ -1,12 +1,11 @@
+
 # -*- coding: utf-8 -*-
 """
 OBSERVATOIRE DU TOURISME SUR INTERNET
-
 CONTEXTE :
 Un outil a été développé pour collecter de la donnée et pour nettoyer cette 
 donnée
 L’outil de restitution implique des tâches manuelles très chronophages
-
 OBJECTIFS :
 Automatiser la production des livrables décrits dans cette expression de
 besoins
@@ -399,11 +398,3 @@ def comparaison_brute_mois_n(fichier, mois, annee):
     tableau_brut = tableau_date.groupby("annee").sum()
     
     return tableau_brut
-
-if __name__ == "__main__":
-    csv_generique = r"C:/Users/ristarz/Desktop/tourisme2/GÉNÉRIQUES/CSV/DE-IT-NL-GB-US-BE-CH-ES-FR_Generique-Paris-Hebdo_20210607_1049.csv"
-    csv_pays = r"C:/Users/ristarz/Desktop/tourisme2/PAR PAYS/CSV/BE_ATF-OutreMer-Hebdo_hebdo_20210607_1048.csv"
-    fichier = traitements_informations(csv_pays)
-    variation, valeurs_brutes = generique_variation_valeur_brutes(fichier)
-    recapitualitf_desc = moyenne_donnees_brute_pays(fichier, 
-                                                    datetime(2021, 3, 1))
