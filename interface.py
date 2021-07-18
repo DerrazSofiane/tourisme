@@ -12,8 +12,6 @@ import numpy as np
 import datetime
 from calendar import monthrange
 import os
-#from pptx import Presentation
-
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -114,30 +112,6 @@ if mode == "Générique":
 
             st.pyplot()
        
-            # if st.button("générer un power point Générique"):
-            #     prs = Presentation()
-            #     bullet_slide_layout = prs.slide_layouts[1]
-                
-            #     slide = prs.slides.add_slide(bullet_slide_layout)
-            #     shapes = slide.shapes
-                
-            #     title_shape = shapes.title
-            #     body_shape = shapes.placeholders[1]
-                
-            #     title_shape.text = 'TOURISME TEST'
-                
-            #     tf = body_shape.text_frame
-            #     tf.text = '1er slide avec top 3'
-                
-            #     p = tf.add_paragraph()
-            #     p.text = 'Use _TextFrame.text for first bullet'
-            #     p.level = 1
-                
-            #     p = tf.add_paragraph()
-            #     p.text = 'Use _TextFrame.add_paragraph() for subsequent bullets'
-            #     p.level = 2
-                
-            #     prs.save('test.pptx')
     except:
         pass
 
