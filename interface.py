@@ -47,11 +47,11 @@ if mode == "Générique":
     # CALCUL GENERIQUE
         if st.sidebar.checkbox("Les tops") and uploaded_file != "None":
             st.title("1- Les Tops")
-            st.write(top3_generique.style.set_precision(2))
+            st.write(top3_generique)
         
         if st.sidebar.checkbox("Volumes brutes") and uploaded_file != "None":
             st.title("Volumes brutes des 2 dernières semaines")
-            st.write(volumes_brutes.set_index(list(fichier.columns)[0]).style.set_precision(2))
+            st.write(volumes_brutes.set_index(list(fichier.columns)[0]))
             tableau = volumes_brutes
             tableau = tableau.rename({list(fichier.columns)[0]: "semaine"}, 
                                      axis=1)
@@ -73,7 +73,7 @@ if mode == "Générique":
             
         if st.sidebar.checkbox("Variation (%)") and uploaded_file != "None":
             st.title("Variations (%) des 4 dernières semaines")
-            st.write(variation.style.set_precision(2))
+            st.write(variation)
             var_S_S1 = variation.head(2).reset_index()
             var_S_S1 = var_S_S1.rename({"index": "semaine"}, axis=1)
             evolution_melted = pd.melt(var_S_S1.sort_index(ascending=False), 
@@ -142,19 +142,19 @@ elif mode == "Par pays":
             st.title("Moyenne des données brutes sur les 2 dernières semaines, des 4 dernières semaines, des 12 dernières semaines")
 
             cols = st.beta_columns(3)
-            cols[0].table(recap_2s.style.set_precision(2))
-            cols[1].table(recap_4s.style.set_precision(2))
-            cols[2].table(recap_12s.style.set_precision(2))
+            cols[0].table(recap_2s)
+            cols[1].table(recap_4s)
+            cols[2].table(recap_12s)
 
             st.title("TOP 6")
 
             cols = st.beta_columns(3)
-            cols[0].table(recap_2s.head(6).style.set_precision(2))
-            cols[1].table(recap_4s.head(6).style.set_precision(2))
-            cols[2].table(recap_12s.head(6).style.set_precision(2))
+            cols[0].table(recap_2s.head(6))
+            cols[1].table(recap_4s.head(6))
+            cols[2].table(recap_12s.head(6))
             if st.checkbox("Voulez vous mettre un commentaire ?"):
                 commentaire_recapitualitf_desc = st.text_area("Emplacement du commentaire", "")
-                st.write(commentaire_recapitualitf_desc.style.set_precision(2))
+                st.write(commentaire_recapitualitf_desc)
        
         if st.sidebar.checkbox("2- Volumes brutes des 3 dernières années du top 6"):
             def top_last_annee(recap):
