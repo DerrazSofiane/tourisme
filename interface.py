@@ -64,7 +64,7 @@ if mode == "Générique":
             """
             st.title("Volumes brutes des 2 dernières semaines")
             volume_brute = (volumes_brutes.set_index(list(fichier.columns)[0]))
-            st.write(volume_brute.style.format("{:.3}"))
+            st.write(volume_brute)
             tableau = volumes_brutes
             # renommage de la 1ere colonne en "semaine"
             tableau = tableau.rename({list(fichier.columns)[0]: "semaine"}, 
@@ -93,7 +93,7 @@ if mode == "Générique":
             ainsi que S-1 sur S-2
             """
             st.title("Variations (%) des 4 dernières semaines")
-            st.write(variation.style.format("{:.3}"))
+            st.write(variation)
             # Récupération des 2 premieres semaines
             var_S_S1 = variation.head(2).reset_index()
             var_S_S1 = var_S_S1.rename({"index": "semaine"}, axis=1)
