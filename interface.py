@@ -92,7 +92,7 @@ if mode == "Générique":
             ainsi que S-1 sur S-2
             """
             st.title("Variations (%) des 4 dernières semaines")
-            st.write(variation)
+            st.write(variation.style.set_precision(2))
             # Récupération des 2 premieres semaines
             var_S_S1 = variation.head(2).reset_index()
             var_S_S1 = var_S_S1.rename({"index": "semaine"}, axis=1)
