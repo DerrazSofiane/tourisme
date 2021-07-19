@@ -63,7 +63,7 @@ if mode == "Générique":
             """ Checkbox de la partie Volume brutes des 2 dernières semaines
             """
             st.title("Volumes brutes des 2 dernières semaines")
-            st.write(volumes_brutes.set_index(list(fichier.columns)[0]).style.set_precision(2))
+            st.write(volumes_brutes.set_index(list(fichier.columns)[0]))
             tableau = volumes_brutes
             # renommage de la 1ere colonne en "semaine"
             tableau = tableau.rename({list(fichier.columns)[0]: "semaine"}, 
@@ -92,7 +92,7 @@ if mode == "Générique":
             ainsi que S-1 sur S-2
             """
             st.title("Variations (%) des 4 dernières semaines")
-            st.write(variation.style.set_precision(2))
+            st.write(variation)
             # Récupération des 2 premieres semaines
             var_S_S1 = variation.head(2).reset_index()
             var_S_S1 = var_S_S1.rename({"index": "semaine"}, axis=1)
