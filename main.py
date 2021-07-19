@@ -74,7 +74,7 @@ def moyenne_variation(fichier, nb_semaine):
                                    reindex_filtre.iloc[0,1:]) * 100
 
         variation = pd.concat([variation, assemblage], axis=1)
-    
+        variation = variation.astype(float).round(2)
     return variation.T
 
 ####-###-###-###-###-###-###-###-###-GENERIQUE-###-###-###-###-###-###-###-###
