@@ -33,28 +33,42 @@ if mode == "Générique":
     my_expander = st.sidebar.beta_expander("Ouvrir", expanded=True)
     with my_expander:
         st.write("2- DONNÉES : chargez le fichier à analyser :open_file_folder:")
+        # Permet de rentrer un fichier pour pouvoir l'utiliser
         uploaded_file = st.file_uploader("")
 
     try:
+        # Appel de la fonction de traitement du fichier main
         fichier = traitements_informations(uploaded_file)
+        # Récupération du nom de la 1ere colonne (cela permet l'identification)
+        # du pays concerné du CSV
         nom_objet = list(fichier.columns)[0]
     
         st.sidebar.write(f"Vous analysez: **{nom_objet}** :heavy_check_mark:")
+        # Ressort un tableau contenant les variations sur 4 semaines
         variation = generique_variation(fichier)
+        # Ressort un tableau contenant le volume des valeurs brutes sur
+        # 2 semaines
         volumes_brutes = generique_volume(fichier)
+        # Ressort le top 3 des pays
         top3_generique = generique_potentiel(variation, volumes_brutes)
 
     # CALCUL GENERIQUE
         if st.sidebar.checkbox("Les tops") and uploaded_file != "None":
+            """ Checkbox de la partie "Les tops pays"
+            """
             st.title("1- Les Tops")
             st.write(top3_generique)
         
         if st.sidebar.checkbox("Volumes brutes") and uploaded_file != "None":
+            """ Checkbox de la partie Volume brutes des 2 dernières semaines
+            """
             st.title("Volumes brutes des 2 dernières semaines")
             st.write(volumes_brutes.set_index(list(fichier.columns)[0]))
             tableau = volumes_brutes
+            # renommage de la 1ere colonne en "semaine"
             tableau = tableau.rename({list(fichier.columns)[0]: "semaine"}, 
                                      axis=1)
+            # Transformation du tableau pour pouvoir le manipuler
             data_melted = pd.melt(tableau, id_vars="semaine", var_name="pays", 
                                   value_name="valeur")
             st.title("Volumes brutes de la semaine S et de la semaine (S-1)")
@@ -69,13 +83,20 @@ if mode == "Générique":
                     size=9,
                     xytext = (0, 1), 
                     textcoords = 'offset points')
+            #Permet d'afficher le graphique
             st.pyplot()
             
         if st.sidebar.checkbox("Variation (%)") and uploaded_file != "None":
+            """ Checkbox de la partie Variation, il retourne un tableau de
+            variation des 4 semaines ainsi que 2 graphique, S sur S-1
+            ainsi que S-1 sur S-2
+            """
             st.title("Variations (%) des 4 dernières semaines")
             st.write(variation)
+            # Récupération des 2 premieres semaines
             var_S_S1 = variation.head(2).reset_index()
             var_S_S1 = var_S_S1.rename({"index": "semaine"}, axis=1)
+            # Transformation du tableau pour pouvoir le manipuler
             evolution_melted = pd.melt(var_S_S1.sort_index(ascending=False), 
                                        id_vars="semaine", var_name="pays", 
                                        value_name="valeur")
@@ -93,6 +114,7 @@ if mode == "Générique":
                         textcoords = 'offset points')
             st.pyplot()
             
+            # Récupération des 2 dernières semaines
             var_S1_S2 = variation.tail(2).reset_index()
             var_S1_S2 = var_S1_S2.rename({"index": "semaine"}, axis=1)
             evolution_s1_melted = pd.melt(var_S1_S2.sort_index(ascending=False), 
@@ -111,6 +133,8 @@ if mode == "Générique":
                     textcoords = 'offset points')
 
             st.pyplot()
+        # Checkbox de commentaire, le str sera conserver dans la variable d'après 
+        # Si c'est coché
         if st.checkbox("Voulez vous mettre un commentaire ?"):
                 commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
                 
@@ -126,9 +150,13 @@ elif mode == "Par pays":
     try:
         fichier = traitements_informations(uploaded_file)
         colonnes = list(fichier.columns)
+        # Mise en place d'une date min commencant à 0
         my_time = datetime.datetime.min.time()
+        # Transformation de la colonne "Semaine" du fichier en datetime
         fichier["Semaine"] = fichier["Semaine"].dt.date
+        # Récupération de la dernière date pour avoir une date de référence
         derniere_date = pd.unique(fichier[colonnes[0]])[-1]
+        # Convertion des dates en datetime
         conv_derniere_date = datetime.datetime.combine(derniere_date, my_time)
         # Ressort une date au format datetime.date
         date_calendar = st.sidebar.date_input("sélectionner la date d'analyse",
@@ -136,11 +164,14 @@ elif mode == "Par pays":
         st.write(date_calendar)
         
         periode_choisi = sommes_periode_choisie(fichier, date_calendar)
+        # Ressort 3 tableaux, 2 semaines, 4 semaines et 12 semaines
         recap_2s, recap_4s, recap_12s = moyenne_donnees_brutes(periode_choisi)
         
         if st.sidebar.checkbox("1- Les Tops") and uploaded_file != "None":
             st.title("Moyenne des données brutes sur les 2 dernières semaines, des 4 dernières semaines, des 12 dernières semaines")
-
+            
+            # Création de 3 colonnes sur l'application pour pouvoir "ranger"
+            # nos tableaux pour pouvoir afficher de façon vertical
             cols = st.beta_columns(3)
             cols[0].table(recap_2s)
             cols[1].table(recap_4s)
@@ -158,6 +189,7 @@ elif mode == "Par pays":
        
         if st.sidebar.checkbox("2- Volumes brutes des 3 dernières années du top 6"):
             def top_last_annee(recap):
+                # Récupération de l'année de la date rentrée
                 annee = date_calendar.year
                 evolution_annee = sommes_annees_top6(fichier, recap, annee)
                 
