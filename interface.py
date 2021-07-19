@@ -64,7 +64,7 @@ if mode == "Générique":
             """
             st.title("Volumes brutes des 2 dernières semaines")
             volume_brute = volumes_brutes.set_index(list(fichier.columns)[0])
-            st.dataframe(volume_brute)
+            st.dataframe(volume_brute.style.set_precision(2))
             tableau = volumes_brutes
             # renommage de la 1ere colonne en "semaine"
             tableau = tableau.rename({list(fichier.columns)[0]: "semaine"}, 
