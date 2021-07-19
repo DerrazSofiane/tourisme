@@ -63,8 +63,21 @@ if mode == "Générique":
             """ Checkbox de la partie Volume brutes des 2 dernières semaines
             """
             st.title("Volumes brutes des 2 dernières semaines")
-            volume_brute = (volumes_brutes.set_index(list(fichier.columns)[0]))
-            st.write(volume_brute.style.set_precision(precision= 2))
+            volume_brute = volumes_brutes.set_index(list(fichier.columns)[0])
+            
+            tmp = volume_brute.copy()
+            colonnes = tmp.columns
+         
+            def arrondie_str(x):
+                x = str(x)
+                x_str = x[:5]
+                print(x_str)
+                return x_str
+            
+            for colonne in colonnes:
+                tmp[colonne] = tmp[colonne].apply(arrondie_str)
+
+            st.write(tmp)
             tableau = volumes_brutes
             # renommage de la 1ere colonne en "semaine"
             tableau = tableau.rename({list(fichier.columns)[0]: "semaine"}, 
@@ -93,7 +106,19 @@ if mode == "Générique":
             ainsi que S-1 sur S-2
             """
             st.title("Variations (%) des 4 dernières semaines")
-            st.write(variation)
+            variation_copy = variation.copy()
+            variation_colonnes = variation.columns
+            
+            def arrondie_str(x):
+                x = str(x)
+                x_str = x[:5]
+                print(x_str)
+                return x_str
+            
+            for colonne in colonnes:
+                variation_copy[colonne] = variation_copy[colonne].apply(arrondie_str)
+                
+            st.write(variation_copy)
             # Récupération des 2 premieres semaines
             var_S_S1 = variation.head(2).reset_index()
             var_S_S1 = var_S_S1.rename({"index": "semaine"}, axis=1)
@@ -170,19 +195,36 @@ elif mode == "Par pays":
         if st.sidebar.checkbox("1- Les Tops") and uploaded_file != "None":
             st.title("Moyenne des données brutes sur les 2 dernières semaines, des 4 dernières semaines, des 12 dernières semaines")
             
+            def arrondie_str(x):
+                x = str(x)
+                x_str = x[:5]
+                print(x_str)
+                return x_str
+            recap_2s_copy = recap_2s.copy()
+            recap_4s_copy = recap_4s.copy()
+            recap_12s_copy = recap_12s.copy()
+            
+            for colonne in list(recap_2s_copy.columns):
+                recap_2s_copy[colonne] = recap_2s_copy[colonne].apply(arrondie_str)
+            
+            for colonne in list(recap_4s_copy.columns):
+                recap_4s_copy[colonne] = recap_4s_copy[colonne].apply(arrondie_str)
+            
+            for colonne in list(recap_12s_copy.columns):
+                recap_12s_copy[colonne] = recap_12s_copy[colonne].apply(arrondie_str)
             # Création de 3 colonnes sur l'application pour pouvoir "ranger"
             # nos tableaux pour pouvoir afficher de façon vertical
             cols = st.beta_columns(3)
-            cols[0].table(recap_2s)
-            cols[1].table(recap_4s)
-            cols[2].table(recap_12s)
+            cols[0].table(recap_2s_copy)
+            cols[1].table(recap_4s_copy)
+            cols[2].table(recap_12s_copy)
 
             st.title("TOP 6")
 
             cols = st.beta_columns(3)
-            cols[0].table(recap_2s.head(6))
-            cols[1].table(recap_4s.head(6))
-            cols[2].table(recap_12s.head(6))
+            cols[0].table(recap_2s_copy.head(6))
+            cols[1].table(recap_4s_copy.head(6))
+            cols[2].table(recap_12s_copy.head(6))
             if st.checkbox("Voulez vous mettre un commentaire ?"):
                 commentaire_recapitualitf_desc = st.text_area("Emplacement du commentaire", "")
                 st.write(commentaire_recapitualitf_desc)
@@ -253,7 +295,6 @@ elif mode == "Par pays":
                 brute_3ans = valeurs_brutes_3annees(fichier, 
                                                     int(mois[mode_mois]),
                                                     int(mode_annee))
-                st.write(brute_3ans)
                 st.title(f"Volumes brutes du mois {mode_mois} l’année {mode_annee} et du mois {mode_mois} de l’année {int(mode_annee - 1)}")
                 brute_3ans = brute_3ans.T
                 str_annee = [str(i) for i in brute_3ans]
