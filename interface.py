@@ -64,7 +64,6 @@ if mode == "Générique":
             """
             st.title("Volumes brutes des 2 dernières semaines")
             volume_brute = (volumes_brutes.set_index(list(fichier.columns)[0]))
-            volume_brute = volume_brute.style.format("{:.3}")
             st.write(volume_brute)
             tableau = volumes_brutes
             # renommage de la 1ere colonne en "semaine"
