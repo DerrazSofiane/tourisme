@@ -51,7 +51,7 @@ if mode == "Générique":
         
         if st.sidebar.checkbox("Volumes brutes") and uploaded_file != "None":
             st.title("Volumes brutes des 2 dernières semaines")
-            st.write(volumes_brutes.set_index(list(fichier.columns)[0]).style.set_precision(2))
+            st.write(volumes_brutes.set_index(list(fichier.columns)[0]))
             tableau = volumes_brutes
             tableau = tableau.rename({list(fichier.columns)[0]: "semaine"}, 
                                      axis=1)
