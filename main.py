@@ -359,6 +359,21 @@ def valeurs_brutes_3annees(fichier, mois, annee):
     return tableau_brut
 
 
+def semaines_evolution_volume(fichier, periode):
+    """ Fonction permettant de récupérer 4 semaines (S / S-1 et S-1 / S-2)
+    et de calculer les variations sur une période donnée
+    Exemple:
+        les 4 semaines a partir du 2021-3-21
+    retourne un tableau
+    """
+    colonnes = list(fichier.columns)
+    fichier = fichier[fichier[colonnes[0]] <= periode]
+    variation = moyenne_variation(fichier,4)
+    variation.fillna(0, inplace=True)
+    
+    return variation
+
+
 if __name__ == "__main__":
     csv_generique = r"C:/Users/ristarz/Desktop/tourisme2/GÉNÉRIQUES/CSV/DE-IT-NL-GB-US-BE-CH-ES-FR_Generique-Paris-Hebdo_20210607_1049.csv"
     csv_pays = r"C:/Users/ristarz/Desktop/tourisme2/PAR PAYS/CSV/BE_ATF-Montagne-Mensuel_mensuel_20210607_1048.csv"
