@@ -338,7 +338,7 @@ elif mode == "Par pays":
                                       value_name="valeur")
   
 
-                st.title("Volumes brutes de la semaine S et de la semaine (S-1)")
+                st.title("Volumes brutes de la semaine S / de la semaine (S-1) et de la semaine S-1 et S-2 ")
                 fig, ax = plt.subplots(figsize=(10,10))
                 st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                      data=data_melted))
