@@ -9,9 +9,9 @@ import datetime
 from calendar import monthrange
 import os
 
-from main import (traitements_informations, generique_variation, 
+from main2 import (traitements_informations, generique_variation, 
                   generique_volume, generique_potentiel, moyenne_donnees_brutes,
-                  sommes_periode_choisie, sommes_annees_top6, tops_pays,
+                  sommes_periode_choisie, evolutions_sum_annees, tops_pays,
                   valeurs_brutes_3annees)
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -189,10 +189,10 @@ elif mode == "Par pays":
         if st.sidebar.checkbox("2- Volumes brutes des 3 dernières années du top 6"):
             def top_last_annee(recap):
                 annee = date_calendar.year
-                evolution_annee = sommes_annees_top6(fichier, annee)
+                evolution_annee = evolutions_sum_annees(fichier, annee)
                 top_6 = recap.head(6)
                 pays = list(top_6.index)
-                annees = pd.unique(evolution_annee["annee"])
+                annees = list(pd.unique(evolution_annee["annee"]))
                 #f, ax = plt.subplots(2,3,figsize=(10,4))
                 for p in pays:
                     st.write(p)
@@ -209,19 +209,20 @@ elif mode == "Par pays":
             cols = st.beta_columns(3)
            
             if st.checkbox("Volumes brutes des 3 dernières années du top 6 hebdo"):
+                st.title("Les Tops hebdo")
+                top_pays_2s = tops_pays(recap_2s,fichier, "TOP 2 SEMAINES")
+                st.write(top_pays_2s)
                 st.title("Volumes brutes des 3 dernières années du top 6 hebdo")
                 top_last_annee(recap_2s.head(6))
-                st.title("Les Tops hebdo")
-                st.write(recap_2s)
-                top_pays_2s = tops_pays(recap_2s, "TOP 2 SEMAINES")
-                st.write(top_pays_2s)
+                
                 
             if st.checkbox("Volumes brutes des 3 dernières années du top 6 mensuel"):
+                st.title("Les Tops mensuel")
+                top_pays_4s = tops_pays(recap_4s, fichier, "TOP 4 SEMAINES")
+                st.write(top_pays_4s)
                 st.title("Volumes brutes des 3 dernières années du top 6 mensuel")
                 top_last_annee(recap_4s.head(6))
-                st.title("Les Tops mensuel")
-                top_pays_4s = tops_pays(recap_4s, "TOP 4 SEMAINES")
-                st.write(top_pays_4s)
+               
                 
                 mois = {"janvier": 1, 
                         "février": 2, 
@@ -251,6 +252,7 @@ elif mode == "Par pays":
                 brute_3ans = valeurs_brutes_3annees(fichier, 
                                                     int(mois[mode_mois]),
                                                     int(mode_annee))
+                st.write(brute_3ans)
                 st.title(f"Volumes brutes du mois {mode_mois} l’année {mode_annee} et du mois {mode_mois} de l’année {int(mode_annee - 1)}")
                 brute_3ans = brute_3ans.T
                 str_annee = [str(i) for i in brute_3ans]

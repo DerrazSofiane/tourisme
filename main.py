@@ -255,7 +255,7 @@ def moyenne_donnees_brutes(sommes_donnees):
     return recap_desc_2s, recap_desc_4s, recap_desc_12s
 
 
-def tops_pays(recapitualif_x_semaines, str_top_semaine):
+def tops_pays(recapitualif_x_semaines, fichier, str_top_semaine):
     """ Fonction retournant un tableau du top 3 des pays ayant le plus gros
     Volume, d'un top 3 des pays ayant le plus haut top de progression ainsi
     qu'un top 3 des pays ayant le plus de potentiel
@@ -306,9 +306,9 @@ def tops_pays(recapitualif_x_semaines, str_top_semaine):
     return top_3_pays
 
 
-def sommes_annees_top6(fichier, annee):
-    """ Fonction retournant un tableau regroupant les tops 6 des pays sur les 3
-    dernières années
+def evolutions_sum_annees(fichier, annee):
+    """ Fonction retournant un tableau les valeurs brutes
+    des 3 dernieres année.
     """
     evolution_annee = pd.DataFrame()
     for i in range(0,4):
@@ -325,11 +325,11 @@ def sommes_annees_top6(fichier, annee):
     evolution_annee.drop(["index", "Semaine"], axis=1, inplace=True)
     colonne_voulu = list(evolution_annee.columns)[::-1]
     evolution_annee = evolution_annee[colonne_voulu]
-
+    
     return evolution_annee
 
 
-def valeurs_brutes_3annees(fichier, annee, mois):
+def valeurs_brutes_3annees(fichier, mois, annee):
     """ Fonction retournant un tableau de la sommes des valeurs des pays 
     en fonction du mois et des 3 dernières années à partir de l'argument
     année de la fonction.
