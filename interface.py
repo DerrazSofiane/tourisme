@@ -12,7 +12,7 @@ import os
 from main import (traitements_informations, generique_variation, 
                   generique_volume, generique_potentiel, moyenne_donnees_brutes,
                   sommes_periode_choisie, evolutions_sum_annees, tops_pays,
-                  valeurs_brutes_3annees)
+                  valeurs_brutes_3annees, semaines_evolution_volume)
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -63,7 +63,7 @@ if mode == "Générique":
             """ Checkbox de la partie Volume brutes des 2 dernières semaines
             """
             st.title("Volumes brutes des 2 dernières semaines")
-            st.write(volumes_brutes.set_index(list(fichier.columns)[0]))
+            st.write(volumes_brutes.set_index(list(fichier.columns)[0]).style.set_precision(2))
             tableau = volumes_brutes
             # renommage de la 1ere colonne en "semaine"
             tableau = tableau.rename({list(fichier.columns)[0]: "semaine"}, 
@@ -92,7 +92,7 @@ if mode == "Générique":
             ainsi que S-1 sur S-2
             """
             st.title("Variations (%) des 4 dernières semaines")
-            st.write(variation)
+            st.write(variation.style.set_precision(2))
             # Récupération des 2 premieres semaines
             var_S_S1 = variation.head(2).reset_index()
             var_S_S1 = var_S_S1.rename({"index": "semaine"}, axis=1)
@@ -277,6 +277,12 @@ elif mode == "Par pays":
                 ax2 = (sns.barplot(x="index", y="valeur", hue="annee", data=derniere_annee_melt2.sort_values(by=["annee"])))
                 plt.xticks(rotation=90)
                 st.pyplot(fig2)
+            
+            if st.checkbox("Volumes brutes des 3 dernières années du top 6 trimestriel"):
+                st.title("Les Tops mensuel")
+        if st.sidebar.checkbox("2- Variation (%) des 3 dernières années du top 6"):
+            if st.checkbox("Volumes brutes des 3 dernières années du top 6 trimestriel"):
+                st.title("Les Tops mensuel")
     except:
         pass
         
