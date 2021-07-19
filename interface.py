@@ -51,7 +51,7 @@ if mode == "Générique":
         
         if st.sidebar.checkbox("Volumes brutes") and uploaded_file != "None":
             st.title("Volumes brutes des 2 dernières semaines")
-            st.write(volumes_brutes.set_index(list(fichier.columns)[0]))
+            st.write(volumes_brutes.set_index(list(fichier.columns)[0]).style.set_precision(2))
             tableau = volumes_brutes
             tableau = tableau.rename({list(fichier.columns)[0]: "semaine"}, 
                                      axis=1)
@@ -73,7 +73,7 @@ if mode == "Générique":
             
         if st.sidebar.checkbox("Variation (%)") and uploaded_file != "None":
             st.title("Variations (%) des 4 dernières semaines")
-            st.write(variation)
+            st.write(variation.style.set_precision(2))
             var_S_S1 = variation.head(2).reset_index()
             var_S_S1 = var_S_S1.rename({"index": "semaine"}, axis=1)
             evolution_melted = pd.melt(var_S_S1.sort_index(ascending=False), 
