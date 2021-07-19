@@ -74,7 +74,7 @@ def moyenne_variation(fichier, nb_semaine):
                                    reindex_filtre.iloc[0,1:]) * 100
 
         variation = pd.concat([variation, assemblage], axis=1)
-        
+    
     return variation.T
 
 ####-###-###-###-###-###-###-###-###-GENERIQUE-###-###-###-###-###-###-###-###
@@ -359,7 +359,7 @@ def valeurs_brutes_3annees(fichier, mois, annee):
     return tableau_brut
 
 
-def semaines_evolution_volume(fichier, periode):
+def variation_hebdo(fichier, periode, top_6_hebdo):
     """ Fonction permettant de récupérer 4 semaines (S / S-1 et S-1 / S-2)
     et de calculer les variations sur une période donnée
     Exemple:
@@ -368,13 +368,15 @@ def semaines_evolution_volume(fichier, periode):
     """
     colonnes = list(fichier.columns)
     fichier = fichier[fichier[colonnes[0]] <= periode]
-    variation = moyenne_variation(fichier,4)
+    variation = moyenne_variation(fichier,2)
     variation.fillna(0, inplace=True)
+    top_6 = list(top_6_hebdo.head(6).index)
+    top_variation_hebdo = variation.loc[:,top_6]
     
-    return variation
+    return top_variation_hebdo
 
 
 if __name__ == "__main__":
     csv_generique = r"C:/Users/ristarz/Desktop/tourisme2/GÉNÉRIQUES/CSV/DE-IT-NL-GB-US-BE-CH-ES-FR_Generique-Paris-Hebdo_20210607_1049.csv"
     csv_pays = r"C:/Users/ristarz/Desktop/tourisme2/PAR PAYS/CSV/BE_ATF-Montagne-Mensuel_mensuel_20210607_1048.csv"
-    fichier = traitements_informations(csv_generique)
+    fichier = traitements_informations(csv_pays)

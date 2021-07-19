@@ -12,7 +12,7 @@ import os
 from main import (traitements_informations, generique_variation, 
                   generique_volume, generique_potentiel, moyenne_donnees_brutes,
                   sommes_periode_choisie, evolutions_sum_annees, tops_pays,
-                  valeurs_brutes_3annees, semaines_evolution_volume)
+                  valeurs_brutes_3annees, variation_hebdo)
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -251,7 +251,7 @@ elif mode == "Par pays":
             
             cols = st.beta_columns(3)
            
-            if st.checkbox("Volumes brutes des 3 dernières années du top 6 hebdo"):
+            if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 hebdo"):
                 st.title("Les Tops hebdo")
                 top_pays_2s = tops_pays(recap_2s,fichier, "TOP 2 SEMAINES")
                 st.write(top_pays_2s)
@@ -259,7 +259,7 @@ elif mode == "Par pays":
                 top_last_annee(recap_2s.head(6))
                 
                 
-            if st.checkbox("Volumes brutes des 3 dernières années du top 6 mensuel"):
+            if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 mensuel"):
                 st.title("Les Tops mensuel")
                 top_pays_4s = tops_pays(recap_4s, fichier, "TOP 4 SEMAINES")
                 st.write(top_pays_4s)
@@ -320,11 +320,39 @@ elif mode == "Par pays":
                 plt.xticks(rotation=90)
                 st.pyplot(fig2)
             
-            if st.checkbox("Volumes brutes des 3 dernières années du top 6 trimestriel"):
-                st.title("Les Tops mensuel")
+            if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 trimestriel"):
+                st.title("Les Tops trimestriel")
+                top_pays_12s = tops_pays(recap_12s, fichier, "TOP 12 SEMAINES")
+                st.write(top_pays_12s)
+                
+                
         if st.sidebar.checkbox("2- Variation (%) des 3 dernières années du top 6"):
-            if st.checkbox("Volumes brutes des 3 dernières années du top 6 trimestriel"):
-                st.title("Les Tops mensuel")
+            if st.sidebar.checkbox("Variation (%) hebdo"):
+                st.title("Les Variation (%) Hebdo")
+                variation_hebdo = variation_hebdo(fichier, date_calendar, recap_2s)
+                variation_hebdo = variation_hebdo.reset_index()
+                variation_hebdo = variation_hebdo.rename({list(variation_hebdo.columns)[0]: "semaine"}, 
+                                     axis=1)
+                # Transformation du tableau pour pouvoir le manipuler
+                data_melted = pd.melt(variation_hebdo, id_vars="semaine", var_name="pays", 
+                                      value_name="valeur")
+  
+
+                st.title("Volumes brutes de la semaine S et de la semaine (S-1)")
+                fig, ax = plt.subplots(figsize=(10,10))
+                st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
+                                     data=data_melted))
+                ax.grid(axis="x")
+                for p in ax.patches:
+                    ax.annotate(format(p.get_height(), '.1f'), 
+                        (p.get_x() + p.get_width() / 2., p.get_height()), 
+                        ha = 'center', va = 'center', 
+                        size=9,
+                        xytext = (0, 1), 
+                        textcoords = 'offset points')
+                #Permet d'afficher le graphique
+                st.pyplot()
+                
     except:
         pass
         
