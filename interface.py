@@ -63,7 +63,7 @@ if mode == "Générique":
             """ Checkbox de la partie Volume brutes des 2 dernières semaines
             """
             st.title("Volumes brutes des 2 dernières semaines")
-            volume_brute = (volumes_brutes.set_index(list(fichier.columns)[0])).style.set_precision(2)
+            volume_brute = (volumes_brutes.set_index(list(fichier.columns)[0]))
             st.write(volume_brute)
             tableau = volumes_brutes
             # renommage de la 1ere colonne en "semaine"
