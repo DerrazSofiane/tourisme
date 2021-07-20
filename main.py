@@ -143,8 +143,8 @@ def generique_potentiel(variation, valeurs_brutes):
         - top potentiel : les 3 plus gros produit VOLUME X PROGRESSION 
             (en moyenne sur la période)
     """
-    tops = {"Top Volume": [],
-           "Top Progression": [],
+    tops = {"top Volume": [],
+           "top Progression": [],
            "Top Potentiel": []}
     
     # Récupération des tops 3 pour chaque top
@@ -164,8 +164,8 @@ def generique_potentiel(variation, valeurs_brutes):
             x = x.replace("[", "").replace("]", "")
         return x
 
-    tops["Top Volume"].append(top_progression)
-    tops["Top Progression"].append(top_volume)
+    tops["top Volume"].append(top_progression)
+    tops["top Progression"].append(top_volume)
     tops["Top Potentiel"].append(top_potentiel)
     colonnes = list(tops.keys())
     tops_3_pays = pd.DataFrame(tops, columns=colonnes)
@@ -269,8 +269,8 @@ def tops_pays(recapitualif_x_semaines, fichier, str_top_semaine):
     en string
     exemple: "TOP 2 SEMAINES"
     """
-    top = {"Top Volume": [],
-           "Top Progression": [],
+    top = {"top Volume": [],
+           "top Progression": [],
            "Top Potentiel": []} 
     
     recapitualif_x_semaines = recapitualif_x_semaines.sort_index()
@@ -294,8 +294,8 @@ def tops_pays(recapitualif_x_semaines, fichier, str_top_semaine):
             x = x.replace("[", "").replace("]", "")
         return x
 
-    top["Top Volume"].append(top_volume)
-    top["Top Progression"].append(top_progression)
+    top["top Volume"].append(top_volume)
+    top["top Progression"].append(top_progression)
     top["Top Potentiel"].append(top_potentiel)
     colonnes = list(top.keys())
     top_3_pays = pd.DataFrame(top, columns=colonnes)
@@ -327,6 +327,32 @@ def evolutions_sum_annees(fichier, annee):
     evolution_annee = evolution_annee[colonne_voulu]
     
     return evolution_annee
+
+
+def evolutions_mois_annee(fichier, mois, annee):
+    """ Fonction retournant un tableau les valeurs brutes
+    des 3 dernieres année.
+    """
+    tableau_date = pd.DataFrame()
+    
+    for i in range(0,4):
+        mois_map = fichier["Semaine"].map(lambda x: x.month) == mois
+        tableau_mois = fichier[mois_map]
+        annee_map = tableau_mois["Semaine"].map(lambda x: x.year) == annee-i
+        tableau_annee_mois = tableau_mois[annee_map]
+        tableau_date = pd.concat([tableau_date, tableau_annee_mois])
+    
+    def index_annee(x):
+        x = str(x)[:4]
+        return x
+    
+    tableau_date["annee"] = tableau_date["Semaine"].apply(index_annee)
+    tableau_date = tableau_date.reset_index()
+    tableau_date.drop(["index", "Semaine"], axis=1, inplace=True)
+    colonne_voulu = list(tableau_date.columns)[::-1]
+    tableau_date = tableau_date[colonne_voulu]
+    
+    return tableau_date
 
 
 def valeurs_brutes_3annees(fichier, mois, annee):
@@ -363,12 +389,12 @@ def variation_hebdo(fichier, periode, top_6_hebdo):
     """ Fonction permettant de récupérer 4 semaines (S / S-1 et S-1 / S-2)
     et de calculer les variations sur une période donnée
     Exemple:
-        les 4 semaines a partir du 2021-3-21
+        les 2 semaines a partir du 2021-3-21
     retourne un tableau
     """
     colonnes = list(fichier.columns)
     fichier = fichier[fichier[colonnes[0]] <= periode]
-    variation = moyenne_variation(fichier,2)
+    variation = moyenne_variation(fichier,4)
     variation.fillna(0, inplace=True)
     top_6 = list(top_6_hebdo.head(6).index)
     top_variation_hebdo = variation.loc[:,top_6]
@@ -376,7 +402,52 @@ def variation_hebdo(fichier, periode, top_6_hebdo):
     return top_variation_hebdo
 
 
+def variation_mensuel(fichier, annee, mois, top_6_mensuel):
+    """ Fonction permettant de récupérer 4 semaines (S / S-1 et S-1 / S-2)
+    et de calculer les variations sur une période donnée
+    Exemple:
+        les 4 semaines a partir du 2021-3-21
+    retourne un tableau
+    """
+   
+    """ Dans un premier temps, nous allons chercher à construire un tableau de
+    moyenne d'un moix X et d'année Y sous la forme.
+            	Moy Mai 2020	Moy Mai 2021	
+        RÈunion (RE)	 65    	 113    	
+        Guadeloupe (GP)	 44    	 69    	
+        Martinique (LC)	 28    	 60    	
+        Tahiti (PF)	     23    	 34    	
+        Mayotte (YT)	 23    	 19    	
+        Saint Martin     6    	 6    	
+    """
+    moyenne_region = pd.DataFrame()
+    top_region = list(top_6_mensuel.head(6).index)
+    top_region.append("Semaine")
+    fichier = fichier.loc[:,top_region]
+    for i in range(0,3):
+        tmp = pd.DataFrame()
+        # Construction du tableau pour l'année N actuel (2021 pour exemple)
+        annee_map = fichier["Semaine"].map(lambda x: x.year) == annee - i
+        tableau_mois = fichier[annee_map]
+        # Construction pour le mois M
+        mois_map = tableau_mois["Semaine"].map(lambda x: x.month) == mois
+        tableau = tableau_mois[mois_map]
+        tmp[str(mois)+" "+str(annee-i)] = tableau.head(4).mean(axis=0)
+        moyenne_region = pd.concat([moyenne_region, tmp], axis=1)
+        
+    annees_concernees = list(moyenne_region.columns)
+    variation = pd.DataFrame()
+    def variation_mois_annee(x,y):
+        var = ((x - y) / y) * 100
+        return var
+    
+    variation[annees_concernees[0]+" / "+annees_concernees[1]] = moyenne_region.apply(lambda x: variation_mois_annee(x[annees_concernees[0]], x[annees_concernees[1]]), axis=1)
+    variation[annees_concernees[0]+" / "+annees_concernees[2]] = moyenne_region.apply(lambda x: variation_mois_annee(x[annees_concernees[0]], x[annees_concernees[2]]), axis=1)
+   
+    return variation
+
+
 if __name__ == "__main__":
     csv_generique = r"C:/Users/ristarz/Desktop/tourisme2/GÉNÉRIQUES/CSV/DE-IT-NL-GB-US-BE-CH-ES-FR_Generique-Paris-Hebdo_20210607_1049.csv"
-    csv_pays = r"C:/Users/ristarz/Desktop/tourisme2/PAR PAYS/CSV/BE_ATF-Montagne-Mensuel_mensuel_20210607_1048.csv"
+    csv_pays = r"C:/Users/ristarz/Desktop/tourisme2/PAR PAYS/CSV/BE_ATF-OutreMer-Mensuel_mensuel_20210607_1048.csv"
     fichier = traitements_informations(csv_pays)
