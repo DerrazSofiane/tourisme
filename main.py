@@ -143,8 +143,8 @@ def generique_potentiel(variation, valeurs_brutes):
         - top potentiel : les 3 plus gros produit VOLUME X PROGRESSION 
             (en moyenne sur la période)
     """
-    tops = {"top Volume": [],
-           "top Progression": [],
+    tops = {"Top Volume": [],
+           "Top Progression": [],
            "Top Potentiel": []}
     
     # Récupération des tops 3 pour chaque top
@@ -164,8 +164,8 @@ def generique_potentiel(variation, valeurs_brutes):
             x = x.replace("[", "").replace("]", "")
         return x
 
-    tops["top Volume"].append(top_progression)
-    tops["top Progression"].append(top_volume)
+    tops["Top Volume"].append(top_progression)
+    tops["Top Progression"].append(top_volume)
     tops["Top Potentiel"].append(top_potentiel)
     colonnes = list(tops.keys())
     tops_3_pays = pd.DataFrame(tops, columns=colonnes)
@@ -269,8 +269,8 @@ def tops_pays(recapitualif_x_semaines, fichier, str_top_semaine):
     en string
     exemple: "TOP 2 SEMAINES"
     """
-    top = {"top Volume": [],
-           "top Progression": [],
+    top = {"Top Volume": [],
+           "Top Progression": [],
            "Top Potentiel": []} 
     
     recapitualif_x_semaines = recapitualif_x_semaines.sort_index()
@@ -294,8 +294,8 @@ def tops_pays(recapitualif_x_semaines, fichier, str_top_semaine):
             x = x.replace("[", "").replace("]", "")
         return x
 
-    top["top Volume"].append(top_volume)
-    top["top Progression"].append(top_progression)
+    top["Top Volume"].append(top_volume)
+    top["Top Progression"].append(top_progression)
     top["Top Potentiel"].append(top_potentiel)
     colonnes = list(top.keys())
     top_3_pays = pd.DataFrame(top, columns=colonnes)
