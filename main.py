@@ -438,7 +438,10 @@ def variation_mensuel(fichier, annee, mois, top_6_mensuel):
     annees_concernees = list(moyenne_region.columns)
     variation = pd.DataFrame()
     def variation_mois_annee(x,y):
-        var = ((x - y) / y) * 100
+        try:
+            var = ((x - y) / y) * 100
+        except ZeroDivisionError:
+            var = 0
         return var
     
     variation[annees_concernees[0]+" / "+annees_concernees[1]] = moyenne_region.apply(lambda x: variation_mois_annee(x[annees_concernees[0]], x[annees_concernees[1]]), axis=1)
