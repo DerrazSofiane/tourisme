@@ -276,9 +276,6 @@ elif mode == "Par pays":
                 st.write(top_pays_4s[colonnes[1]])
                 st.write(top_pays_4s[colonnes[2]])
                 st.title("Volumes brutes des 3 dernières années du top 6 mensuel")
-                top_last_annee(recap_4s.head(6))
-               
-                
                 mois = {"janvier": 1, 
                         "février": 2, 
                         "mars": 3, 
@@ -304,6 +301,10 @@ elif mode == "Par pays":
                         "Quelle annee?",
                         (derniere_3annees)
                         )
+                top_last_annee(recap_4s.head(6))
+               
+                
+               
                 brute_3ans = valeurs_brutes_3annees(fichier, 
                                                     int(mois[mode_mois]),
                                                     int(mode_annee))
