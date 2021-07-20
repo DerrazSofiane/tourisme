@@ -57,8 +57,10 @@ if mode == "Générique":
             """ Checkbox de la partie "Les tops pays"
             """
             st.title("1- Les Tops")
-            st.write(top3_generique)
-        
+            colonnes = list(top3_generique.columns)
+            st.write(top3_generique[colonnes[0]])
+            st.write(top3_generique[colonnes[1]])
+            st.write(top3_generique[colonnes[2]])
         if st.sidebar.checkbox("Volumes brutes") and uploaded_file != "None":
             """ Checkbox de la partie Volume brutes des 2 dernières semaines
             """
@@ -200,6 +202,7 @@ elif mode == "Par pays":
                 x_str = x[:5]
                 print(x_str)
                 return x_str
+            
             recap_2s_copy = recap_2s.copy()
             recap_4s_copy = recap_4s.copy()
             recap_12s_copy = recap_12s.copy()
@@ -225,6 +228,7 @@ elif mode == "Par pays":
             cols[0].table(recap_2s_copy.head(6))
             cols[1].table(recap_4s_copy.head(6))
             cols[2].table(recap_12s_copy.head(6))
+           
             if st.checkbox("Voulez vous mettre un commentaire ?"):
                 commentaire_recapitualitf_desc = st.text_area("Emplacement du commentaire", "")
                 st.write(commentaire_recapitualitf_desc)
@@ -254,7 +258,10 @@ elif mode == "Par pays":
             if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 hebdo"):
                 st.title("Les Tops hebdo")
                 top_pays_2s = tops_pays(recap_2s,fichier, "TOP 2 SEMAINES")
-                st.write(top_pays_2s)
+                colonnes = list(top_pays_2s.columns)
+                st.write(top_pays_2s[colonnes[0]])
+                st.write(top_pays_2s[colonnes[1]])
+                st.write(top_pays_2s[colonnes[2]])
                 st.title("Volumes brutes des 3 dernières années du top 6 hebdo")
                 top_last_annee(recap_2s.head(6))
                 
@@ -262,7 +269,10 @@ elif mode == "Par pays":
             if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 mensuel"):
                 st.title("Les Tops mensuel")
                 top_pays_4s = tops_pays(recap_4s, fichier, "TOP 4 SEMAINES")
-                st.write(top_pays_4s)
+                colonnes = list(top_pays_4s.columns)
+                st.write(top_pays_4s[colonnes[0]])
+                st.write(top_pays_4s[colonnes[1]])
+                st.write(top_pays_4s[colonnes[2]])
                 st.title("Volumes brutes des 3 dernières années du top 6 mensuel")
                 top_last_annee(recap_4s.head(6))
                
@@ -323,7 +333,10 @@ elif mode == "Par pays":
             if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 trimestriel"):
                 st.title("Les Tops trimestriel")
                 top_pays_12s = tops_pays(recap_12s, fichier, "TOP 12 SEMAINES")
-                st.write(top_pays_12s)
+                colonnes = list(top_pays_12s.columns)
+                st.write(top_pays_12s[colonnes[0]])
+                st.write(top_pays_12s[colonnes[1]])
+                st.write(top_pays_12s[colonnes[2]])
                 
                 
         if st.sidebar.checkbox("2- Variation (%) des 3 dernières années du top 6"):
@@ -338,7 +351,7 @@ elif mode == "Par pays":
                                       value_name="valeur")
   
 
-                st.title("Volumes brutes de la semaine S / de la semaine (S-1) et de la semaine S-1 et S-2 ")
+                st.title("Volumes brutes de la semaine S et de la semaine (S-1)")
                 fig, ax = plt.subplots(figsize=(10,10))
                 st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                      data=data_melted))
