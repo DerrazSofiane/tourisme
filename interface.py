@@ -217,23 +217,25 @@ elif mode == "Par pays":
                 recap_12s_copy[colonne] = recap_12s_copy[colonne].apply(arrondie_str)
             # Création de 3 colonnes sur l'application pour pouvoir "ranger"
             # nos tableaux pour pouvoir afficher de façon vertical
-            cols = st.beta_columns(3)
-            cols[0].table(recap_2s_copy)
-            cols[1].table(recap_4s_copy)
-            cols[2].table(recap_12s_copy)
-
+            
             st.title("TOP 6")
 
             cols = st.beta_columns(3)
             cols[0].table(recap_2s_copy.head(6))
             cols[1].table(recap_4s_copy.head(6))
             cols[2].table(recap_12s_copy.head(6))
+            
+            cols = st.beta_columns(3)
+            cols[0].table(recap_2s_copy)
+            cols[1].table(recap_4s_copy)
+            cols[2].table(recap_12s_copy)
+
            
             if st.checkbox("Voulez vous mettre un commentaire ?"):
                 commentaire_recapitualitf_desc = st.text_area("Emplacement du commentaire", "")
                 st.write(commentaire_recapitualitf_desc)
        
-        if st.sidebar.checkbox("2- Volumes brutes des 3 dernières années du top 6"):
+        if st.sidebar.checkbox("2- Volumes bruts des 3 dernières années du top 6"):
             def top_last_annee(recap):
                 annee = date_calendar.year
                 evolution_annee = evolutions_sum_annees(fichier, annee)
@@ -255,7 +257,7 @@ elif mode == "Par pays":
             
             cols = st.beta_columns(3)
            
-            if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 hebdo"):
+            if st.sidebar.checkbox("Volumes bruts des 3 dernières années du top 6 hebdo"):
                 st.title("Les Tops hebdo")
                 top_pays_2s = tops_pays(recap_2s,fichier, "TOP 2 SEMAINES")
                 colonnes = list(top_pays_2s.columns)
@@ -266,7 +268,7 @@ elif mode == "Par pays":
                 top_last_annee(recap_2s.head(6))
                 
                 
-            if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 mensuel"):
+            if st.sidebar.checkbox("Volumes bruts des 3 dernières années du top 6 mensuel"):
                 st.title("Les Tops mensuel")
                 top_pays_4s = tops_pays(recap_4s, fichier, "TOP 4 SEMAINES")
                 colonnes = list(top_pays_4s.columns)
@@ -330,8 +332,8 @@ elif mode == "Par pays":
                 plt.xticks(rotation=90)
                 st.pyplot(fig2)
             
-            if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 trimestriel"):
-                st.title("Les Tops trimestriel")
+            if st.sidebar.checkbox("Volumes bruts des 3 dernières années du top 6 trimestriel"):
+                st.title(" Les Tops Trimestriels")
                 top_pays_12s = tops_pays(recap_12s, fichier, "TOP 12 SEMAINES")
                 colonnes = list(top_pays_12s.columns)
                 st.write(top_pays_12s[colonnes[0]])
@@ -339,7 +341,7 @@ elif mode == "Par pays":
                 st.write(top_pays_12s[colonnes[2]])
                 
                 
-        if st.sidebar.checkbox("2- Variation (%) des 3 dernières années du top 6"):
+        if st.sidebar.checkbox("3- Variation (%) des 3 dernières années du top 6"):
             if st.sidebar.checkbox("Variation (%) hebdo"):
                 st.title("Les Variation (%) Hebdo")
                 variation_hebdo = variation_hebdo(fichier, date_calendar, recap_2s)
@@ -351,7 +353,7 @@ elif mode == "Par pays":
                                       value_name="valeur")
   
 
-                st.title("Variation (%) de la semaine S et de la semaine (S-1)")
+                st.title("Var de la semaine S et de la semaine (S-1)")
                 fig, ax = plt.subplots(figsize=(10,10))
                 st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                      data=data_melted))
