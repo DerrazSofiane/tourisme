@@ -242,7 +242,7 @@ elif mode == "Par pays":
                 commentaire_recapitualitf_desc = st.text_area("Emplacement du commentaire", "")
                 st.write(commentaire_recapitualitf_desc)
        
-        elif st.sidebar.checkbox("2- Les volumes des 3 dernières années du top 6"):
+        if st.sidebar.checkbox("2- Les volumes des 3 dernières années du top 6"):
             def top_last_annee(recap):
                 annee = date_calendar.year
                 evolution_annee = evolutions_sum_annees(fichier, annee)
@@ -454,7 +454,7 @@ elif mode == "Par pays":
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
                 
-        elif st.sidebar.checkbox("3- Les variation (%) des 3 dernières années du top 6"):
+        if st.sidebar.checkbox("3- Les variation (%) des 3 dernières années du top 6"):
             if st.sidebar.checkbox("Les variation (%) hebdomadaire"):
                 st.title("Les variation (%) hebdomadaire")
                 variation_hebdo = variation_hebdo(fichier, date_calendar, recap_2s)
@@ -615,7 +615,7 @@ elif mode == "Par pays":
                 plt.xticks(rotation=90)
                 st.pyplot()
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
-                    commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
+                    commentaire_graph_s3 = st.text_area("Emplacement du commentaire", "")
                 
     except:
         pass
