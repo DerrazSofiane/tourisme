@@ -432,7 +432,7 @@ elif mode == "Par pays":
                 st.pyplot()
                 
                 
-        if st.sidebar.checkbox("3- Variation (%) des 3 dernières années du top 6"):
+        if st.sidebar.checkbox("3- Les variation (%) des 3 dernières années du top 6"):
             if st.sidebar.checkbox("Variation (%) hebdo"):
                 st.title("Les variation (%) hebdomadaire")
                 variation_hebdo = variation_hebdo(fichier, date_calendar, recap_2s)
@@ -481,6 +481,7 @@ elif mode == "Par pays":
                
                 st.pyplot()
             if st.sidebar.checkbox("Les variation (%) mensuelle"):
+                st.title("Les variation (%) mensuelle")
                 mois = {"janvier": 1, 
                         "février": 2, 
                         "mars": 3, 
@@ -550,7 +551,7 @@ elif mode == "Par pays":
                 st.pyplot()
             
             if st.sidebar.checkbox("les variation (%) mensuelle"):
-                st.title("Variation (%) trimestrielle")
+                st.title("les variation (%) mensuelle")
                 derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
                 derniere_3annees.sort(reverse=True)
                 mode_annee = st.selectbox(
