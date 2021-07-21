@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
@@ -57,6 +56,7 @@ if mode == "Générique":
         top3_generique = generique_potentiel(variation, volumes_brutes)
 
     # CALCUL GENERIQUE
+        # PARTIE TOP
         if st.sidebar.checkbox("1 - Les tops") and uploaded_file != "None":
             # Checkbox de la partie "Les tops pays"
             st.title("1- Les meilleures pays pour le tourisme durant les 4 dernières semaines")
@@ -68,6 +68,7 @@ if mode == "Générique":
             top3_generique2.index = index
             st.table(top3_generique2)
         
+        # PARTIE VOLUME
         if st.sidebar.checkbox("2 - Les volumes") and uploaded_file != "None":
             # Checkbox de la partie Volume brutes des 2 dernières semaines
             st.title("Volumes des 2 dernières semaines")
@@ -109,7 +110,8 @@ if mode == "Générique":
                     rotation=90)
             #Permet d'afficher le graphique
             st.pyplot()
-            
+        
+        # PARTIE VARIATION
         if st.sidebar.checkbox("3 - Les variation (%)") and uploaded_file != "None":
 
             st.title("Variations (%) des 4 dernières semaines")
@@ -203,19 +205,26 @@ elif mode == "Par pays":
         # Ressort 3 tableaux, 2 semaines, 4 semaines et 12 semaines
         recap_2s, recap_4s, recap_12s = moyenne_donnees_brutes(periode_choisi)
         
+        # LES TOPS
         if st.sidebar.checkbox("1- Les tops") and uploaded_file != "None":
             st.title("Les volumes hebdomadaires moyens des 2, 4, 12 dernières semaines")
             
             def arrondie_str(x):
+                """ Fonction permettant de transformer mon datetime en str et
+                de pouvoir l'arrondir.
+                """
                 x = str(x)
                 x_str = x[:5]
-                print(x_str)
+               
                 return x_str
             
+            # Création de copy pour éviter les bugs d'écritures
             recap_2s_copy = recap_2s.copy()
             recap_4s_copy = recap_4s.copy()
             recap_12s_copy = recap_12s.copy()
             
+            # Pour chaque colonnes de chaque recap, la fonction arrondie_str
+            # va être appliqué
             for colonne in list(recap_2s_copy.columns):
                 recap_2s_copy[colonne] = recap_2s_copy[colonne].apply(arrondie_str)
             
@@ -224,28 +233,36 @@ elif mode == "Par pays":
             
             for colonne in list(recap_12s_copy.columns):
                 recap_12s_copy[colonne] = recap_12s_copy[colonne].apply(arrondie_str)
+           
+            st.title("TOP 6")
+            
             # Création de 3 colonnes sur l'application pour pouvoir "ranger"
             # nos tableaux pour pouvoir afficher de façon vertical
-            
-            st.title("TOP 6")
-
             cols = st.beta_columns(3)
             cols[0].table(recap_2s_copy.head(6))
             cols[1].table(recap_4s_copy.head(6))
             cols[2].table(recap_12s_copy.head(6))
+            
             st.title("Les valeurs suivantes")
             cols = st.beta_columns(3)
             cols[0].table(recap_2s_copy.iloc[7:])
             cols[1].table(recap_4s_copy.iloc[7:])
             cols[2].table(recap_12s_copy.iloc[7:])
 
-            
+            # Checkbox pour enregister un commentaire, ATTENTION
+            # Peux afficher qu'un seul checkbox par page pour l'instant
             if st.checkbox("Voulez vous mettre un commentaire ?"):
                 commentaire_recapitualitf_desc = st.text_area("Emplacement du commentaire", "")
                 st.write(commentaire_recapitualitf_desc)
        
+        # LES VOLUMES PAR PAYS
         if st.sidebar.checkbox("2- Les volumes des 3 dernières années du top 6"):
             def top_last_annee(recap):
+                """ Fonction générale permettant de créer de façon dynamique
+                des graphiques sur 3 années.
+                Elle prends en paramettre le récapitulatif choisi de X semaines
+                
+                """
                 annee = date_calendar.year
                 evolution_annee = evolutions_sum_annees(fichier, annee)
                 top_6 = recap.head(6)
@@ -266,22 +283,27 @@ elif mode == "Par pays":
             
             cols = st.beta_columns(3)
            
+            # VOLUME HEBDO
             if st.sidebar.checkbox("Volumes des 3 dernières années du top 6 hebdo"):
                 st.title("Les tops hebdomadaires")
+                
+                # Récupération du top 3 sur 2 semaines
                 top_pays_2s = tops_pays(recap_2s,fichier, "TOP 2 SEMAINES")
                 colonnes = list(top_pays_2s.columns)
                 top_pays_concat = pd.concat([top_pays_2s[colonnes[0]], top_pays_2s[colonnes[1]], top_pays_2s[colonnes[2]]])
                 index = [1,2,3]
                 colonne = "Top 3"
-                
                 top_pays_concat.columns = colonne
                 top_pays_concat.index = index
                 st.table(top_pays_concat)
                 st.title("Volumes des 3 dernières années du top 6 hebdo")
+                # Appel de la fonction de création des graphique sur 3 ans
                 top_last_annee(recap_2s.head(6))
                 
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
+           
+            # VOLUME MENSUEL
             elif st.sidebar.checkbox("Volumes des 3 dernières années du top 6 mensuel"):
                 def top_last_mois_annee(recap, mois, annee):
                     evolution_annee = evolutions_sum_annees(fichier, annee)
@@ -289,7 +311,6 @@ elif mode == "Par pays":
                     pays = list(top_6.index)
                     annees = list(pd.unique(evolution_annee["annee"]))
                     
-                    #f, ax = plt.subplots(2,3,figsize=(10,4))
                     for p in pays:
                         st.write(p)
                         annee1 = evolution_annee[p][(evolution_annee["annee"] == "2019")].reset_index().drop("index", axis=1)
@@ -314,6 +335,7 @@ elif mode == "Par pays":
                 st.table(top_pays_concat_mensuel)
                 st.title("Volumes mensuels des 3 dernières années")
                
+                # Mise en place d'un calendrier
                 mois = {"janvier": 1, 
                         "février": 2, 
                         "mars": 3, 
@@ -327,6 +349,7 @@ elif mode == "Par pays":
                         "novembre": 11, 
                         "décembre": 12}
                 
+                # Creation de la selection du mois
                 mois_str = list(mois.keys())
                 mode_mois = st.selectbox(
                         "Quel mois?",
@@ -335,31 +358,38 @@ elif mode == "Par pays":
                 
                 derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
                 derniere_3annees.sort(reverse=True)
+                # Creation de la selection de l'année
                 mode_annee = st.selectbox(
                         "Quelle année?",
                         (derniere_3annees)
                         )
+                
                 top_last_mois_annee(recap_4s.head(6), int(mois[mode_mois]), int(mode_annee))
+                
                 brute_3ans = valeurs_brutes_3annees(fichier, 
                                                     int(mois[mode_mois]),
                                                     int(mode_annee))
+                
                 st.title(f"Volumes mensuels de {mode_mois} {mode_annee} comparé à {mode_annee-1}")
                
                 brute_3ans = brute_3ans.T
                 str_annee = [str(i) for i in brute_3ans]
-                derniere_annee_annee1 = brute_3ans[[str_annee[1], str_annee[-1]]]
+                derniere_annee_annee1 = brute_3ans[[str_annee[1],
+                                                    str_annee[-1]]]
                 top_6_mensuel = list(recap_4s.head(6).index)
                 
                 derniere_annee_annee1 = derniere_annee_annee1.loc[top_6_mensuel,:]
                 derniere_annee_melt = pd.melt(derniere_annee_annee1.reset_index(),
                                               id_vars="index", var_name="annee",
                                               value_name="valeur")
+                
                 fig_mensuel1, ax_mensuel = plt.subplots(figsize=(10,10))
                 ax_mensuel = (sns.barplot(x="index", y="valeur", hue="annee", 
                                   data=derniere_annee_melt.sort_values(by=["annee"])))
                 plt.xticks(rotation=90)
                 ax_mensuel.set(xlabel="Région", ylabel='Volume')
                 ax_mensuel.grid()
+               
                 for p in ax_mensuel.patches:
                     ax_mensuel.annotate(" "+str(format(p.get_height(), '.1f')), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
@@ -384,6 +414,7 @@ elif mode == "Par pays":
                 ax_mensuel2.set(xlabel="Région", ylabel='Volume')
                 plt.xticks(rotation=90)
                 ax_mensuel2.grid()
+                
                 for p in ax_mensuel2.patches:
                     ax_mensuel2.annotate(" "+str(format(p.get_height(), '.1f')), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
@@ -396,6 +427,8 @@ elif mode == "Par pays":
                 
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
+            
+            # VOLUME TRIMESTRIEL
             elif st.sidebar.checkbox("Volumes des 3 dernières années du top 6 trimestriel"):
                 st.title("Les Tops trimestriel")
                 top_pays_12s = tops_pays(recap_12s, fichier, "TOP 12 SEMAINES")
@@ -416,21 +449,19 @@ elif mode == "Par pays":
                         "Quelle annee?",
                         (derniere_3annees_trim)
                         )
-                
-                
+
                 ############################### voir courbes
-                
-                
-                
-                
-                
-                
+
                 moyenne_trimestre = moyenne_trimestrielle(fichier, mode_annee,
                                                           recap_12s)
+               
                 moyenne_trimestre_t = moyenne_trimestre.T.reset_index()
-                moyenne_trimestre_t = moyenne_trimestre_t.rename({"index": "annee"}, axis=1)
+                moyenne_trimestre_t = moyenne_trimestre_t.rename({"index":
+                                                                  "annee"}, 
+                                                                 axis=1)
                 moyenne_trimestre_melted = pd.melt(moyenne_trimestre_t.sort_index(ascending=False), 
                                           id_vars="annee", var_name="pays", value_name="valeur")
+                
                 colonnes = list(moyenne_trimestre.columns)
                 pays = list(pd.unique(moyenne_trimestre_melted["pays"]))
                 moyenne_trimestre_melted_filtreN = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2021)]
@@ -442,6 +473,7 @@ elif mode == "Par pays":
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
                                      data=concat_N))
                 ax3.grid()
+                
                 for p in ax3.patches:
                     ax3.annotate(" "+str(format(p.get_height(), '.1f')), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
@@ -463,6 +495,7 @@ elif mode == "Par pays":
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
                                      data=concat_N2))
                 ax4.grid()
+                
                 for p in ax4.patches:
                     ax4.annotate(" "+str(format(p.get_height(), '.1f')), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
@@ -473,12 +506,15 @@ elif mode == "Par pays":
                         rotation=90)
                 plt.xticks(rotation=90)
                 ax4.set(xlabel="Région", ylabel='Volume')
-
                 st.pyplot()
+                
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
-                
+        
+        # VARIATION PAR PAYS        
         if st.sidebar.checkbox("3- Les variation (%) des 3 dernières années du top 6"):
+           
+            # VARIATION HEBDOMADAIRE
             if st.sidebar.checkbox("Les variation (%) hebdomadaire"):
                 st.title("Les variations (%) hebdomadaire")
                 variation_hebdo = variation_hebdo(fichier, date_calendar, recap_2s)
@@ -491,16 +527,18 @@ elif mode == "Par pays":
                 variation_hebdo_s1_s2 = variation_hebdo_s1_s2.rename({list(variation_hebdo_s1_s2.columns)[0]: "semaine"}, 
                                      axis=1)
                 # Transformation du tableau pour pouvoir le manipuler
-                data_melted_s = pd.melt(variation_hebdo_s_s1, id_vars="semaine", var_name="pays", 
-                                      value_name="valeur")
+                data_melted_s = pd.melt(variation_hebdo_s_s1, id_vars="semaine", 
+                                        var_name="pays", value_name="valeur")
   
-                data_melted_s1 = pd.melt(variation_hebdo_s1_s2, id_vars="semaine", var_name="pays", 
-                                      value_name="valeur")
+                data_melted_s1 = pd.melt(variation_hebdo_s1_s2, id_vars="semaine",
+                                         var_name="pays", value_name="valeur")
+                
                 st.title("Variation en % de S/S-1")
                 fig, ax = plt.subplots(figsize=(10,10))
                 st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                      data=data_melted_s))
                 ax.grid(axis="x")
+                
                 for p in ax.patches:
                     ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
@@ -508,7 +546,7 @@ elif mode == "Par pays":
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points')
-                #Permet d'afficher le graphique
+                
                 ax.set(xlabel="Région", ylabel='Variation (%)')
                 st.pyplot()
                 
@@ -517,6 +555,7 @@ elif mode == "Par pays":
                 st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                      data=data_melted_s1))
                 ax.grid(axis="x")
+               
                 for p in ax.patches:
                     ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
@@ -530,6 +569,8 @@ elif mode == "Par pays":
                 st.pyplot()
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
+            
+            # VARIATION MENSUELLE
             elif st.sidebar.checkbox("Les variations (%) mensuelle"):
                 st.title("Les variations (%) mensuelle")
                 mois = {"janvier": 1, 
@@ -565,8 +606,10 @@ elif mode == "Par pays":
                 st.title(f"Evolution en % du mois {mode_mois} de l'année {mode_annee} et {mode_annee-1}")               
                 
                 fig, ax = plt.subplots(figsize=(10,10))
-                st.write(plt.bar(variation_mensuelle[colonnes_annee_mois[0]],variation_mensuelle[colonnes_annee_mois[1]]))
+                st.write(plt.bar(variation_mensuelle[colonnes_annee_mois[0]],
+                                 variation_mensuelle[colonnes_annee_mois[1]]))
                 ax.grid()
+                
                 for p in ax.patches:
                     ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
@@ -574,6 +617,7 @@ elif mode == "Par pays":
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points')
+               
                 plt.xticks(rotation=90)
                 ax.set(xlabel="Région", ylabel='Variation (%)')
 
@@ -585,8 +629,10 @@ elif mode == "Par pays":
                 st.title(f"Evolution en % du mois {mode_mois} de l'année {mode_annee} et {mode_annee-2}")
                 
                 fig, ax = plt.subplots(figsize=(10,10))
-                st.write(plt.bar(variation_mensuelle[colonnes_annee_mois[0]],variation_mensuelle[colonnes_annee_mois[2]]))
+                st.write(plt.bar(variation_mensuelle[colonnes_annee_mois[0]],
+                                 variation_mensuelle[colonnes_annee_mois[2]]))
                 ax.grid()
+                
                 for p in ax.patches:
                     ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
@@ -594,15 +640,17 @@ elif mode == "Par pays":
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points')
+                
                 plt.xticks(rotation=90)
                 legend2 = str(mode_mois)+" "+str(mode_annee)+"/"+str(mode_annee-2)
                 plt.title(legend2)
                 ax.set(xlabel="Région", ylabel='Variation (%)')
-
-                #Permet d'afficher le graphique
                 st.pyplot()
+                
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
+            
+            # VARIATION TRIMESTRIELLE
             elif st.sidebar.checkbox("Les variation (%) trimestrielle"):
                 st.title("les variation (%) trimestrielle")
                 derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
@@ -630,6 +678,7 @@ elif mode == "Par pays":
                         xytext = (0, 1), 
                         textcoords = 'offset points',
                         rotation=90)
+               
                 plt.xticks(rotation=90)
                 st.pyplot()
                 st.title(f"les variations du 1er Trimestre de l'année {mode_annee} et {mode_annee-1}")
@@ -639,6 +688,7 @@ elif mode == "Par pays":
 
                 st.write(sns.barplot(x="index",y = colonnes[1], data=t2))
                 ax2.grid()
+                
                 for p in ax2.patches:
                     ax2.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
