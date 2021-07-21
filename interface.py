@@ -226,7 +226,7 @@ elif mode == "Par pays":
             cols[2].table(recap_12s_copy.head(6))
             st.title("Les valeurs suivantes")
             cols = st.beta_columns(3)
-            cols[0].table(recap_2s_copy.loc[7:])
+            cols[0].table(recap_2s_copy.iloc[7:])
             cols[1].table(recap_4s_copy)
             cols[2].table(recap_12s_copy)
 
