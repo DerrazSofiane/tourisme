@@ -295,7 +295,7 @@ elif mode == "Par pays":
                 st.write(top_pays_4s[colonnes[0]])
                 st.write(top_pays_4s[colonnes[1]])
                 st.write(top_pays_4s[colonnes[2]])
-                st.title("Volumes hebdomadaires des 3 dernières années")
+                st.title("Volumes mensuel des 3 dernières années")
                
                 mois = {"janvier": 1, 
                         "février": 2, 
@@ -326,7 +326,7 @@ elif mode == "Par pays":
                 brute_3ans = valeurs_brutes_3annees(fichier, 
                                                     int(mois[mode_mois]),
                                                     int(mode_annee))
-                st.title(f"Volumes mensuels de {mode_mois} {mode_annee} comparé à {mode_annee-1}")
+                st.title(f"Volumes mensuels de {mode_mois} {mode_annee} comparé à {mode_annee-2}")
                
                 brute_3ans = brute_3ans.T
                 str_annee = [str(i) for i in brute_3ans]
@@ -344,7 +344,7 @@ elif mode == "Par pays":
                 plt.xticks(rotation=90)
                 st.pyplot(fig1)
                 
-                st.title(f"Volume du mois {mode_mois} l’année {str(int(mode_annee))} et du mois {mode_mois} de l’année {str(int(mode_annee-2))}")
+                st.title(f"Volumes mensuels de {mode_mois} {mode_annee} comparé à {mode_annee-1}")
                 top_6_mensuel = list(recap_4s.head(6).index)
                 derniere_annee_annee2 = brute_3ans[[str_annee[0], str_annee[-1]]]
                 derniere_annee_annee2 = derniere_annee_annee2.loc[top_6_mensuel,:]
