@@ -93,7 +93,7 @@ if mode == "Générique":
                                  data=data_melted))
             ax.grid(axis="x")
             for p in ax.patches:
-                ax.annotate(" "+str(format(p.get_height(), '.1f'))+"%", 
+                ax.annotate(format(p.get_height(), '.1f'), 
                     (p.get_x() + p.get_width() / 2., p.get_height()), 
                     ha = 'center', va = 'bottom', 
                     size=9,
@@ -133,12 +133,13 @@ if mode == "Générique":
             ax.grid(axis="x")
             ax.set(xlabel="Pays", ylabel='Variation (%)')
             for p in ax.patches:
-                ax.annotate(format(p.get_height(), '.1f'), 
-                        (p.get_x() + p.get_width() / 2., p.get_height()), 
-                        ha = 'center', va = 'center', 
-                        size=9,
-                        xytext = (0, 1), 
-                        textcoords = 'offset points')
+                ax.annotate(" "+str(format(p.get_height(), '.1f'))+"%", 
+                    (p.get_x() + p.get_width() / 2., p.get_height()), 
+                    ha = 'center', va = 'bottom', 
+                    size=9,
+                    xytext = (0, 1), 
+                    textcoords = 'offset points',
+                    rotation=90)
             st.pyplot()
             
             # Récupération des 2 dernières semaines
@@ -153,12 +154,13 @@ if mode == "Générique":
             ax.grid(axis="x")
             ax.set(xlabel="Pays", ylabel='Variation (%)')
             for p in ax.patches:
-                ax.annotate(format(p.get_height(), '.1f'), 
+                ax.annotate(" "+str(format(p.get_height(), '.1f'))+"%", 
                     (p.get_x() + p.get_width() / 2., p.get_height()), 
-                    ha = 'center', va = 'center', 
+                    ha = 'center', va = 'bottom', 
                     size=9,
                     xytext = (0, 1), 
-                    textcoords = 'offset points')
+                    textcoords = 'offset points',
+                    rotation=90)
 
             st.pyplot()
         # Checkbox de commentaire, le str sera conserver dans la variable d'après 
@@ -235,7 +237,7 @@ elif mode == "Par pays":
                 commentaire_recapitualitf_desc = st.text_area("Emplacement du commentaire", "")
                 st.write(commentaire_recapitualitf_desc)
        
-        if st.sidebar.checkbox("2- Volumes brutes des 3 dernières années du top 6"):
+        if st.sidebar.checkbox("2- Volumes des 3 dernières années du top 6"):
             def top_last_annee(recap):
                 annee = date_calendar.year
                 evolution_annee = evolutions_sum_annees(fichier, annee)
@@ -258,7 +260,7 @@ elif mode == "Par pays":
             cols = st.beta_columns(3)
            
             if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 hebdo"):
-                st.title("Les Tops hebdo")
+                st.title("Les tops hebdomadaires")
                 top_pays_2s = tops_pays(recap_2s,fichier, "TOP 2 SEMAINES")
                 colonnes = list(top_pays_2s.columns)
                 st.write(top_pays_2s[colonnes[0]])
@@ -293,7 +295,7 @@ elif mode == "Par pays":
                 st.write(top_pays_4s[colonnes[0]])
                 st.write(top_pays_4s[colonnes[1]])
                 st.write(top_pays_4s[colonnes[2]])
-                st.title("Volumes brutes des 3 dernières années du top 6 mensuel")
+                st.title("Volumes hebdomadaires des 3 dernières années")
                
                 mois = {"janvier": 1, 
                         "février": 2, 
@@ -324,7 +326,8 @@ elif mode == "Par pays":
                 brute_3ans = valeurs_brutes_3annees(fichier, 
                                                     int(mois[mode_mois]),
                                                     int(mode_annee))
-                st.title(f"Volumes brutes du mois {mode_mois} l’année {mode_annee} et du mois {mode_mois} de l’année {int(mode_annee - 1)}")
+                st.title(f"Volumes mensuels de {mode_mois} {mode_annee} comparé à {mode_annee-1}")
+               
                 brute_3ans = brute_3ans.T
                 str_annee = [str(i) for i in brute_3ans]
                 derniere_annee_annee1 = brute_3ans[str_annee[0:2]]
@@ -341,7 +344,7 @@ elif mode == "Par pays":
                 plt.xticks(rotation=90)
                 st.pyplot(fig1)
                 
-                st.title(f"Valeurs brutes du mois {mode_mois} l’année {str(int(mode_annee))} et du mois {mode_mois} de l’année {str(int(mode_annee-2))}")
+                st.title(f"Volume du mois {mode_mois} l’année {str(int(mode_annee))} et du mois {mode_mois} de l’année {str(int(mode_annee-2))}")
                 top_6_mensuel = list(recap_4s.head(6).index)
                 derniere_annee_annee2 = brute_3ans[[str_annee[0], str_annee[-1]]]
                 derniere_annee_annee2 = derniere_annee_annee2.loc[top_6_mensuel,:]
@@ -355,7 +358,7 @@ elif mode == "Par pays":
                 plt.xticks(rotation=90)
                 st.pyplot(fig2)
             
-            if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 trimestriel"):
+            if st.sidebar.checkbox("Volumes des 3 dernières années du top 6 trimestriel"):
                 st.title("Les Tops trimestriel")
                 top_pays_12s = tops_pays(recap_12s, fichier, "TOP 12 SEMAINES")
                 colonnes = list(top_pays_12s.columns)
@@ -390,7 +393,7 @@ elif mode == "Par pays":
                 moyenne_trimestre_melted_filtreN = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2021)]
                 moyenne_trimestre_melted_filtreN2 = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2020)]
                 concat_N = pd.concat([moyenne_trimestre_melted_filtreN,moyenne_trimestre_melted_filtreN2])
-                st.title("Volume brute de l'année N sur N-1")
+                st.title("Volume de l'année N sur N-1")
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
                                      data=concat_N))
                 plt.xticks(rotation=90)
@@ -398,7 +401,7 @@ elif mode == "Par pays":
                 st.pyplot()
                 moyenne_trimestre_melted_filtreN3 = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2019)]
                 concat_N2 = pd.concat([moyenne_trimestre_melted_filtreN,moyenne_trimestre_melted_filtreN3])
-                st.title("Volume brute de l'année N sur N-2")
+                st.title("Volume de l'année N sur N-2")
 
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
                                      data=concat_N2))
