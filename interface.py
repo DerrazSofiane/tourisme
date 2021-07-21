@@ -548,7 +548,7 @@ elif mode == "Par pays":
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points')
-                
+                plt.xticks(roation=90)
                 ax.set(xlabel="Région", ylabel='Variation (%)')
                 st.pyplot()
                 
