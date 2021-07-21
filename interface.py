@@ -66,7 +66,7 @@ if mode == "Générique":
             colonne = "Top 3"
             top3_generique2.columns = colonne
             top3_generique2.index = index
-            st.write(top3_generique2)
+            st.table(top3_generique2)
         if st.sidebar.checkbox("2 - Volumes") and uploaded_file != "None":
             # Checkbox de la partie Volume brutes des 2 dernières semaines
             st.title("Volumes des 2 dernières semaines")
@@ -234,8 +234,8 @@ elif mode == "Par pays":
             st.title("Les valeurs suivantes")
             cols = st.beta_columns(3)
             cols[0].table(recap_2s_copy.iloc[7:])
-            cols[1].table(recap_4s_copy)
-            cols[2].table(recap_12s_copy)
+            cols[1].table(recap_4s_copy.iloc[7:])
+            cols[2].table(recap_12s_copy.iloc[7:])
 
             
             if st.checkbox("Voulez vous mettre un commentaire ?"):
@@ -301,9 +301,13 @@ elif mode == "Par pays":
                 st.title("Les Tops mensuel")
                 top_pays_4s = tops_pays(recap_4s, fichier, "TOP 4 SEMAINES")
                 colonnes = list(top_pays_4s.columns)
-                st.table(top_pays_4s[colonnes[0]])
-                st.table(top_pays_4s[colonnes[1]])
-                st.table(top_pays_4s[colonnes[2]])
+                top_pays_concat_mensuel = pd.concat([top_pays_4s[colonnes[0]], top_pays_4s[colonnes[1]], top_pays_4s[colonnes[2]]])
+                index = [1,2,3]
+                colonne = "Top 3"
+                
+                top_pays_concat_mensuel.columns = colonne
+                top_pays_concat_mensuel.index = index
+                st.table(top_pays_concat_mensuel)
                 st.title("Volumes mensuel des 3 dernières années")
                
                 mois = {"janvier": 1, 
@@ -373,9 +377,15 @@ elif mode == "Par pays":
                 st.title("Les Tops trimestriel")
                 top_pays_12s = tops_pays(recap_12s, fichier, "TOP 12 SEMAINES")
                 colonnes = list(top_pays_12s.columns)
-                st.write(top_pays_12s[colonnes[0]])
-                st.write(top_pays_12s[colonnes[1]])
-                st.write(top_pays_12s[colonnes[2]])
+                top_pays_concat_trim = pd.concat([top_pays_12s[colonnes[0]],
+                                                  top_pays_12s[colonnes[1]], 
+                                                  top_pays_12s[colonnes[2]]])
+                index = [1,2,3]
+                colonne = "Top 3"
+                
+                top_pays_concat.columns = colonne
+                top_pays_concat.index = index
+                st.table(top_pays_concat_trim)
                 
                 derniere_3annees_trim = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
                 derniere_3annees_trim.sort(reverse=True)
