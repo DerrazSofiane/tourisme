@@ -157,7 +157,7 @@ if mode == "Générique":
             evolution_s1_melted = pd.melt(var_S1_S2.sort_index(ascending=False), 
                                           id_vars="semaine", var_name="pays", value_name="valeur")
             st.title("Variations hebdomadaires des volumes de la semaine passée")
-            fig, ax = plt.subplots(figsize=(10,10))
+            fig, ax = plt.subplots(figsize=(12,7), dpi=300)
             st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                  data=evolution_s1_melted))
             ax.grid(axis="x")
