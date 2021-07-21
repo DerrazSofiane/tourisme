@@ -278,7 +278,8 @@ elif mode == "Par pays":
                 st.title("Volumes brutes des 3 dernières années du top 6 hebdo")
                 top_last_annee(recap_2s.head(6))
                 
-                
+                if st.checkbox("Voulez vous mettre un commentaire ?"):
+                    commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
             elif st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 mensuel"):
                 def top_last_mois_annee(recap, mois, annee):
                     evolution_annee = evolutions_sum_annees(fichier, annee)
@@ -372,7 +373,8 @@ elif mode == "Par pays":
                 ax2.set(xlabel="Région", ylabel='Volume')
                 plt.xticks(rotation=90)
                 st.pyplot(fig2)
-            
+                if st.checkbox("Voulez vous mettre un commentaire ?"):
+                    commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
             elif st.sidebar.checkbox("Volumes des 3 dernières années du top 6 trimestriel"):
                 st.title("Les Tops trimestriel")
                 top_pays_12s = tops_pays(recap_12s, fichier, "TOP 12 SEMAINES")
@@ -449,7 +451,8 @@ elif mode == "Par pays":
                         rotation=90)
                 plt.xticks(rotation=90)
                 st.pyplot()
-                
+                if st.checkbox("Voulez vous mettre un commentaire ?"):
+                    commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
                 
         if st.sidebar.checkbox("3- Les variation (%) des 3 dernières années du top 6"):
             if st.sidebar.checkbox("Les variation (%) hebdomadaire"):
@@ -501,7 +504,8 @@ elif mode == "Par pays":
                 ax.set(xlabel="Région", ylabel='Valeur (%)')
 
                 st.pyplot()
-                
+                if st.checkbox("Voulez vous mettre un commentaire ?"):
+                    commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
             elif st.sidebar.checkbox("Les variation (%) mensuelle"):
                 st.title("Les variation (%) mensuelle")
                 mois = {"janvier": 1, 
@@ -574,7 +578,8 @@ elif mode == "Par pays":
 
                 #Permet d'afficher le graphique
                 st.pyplot()
-            
+                if st.checkbox("Voulez vous mettre un commentaire ?"):
+                    commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
             elif st.sidebar.checkbox("les variation (%) trimestrielle"):
                 st.title("les variation (%) trimestrielle")
                 derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
@@ -609,7 +614,8 @@ elif mode == "Par pays":
                 
                 plt.xticks(rotation=90)
                 st.pyplot()
-                
+                if st.checkbox("Voulez vous mettre un commentaire ?"):
+                    commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
                 
     except:
         pass
