@@ -62,7 +62,7 @@ if mode == "Générique":
             st.write(top3_generique[colonnes[0]])
             st.write(top3_generique[colonnes[1]])
             st.write(top3_generique[colonnes[2]])
-            top3_generique2 = pd.concat([top3_generique[top3_generique[colonnes[0]],colonnes[1]], top3_generique[colonnes[2]]])
+            top3_generique2 = pd.concat([top3_generique[colonnes[0]], top3_generique[colonnes[1]], top3_generique[colonnes[2]]])
             st.write(top3_generique2)
         if st.sidebar.checkbox("2 - Volumes") and uploaded_file != "None":
             # Checkbox de la partie Volume brutes des 2 dernières semaines
