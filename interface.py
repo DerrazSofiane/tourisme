@@ -217,18 +217,20 @@ elif mode == "Par pays":
                 recap_12s_copy[colonne] = recap_12s_copy[colonne].apply(arrondie_str)
             # Création de 3 colonnes sur l'application pour pouvoir "ranger"
             # nos tableaux pour pouvoir afficher de façon vertical
-            cols = st.beta_columns(3)
-            cols[0].table(recap_2s_copy)
-            cols[1].table(recap_4s_copy)
-            cols[2].table(recap_12s_copy)
-
+            
             st.title("TOP 6")
 
             cols = st.beta_columns(3)
             cols[0].table(recap_2s_copy.head(6))
             cols[1].table(recap_4s_copy.head(6))
             cols[2].table(recap_12s_copy.head(6))
-           
+            st.title("Les valeurs suivantes")
+            cols = st.beta_columns(3)
+            cols[0].table(recap_2s_copy.loc[7:])
+            cols[1].table(recap_4s_copy)
+            cols[2].table(recap_12s_copy)
+
+            
             if st.checkbox("Voulez vous mettre un commentaire ?"):
                 commentaire_recapitualitf_desc = st.text_area("Emplacement du commentaire", "")
                 st.write(commentaire_recapitualitf_desc)
