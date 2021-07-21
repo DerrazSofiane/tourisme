@@ -507,7 +507,7 @@ elif mode == "Par pays":
                         xytext = (0, 1), 
                         textcoords = 'offset points')
                 #Permet d'afficher le graphique
-                ax.set(xlabel="Région", ylabel='Valeur (%)')
+                ax.set(xlabel="Région", ylabel='Variation (%)')
                 st.pyplot()
                 
                 st.title("Variation en % de S-1 / S-2")
@@ -523,7 +523,7 @@ elif mode == "Par pays":
                         xytext = (0, 1), 
                         textcoords = 'offset points')
                 #Permet d'afficher le graphique
-                ax.set(xlabel="Région", ylabel='Valeur (%)')
+                ax.set(xlabel="Région", ylabel='Variation (%)')
 
                 st.pyplot()
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
@@ -574,7 +574,7 @@ elif mode == "Par pays":
                         xytext = (0, 1), 
                         textcoords = 'offset points')
                 plt.xticks(rotation=90)
-                ax.set(xlabel="Région", ylabel='Valeur (%)')
+                ax.set(xlabel="Région", ylabel='Variation (%)')
 
                 legend = str(mode_mois)+" "+str(mode_annee)+"/"+str(mode_annee-1)
                 plt.title(legend)
@@ -596,7 +596,7 @@ elif mode == "Par pays":
                 plt.xticks(rotation=90)
                 legend2 = str(mode_mois)+" "+str(mode_annee)+"/"+str(mode_annee-2)
                 plt.title(legend2)
-                ax.set(xlabel="Région", ylabel='Valeur (%)')
+                ax.set(xlabel="Région", ylabel='Variation (%)')
 
                 #Permet d'afficher le graphique
                 st.pyplot()
