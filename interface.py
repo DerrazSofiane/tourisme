@@ -67,7 +67,7 @@ if mode == "Générique":
             top3_generique2.columns = colonne
             top3_generique2.index = index
             st.table(top3_generique2)
-        if st.sidebar.checkbox("2 - Volumes") and uploaded_file != "None":
+        if st.sidebar.checkbox("2 - Les volumes") and uploaded_file != "None":
             # Checkbox de la partie Volume brutes des 2 dernières semaines
             st.title("Volumes des 2 dernières semaines")
             volume_brute = volumes_brutes.set_index(list(fichier.columns)[0])
@@ -108,7 +108,7 @@ if mode == "Générique":
             #Permet d'afficher le graphique
             st.pyplot()
             
-        if st.sidebar.checkbox("Variation (%)") and uploaded_file != "None":
+        if st.sidebar.checkbox("3 - Les variation (%)") and uploaded_file != "None":
 
             st.title("Variations (%) des 4 dernières semaines")
             variation_copy = variation.copy()
