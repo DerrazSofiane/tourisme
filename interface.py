@@ -130,7 +130,7 @@ if mode == "Générique":
             st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                  data=evolution_melted))
             ax.grid(axis="x")
-            ax.set(xlabel='common xlabel', ylabel='common ylabel')
+            ax.set(xlabel='Variation (%)', ylabel='Pays')
             for p in ax.patches:
                 ax.annotate(format(p.get_height(), '.1f'), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
@@ -150,6 +150,7 @@ if mode == "Générique":
             st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                  data=evolution_s1_melted))
             ax.grid(axis="x")
+            ax.set(xlabel='Variation (%)', ylabel='Pays')
             for p in ax.patches:
                 ax.annotate(format(p.get_height(), '.1f'), 
                     (p.get_x() + p.get_width() / 2., p.get_height()), 
