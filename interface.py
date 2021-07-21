@@ -502,7 +502,7 @@ elif mode == "Par pays":
 
                 st.pyplot()
                 
-            if st.sidebar.checkbox("Les variation (%) mensuelle"):
+            elif st.sidebar.checkbox("Les variation (%) mensuelle"):
                 st.title("Les variation (%) mensuelle")
                 mois = {"janvier": 1, 
                         "février": 2, 
@@ -574,7 +574,7 @@ elif mode == "Par pays":
                 #Permet d'afficher le graphique
                 st.pyplot()
             
-            if st.sidebar.checkbox("les variation (%) trimestrielle"):
+            elif st.sidebar.checkbox("les variation (%) trimestrielle"):
                 st.title("les variation (%) trimestrielle")
                 derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
                 derniere_3annees.sort(reverse=True)
