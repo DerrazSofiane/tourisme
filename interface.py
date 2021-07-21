@@ -389,7 +389,6 @@ elif mode == "Par pays":
                                           id_vars="annee", var_name="pays", value_name="valeur")
                 colonnes = list(moyenne_trimestre.columns)
                 pays = list(pd.unique(moyenne_trimestre_melted["pays"]))
-                #f, ax = plt.subplots(2,3,figsize=(10,4))
                 moyenne_trimestre_melted_filtreN = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2021)]
                 moyenne_trimestre_melted_filtreN2 = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2020)]
                 concat_N = pd.concat([moyenne_trimestre_melted_filtreN,moyenne_trimestre_melted_filtreN2])
@@ -399,7 +398,7 @@ elif mode == "Par pays":
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
                                      data=concat_N))
                 ax3.grid()
-                for p in ax.patches:
+                for p in ax3.patches:
                     ax3.annotate(format(p.get_height(), '.1f'), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
                         ha = 'center', va = 'bottom', 
