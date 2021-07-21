@@ -365,6 +365,7 @@ elif mode == "Par pays":
                 derniere_annee_melt2 = pd.melt(derniere_annee_annee2.reset_index(), 
                                                id_vars="index", var_name="annee",
                                                value_name="valeur")
+                st.write(derniere_annee_melt2)
                 fig2 = plt.figure()
 
                 ax2 = (sns.barplot(x="index", y="valeur", hue="annee", 
