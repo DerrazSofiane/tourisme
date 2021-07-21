@@ -243,7 +243,7 @@ elif mode == "Par pays":
                 commentaire_recapitualitf_desc = st.text_area("Emplacement du commentaire", "")
                 st.write(commentaire_recapitualitf_desc)
        
-        if st.sidebar.radio("2- Les volumes des 3 dernières années du top 6"):
+        if st.sidebar.checkbox("2- Les volumes des 3 dernières années du top 6"):
             def top_last_annee(recap):
                 annee = date_calendar.year
                 evolution_annee = evolutions_sum_annees(fichier, annee)
@@ -265,7 +265,7 @@ elif mode == "Par pays":
             
             cols = st.beta_columns(3)
            
-            if st.sidebar.radio("Volumes des 3 dernières années du top 6 hebdo"):
+            if st.sidebar.checkbox("Volumes des 3 dernières années du top 6 hebdo"):
                 st.title("Les tops hebdomadaires")
                 top_pays_2s = tops_pays(recap_2s,fichier, "TOP 2 SEMAINES")
                 colonnes = list(top_pays_2s.columns)
@@ -281,7 +281,7 @@ elif mode == "Par pays":
                 
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
-            elif st.sidebar.radio("Volumes des 3 dernières années du top 6 mensuel"):
+            elif st.sidebar.checkbox("Volumes des 3 dernières années du top 6 mensuel"):
                 def top_last_mois_annee(recap, mois, annee):
                     evolution_annee = evolutions_sum_annees(fichier, annee)
                     top_6 = recap.head(6)
