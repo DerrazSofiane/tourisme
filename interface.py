@@ -98,7 +98,8 @@ if mode == "Générique":
                     ha = 'center', va = 'center', 
                     size=9,
                     xytext = (0, 1), 
-                    textcoords = 'offset points')
+                    textcoords = 'offset points',
+                    rotation=90)
             #Permet d'afficher le graphique
             st.pyplot()
             
