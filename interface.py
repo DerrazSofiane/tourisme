@@ -17,7 +17,6 @@ from main import (traitements_informations, generique_variation,
                   variation_trimestrielle)
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
-st.set_option('wideMode' , True)
 
 
 
