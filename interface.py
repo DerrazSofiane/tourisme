@@ -601,7 +601,7 @@ elif mode == "Par pays":
                 st.pyplot()
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
-            elif st.sidebar.checkbox("les variation (%) trimestrielle"):
+            elif st.sidebar.checkbox("Les variation (%) trimestrielle"):
                 st.title("les variation (%) trimestrielle")
                 derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
                 derniere_3annees.sort(reverse=True)
@@ -615,7 +615,7 @@ elif mode == "Par pays":
                 colonnes = list(variation_trimestrielle.columns)
                 fig, ax = plt.subplots(figsize=(10,10))
                 t1 = variation_trimestrielle[colonnes[0]].reset_index()
-                st.title(f"Variation du 1er Trimestre de l'année {mode_annee} et {mode_annee-2}")
+                st.title(f"Les variation du 1er Trimestre de l'année {mode_annee} et {mode_annee-2}")
                 st.write(sns.barplot(x="index",y = colonnes[0], data=t1))
                 ax.grid()
                 for p in ax.patches:
@@ -628,7 +628,7 @@ elif mode == "Par pays":
                         rotation=90)
                 plt.xticks(rotation=90)
                 st.pyplot()
-                st.title(f"Variation du 1er Trimestre de l'année {mode_annee} et {mode_annee-1}")
+                st.title(f"les variation du 1er Trimestre de l'année {mode_annee} et {mode_annee-1}")
 
                 t2 = variation_trimestrielle[colonnes[1]].reset_index()
                 st.write(sns.barplot(x="index",y = colonnes[1], data=t2))
