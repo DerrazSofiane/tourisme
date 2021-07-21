@@ -300,6 +300,8 @@ elif mode == "Par pays":
                 top_pays_4s = tops_pays(recap_4s, fichier, "TOP 4 SEMAINES")
                 colonnes = list(top_pays_4s.columns)
                 st.write(top_pays_4s[colonnes[0]])
+                top_3_first_df = top_pays_4s[colonnes[0]].to_string(header=False, index=False).split(",")
+                top_3_modif = "\n".join(top_3_first_df)
                 st.write("Top volume : ",top_pays_4s[colonnes[0]].to_string(header=False, index=False))
                 st.write(top_pays_4s[colonnes[1]])
                 st.write(top_pays_4s[colonnes[2]])
