@@ -374,6 +374,7 @@ elif mode == "Par pays":
                 ax2.set(xlabel="Région", ylabel='Volume')
                 plt.xticks(rotation=90)
                 st.pyplot(fig2)
+                
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
             elif st.sidebar.checkbox("Volumes des 3 dernières années du top 6 trimestriel"):
@@ -423,7 +424,7 @@ elif mode == "Par pays":
                                      data=concat_N))
                 ax3.grid()
                 for p in ax3.patches:
-                    ax3.annotate(format(p.get_height(), '.1f'), 
+                    ax3.annotate(" "+str(format(p.get_height(), '.1f')), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
                         ha = 'center', va = 'bottom', 
                         size=9,
@@ -444,7 +445,7 @@ elif mode == "Par pays":
                                      data=concat_N2))
                 ax4.grid()
                 for p in ax4.patches:
-                    ax4.annotate(format(p.get_height(), '.1f'), 
+                    ax4.annotate(" "+str(format(p.get_height(), '.1f')), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
                         ha = 'center', va = 'bottom', 
                         size=9,
