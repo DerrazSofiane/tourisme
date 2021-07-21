@@ -95,7 +95,7 @@ if mode == "Générique":
             for p in ax.patches:
                 ax.annotate(format(p.get_height(), '.1f'), 
                     (p.get_x() + p.get_width() / 2., p.get_height()), 
-                    ha = 'center', va = 'top', 
+                    ha = 'center', va = 'bottom', 
                     size=9,
                     xytext = (0, 1), 
                     textcoords = 'offset points',
