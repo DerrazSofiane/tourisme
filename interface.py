@@ -93,8 +93,7 @@ if mode == "Générique":
             # Transformation du tableau pour pouvoir le manipuler
             data_melted = pd.melt(tableau, id_vars="semaine", var_name="pays", 
                                   value_name="valeur")
-            st.write(tableau)
-            st.write(data_melted)
+
             st.title("Volumes de la semaine S et de la semaine (S-1)")
             fig, ax = plt.subplots(figsize=(10,10))
             st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
