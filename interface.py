@@ -339,11 +339,11 @@ elif mode == "Par pays":
                 brute_3ans = valeurs_brutes_3annees(fichier, 
                                                     int(mois[mode_mois]),
                                                     int(mode_annee))
-                st.title(f"Volumes mensuels de {mode_mois} {mode_annee} comparé à {mode_annee-2}")
+                st.title(f"Volumes mensuels de {mode_mois} {mode_annee} comparé à {mode_annee-1}")
                
                 brute_3ans = brute_3ans.T
                 str_annee = [str(i) for i in brute_3ans]
-                derniere_annee_annee1 = brute_3ans[str_annee[0:2]]
+                derniere_annee_annee1 = brute_3ans[[str_annee[0], str_annee[1]]]
                 top_6_mensuel = list(recap_4s.head(6).index)
                 
                 derniere_annee_annee1 = derniere_annee_annee1.loc[top_6_mensuel,:]
@@ -358,14 +358,13 @@ elif mode == "Par pays":
                 ax1.set(xlabel="Région", ylabel='Volume')
                 st.pyplot(fig1)
                 
-                st.title(f"Volumes mensuels de {mode_mois} {mode_annee} comparé à {mode_annee-1}")
+                st.title(f"Volumes mensuels de {mode_mois} {mode_annee} comparé à {mode_annee-2}")
                 top_6_mensuel = list(recap_4s.head(6).index)
                 derniere_annee_annee2 = brute_3ans[[str_annee[0], str_annee[-1]]]
                 derniere_annee_annee2 = derniere_annee_annee2.loc[top_6_mensuel,:]
                 derniere_annee_melt2 = pd.melt(derniere_annee_annee2.reset_index(), 
                                                id_vars="index", var_name="annee",
                                                value_name="valeur")
-                st.write(derniere_annee_melt2)
                 fig2 = plt.figure()
 
                 ax2 = (sns.barplot(x="index", y="valeur", hue="annee", 
