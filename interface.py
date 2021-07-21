@@ -131,6 +131,7 @@ if mode == "Générique":
             return fig
         st.title("test")
         graph_volumes(data_melted)
+        st.pyplot()
 
         # PARTIE VARIATION
         if st.sidebar.checkbox("3 - Les variation (%)") and uploaded_file != "None":
