@@ -384,7 +384,7 @@ elif mode == "Par pays":
                                               id_vars="index", var_name="annee",
                                               value_name="valeur")
                 
-                fig_mensuel1, ax_mensuel = plt.subplots(figsize=(10,10))
+                fig_mensuel1, ax_mensuel = plt.subplots(figsize=(12,7), dpi=300)
                 ax_mensuel = (sns.barplot(x="index", y="valeur", hue="annee", 
                                   data=derniere_annee_melt.sort_values(by=["annee"])))
                 plt.xticks(rotation=90)
@@ -408,7 +408,7 @@ elif mode == "Par pays":
                 derniere_annee_melt2 = pd.melt(derniere_annee_annee2.reset_index(), 
                                                id_vars="index", var_name="annee",
                                                value_name="valeur")
-                fig_mensuel2, ax_mensuel2 = plt.subplots(figsize=(10,10))
+                fig_mensuel2, ax_mensuel2 = plt.subplots(figsize=(12,7), dpi=300)
 
                 ax_mensuel2 = (sns.barplot(x="index", y="valeur", hue="annee", 
                                    data=derniere_annee_melt2.sort_values(by=["annee"])))
@@ -470,7 +470,7 @@ elif mode == "Par pays":
                 concat_N = pd.concat([moyenne_trimestre_melted_filtreN,moyenne_trimestre_melted_filtreN2])
                 
                 st.title(f"Volume du 1er Trimestre de l'année {colonnes[0]} et {colonnes[1]}")
-                fig3, ax3 = plt.subplots(figsize=(10,10))
+                fig3, ax3 = plt.subplots(figsize=(12,7), dpi=300)
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
                                      data=concat_N))
                 ax3.grid()
@@ -491,7 +491,7 @@ elif mode == "Par pays":
                 moyenne_trimestre_melted_filtreN3 = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2019)]
                 concat_N2 = pd.concat([moyenne_trimestre_melted_filtreN,moyenne_trimestre_melted_filtreN3])
                 st.title(f"Volume du 1er Trimestre de l'année {colonnes[0]} et {colonnes[2]}")
-                fig4, ax4 = plt.subplots(figsize=(10,10))
+                fig4, ax4 = plt.subplots(figsize=(12,7), dpi=300)
 
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
                                      data=concat_N2))
@@ -538,7 +538,7 @@ elif mode == "Par pays":
                                          var_name="pays", value_name="valeur")
                 
                 st.title("Variation en % de S/S-1")
-                fig, ax = plt.subplots(figsize=(10,10))
+                fig, ax = plt.subplots(figsize=(12,7), dpi=300)
                 st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                      data=data_melted_s))
                 ax.grid(axis="x")
@@ -555,7 +555,7 @@ elif mode == "Par pays":
                 st.pyplot()
                 
                 st.title("Variations en % de S-1 / S-2")
-                fig, ax = plt.subplots(figsize=(10,10))
+                fig, ax = plt.subplots(figsize=(12,7), dpi=300)
                 st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                      data=data_melted_s1))
                 ax.grid(axis="x")
@@ -610,7 +610,7 @@ elif mode == "Par pays":
                 colonnes_annee_mois = list(variation_mensuelle.columns)
                 st.title(f"Evolution en % du mois {mode_mois} de l'année {mode_annee} et {mode_annee-1}")               
                 
-                fig, ax = plt.subplots(figsize=(10,10))
+                fig, ax = plt.subplots(figsize=(12,7), dpi=300)
                 st.write(plt.bar(variation_mensuelle[colonnes_annee_mois[0]],
                                  variation_mensuelle[colonnes_annee_mois[1]]))
                 ax.grid()
@@ -633,7 +633,7 @@ elif mode == "Par pays":
                 
                 st.title(f"Evolution en % du mois {mode_mois} de l'année {mode_annee} et {mode_annee-2}")
                 
-                fig, ax = plt.subplots(figsize=(10,10))
+                fig, ax = plt.subplots(figsize=(12,7), dpi=300)
                 st.write(plt.bar(variation_mensuelle[colonnes_annee_mois[0]],
                                  variation_mensuelle[colonnes_annee_mois[2]]))
                 ax.grid()
@@ -668,7 +668,7 @@ elif mode == "Par pays":
                                                           recap_12s)
                 variation_trimestrielle = variation_trimestrielle(moyenne_trimestre)
                 colonnes = list(variation_trimestrielle.columns)
-                fig, ax = plt.subplots(figsize=(10,10))
+                fig, ax = plt.subplots(figsize=(12,7), dpi=300)
                 t1 = variation_trimestrielle[colonnes[0]].reset_index()
                 st.title(f"Les variations du 1er Trimestre de l'année {mode_annee} et {mode_annee-2}")
                 st.write(sns.barplot(x="index",y = colonnes[0], data=t1))
@@ -689,7 +689,7 @@ elif mode == "Par pays":
                 st.title(f"les variations du 1er Trimestre de l'année {mode_annee} et {mode_annee-1}")
 
                 t2 = variation_trimestrielle[colonnes[1]].reset_index()
-                fig2, ax2 = plt.subplots(figsize=(10,10))
+                fig2, ax2 = plt.subplots(figsize=(12,7), dpi=300)
 
                 st.write(sns.barplot(x="index",y = colonnes[1], data=t2))
                 ax2.grid()
