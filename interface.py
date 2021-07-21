@@ -17,6 +17,9 @@ from main import (traitements_informations, generique_variation,
                   variation_trimestrielle)
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
+st.set_option('wideMode' , True)
+
+
 
 st.title("OBSERVATOIRE DU TOURISME")
 st.image("https://nicolasbaudy.files.wordpress.com/2020/02/cropped-logo-new-2.png", use_column_width=False)
@@ -300,7 +303,7 @@ elif mode == "Par pays":
                 top_pays_4s = tops_pays(recap_4s, fichier, "TOP 4 SEMAINES")
                 colonnes = list(top_pays_4s.columns)
                 st.write(top_pays_4s[colonnes[0]])
-                st.dataframe(top_pays_4s[colonnes[1]],width=1024, height=768)
+                st.dataframe(top_pays_4s[colonnes[1]])
                 st.write(top_pays_4s[colonnes[2]])
                 st.title("Volumes mensuel des 3 dernières années")
                
