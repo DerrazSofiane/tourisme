@@ -342,6 +342,7 @@ elif mode == "Par pays":
                 ax1 = (sns.barplot(x="index", y="valeur", hue="annee", 
                                   data=derniere_annee_melt.sort_values(by=["annee"])))
                 plt.xticks(rotation=90)
+                ax1.set(xlabel="Région", ylabel='Volume')
                 st.pyplot(fig1)
                 
                 st.title(f"Volumes mensuels de {mode_mois} {mode_annee} comparé à {mode_annee-1}")
@@ -355,6 +356,7 @@ elif mode == "Par pays":
 
                 ax2 = (sns.barplot(x="index", y="valeur", hue="annee", 
                                    data=derniere_annee_melt2.sort_values(by=["annee"])))
+                ax2.set(xlabel="Région", ylabel='Volume')
                 plt.xticks(rotation=90)
                 st.pyplot(fig2)
             
