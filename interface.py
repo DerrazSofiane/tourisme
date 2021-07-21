@@ -383,8 +383,8 @@ elif mode == "Par pays":
                 index = [1,2,3]
                 colonne = "Top 3"
                 
-                top_pays_concat.columns = colonne
-                top_pays_concat.index = index
+                top_pays_concat_trim.columns = colonne
+                top_pays_concat_trim.index = index
                 st.table(top_pays_concat_trim)
                 
                 derniere_3annees_trim = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
