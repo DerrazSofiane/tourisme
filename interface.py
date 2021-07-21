@@ -55,7 +55,7 @@ if mode == "Générique":
         top3_generique = generique_potentiel(variation, volumes_brutes)
 
     # CALCUL GENERIQUE
-        if st.sidebar.checkbox("1 - Les Tops") and uploaded_file != "None":
+        if st.sidebar.checkbox("1 - Les tops") and uploaded_file != "None":
             # Checkbox de la partie "Les tops pays"
             st.title("1- Les meilleures pays pour le tourisme durant les 4 dernières semaines")
             colonnes = list(top3_generique.columns)
@@ -199,8 +199,8 @@ elif mode == "Par pays":
         # Ressort 3 tableaux, 2 semaines, 4 semaines et 12 semaines
         recap_2s, recap_4s, recap_12s = moyenne_donnees_brutes(periode_choisi)
         
-        if st.sidebar.checkbox("1- Les Tops") and uploaded_file != "None":
-            st.title("Volumes hebdomadaires moyens des 2, 4, 12 dernières semaines")
+        if st.sidebar.checkbox("1- Les tops") and uploaded_file != "None":
+            st.title("Les volumes hebdomadaires moyens des 2, 4, 12 dernières semaines")
             
             def arrondie_str(x):
                 x = str(x)
@@ -240,7 +240,7 @@ elif mode == "Par pays":
                 commentaire_recapitualitf_desc = st.text_area("Emplacement du commentaire", "")
                 st.write(commentaire_recapitualitf_desc)
        
-        if st.sidebar.checkbox("2- Volumes des 3 dernières années du top 6"):
+        if st.sidebar.checkbox("2- Les volumes des 3 dernières années du top 6"):
             def top_last_annee(recap):
                 annee = date_calendar.year
                 evolution_annee = evolutions_sum_annees(fichier, annee)
@@ -266,9 +266,12 @@ elif mode == "Par pays":
                 st.title("Les tops hebdomadaires")
                 top_pays_2s = tops_pays(recap_2s,fichier, "TOP 2 SEMAINES")
                 colonnes = list(top_pays_2s.columns)
-                st.write(top_pays_2s[colonnes[0]])
-                st.write(top_pays_2s[colonnes[1]])
-                st.write(top_pays_2s[colonnes[2]])
+                top_pays_concat = pd.concat([top_pays_2s[colonnes[0]], top_pays_2s[colonnes[1]], top_pays_2s[colonnes[2]]])
+                index = [1,2,3]
+                colonne = "Top 3"
+                top_pays_2s.columns = colonne
+                top_pays_2s.index = index
+                st.write(top_pays_2s)
                 st.title("Volumes brutes des 3 dernières années du top 6 hebdo")
                 top_last_annee(recap_2s.head(6))
                 
