@@ -419,7 +419,7 @@ elif mode == "Par pays":
                                      data=concat_N2))
                 ax4.grid()
                 for p in ax4.patches:
-                    ax2.annotate(format(p.get_height(), '.1f'), 
+                    ax4.annotate(format(p.get_height(), '.1f'), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
                         ha = 'center', va = 'bottom', 
                         size=9,
