@@ -352,13 +352,21 @@ elif mode == "Par pays":
                 derniere_annee_melt = pd.melt(derniere_annee_annee1.reset_index(),
                                               id_vars="index", var_name="annee",
                                               value_name="valeur")
-                fig1 = plt.figure()
-
-                ax1 = (sns.barplot(x="index", y="valeur", hue="annee", 
+                fig_mensuel1, ax_mensuel = plt.subplots(figsize=(10,10))
+                ax_mensuel = (sns.barplot(x="index", y="valeur", hue="annee", 
                                   data=derniere_annee_melt.sort_values(by=["annee"])))
                 plt.xticks(rotation=90)
-                ax1.set(xlabel="Région", ylabel='Volume')
-                st.pyplot(fig1)
+                ax_mensuel.set(xlabel="Région", ylabel='Volume')
+                ax_mensuel.grid()
+                for p in ax_mensuel.patches:
+                    ax_mensuel.annotate(" "+str(format(p.get_height(), '.1f')), 
+                        (p.get_x() + p.get_width() / 2., p.get_height()), 
+                        ha = 'center', va = 'bottom', 
+                        size=9,
+                        xytext = (0, 1), 
+                        textcoords = 'offset points',
+                        rotation=90)
+                st.pyplot()
                 
                 st.title(f"Volumes mensuels de {mode_mois} {mode_annee} comparé à {mode_annee-2}")
                 top_6_mensuel = list(recap_4s.head(6).index)
@@ -373,6 +381,7 @@ elif mode == "Par pays":
                                    data=derniere_annee_melt2.sort_values(by=["annee"])))
                 ax2.set(xlabel="Région", ylabel='Volume')
                 plt.xticks(rotation=90)
+                
                 st.pyplot(fig2)
                 
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
