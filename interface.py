@@ -526,7 +526,7 @@ elif mode == "Par pays":
                 variation_hebdo_s1_s2 = variation_hebdo_s1_s2.reset_index()
                 variation_hebdo_s1_s2 = variation_hebdo_s1_s2.rename({list(variation_hebdo_s1_s2.columns)[0]: "semaine"}, 
                                      axis=1)
-                variation_hebdo_s1_s2 = variation_hebdo_s1_s2.sort_values(by="semaine")
+                #variation_hebdo_s1_s2 = variation_hebdo_s1_s2.sort_values(by="semaine")
                 st.write(variation_hebdo_s1_s2)
                 # Transformation du tableau pour pouvoir le manipuler
                 data_melted_s = pd.melt(variation_hebdo_s_s1, id_vars="semaine", 
