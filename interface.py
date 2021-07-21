@@ -641,8 +641,7 @@ elif mode == "Par pays":
                         ha = 'center', va = 'top', 
                         size=9,
                         xytext = (0, 1), 
-                        textcoords = 'offset points',
-                        rotation=90)
+                        textcoords = 'offset points')
                 plt.xticks(rotation=90)
                 st.pyplot()
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
