@@ -93,7 +93,7 @@ if mode == "Générique":
                                  data=data_melted))
             ax.grid(axis="x")
             for p in ax.patches:
-                ax.annotate(str(format(p.get_height(), '.1f'))+"%", 
+                ax.annotate(" "+str(format(p.get_height(), '.1f'))+"%", 
                     (p.get_x() + p.get_width() / 2., p.get_height()), 
                     ha = 'center', va = 'bottom', 
                     size=9,
