@@ -558,7 +558,6 @@ elif mode == "Par pays":
                 variation_mensuelle = variation_mensuel(fichier, mode_annee, 
                                                         mois[mode_mois],recap_4s)
                 variation_mensuelle = variation_mensuelle.reset_index()
-                st.write(variation_mensuelle)
 
                 colonnes_annee_mois = list(variation_mensuelle.columns)
                 st.title(f"Evolution en % du mois {mode_mois} de l'année {mode_annee} et {mode_annee-1}")               
