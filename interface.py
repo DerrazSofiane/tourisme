@@ -59,10 +59,11 @@ if mode == "Générique":
             # Checkbox de la partie "Les tops pays"
             st.title("1- Les meilleures pays pour le tourisme durant les 4 dernières semaines")
             colonnes = list(top3_generique.columns)
-            st.write(top3_generique[colonnes[0]])
-            st.write(top3_generique[colonnes[1]])
-            st.write(top3_generique[colonnes[2]])
             top3_generique2 = pd.concat([top3_generique[colonnes[0]], top3_generique[colonnes[1]], top3_generique[colonnes[2]]])
+            index = [1,2,3]
+            colonne = "Top 3"
+            top3_generique2.columns = colonne
+            top3_generique2.index = index
             st.write(top3_generique2)
         if st.sidebar.checkbox("2 - Volumes") and uploaded_file != "None":
             # Checkbox de la partie Volume brutes des 2 dernières semaines
