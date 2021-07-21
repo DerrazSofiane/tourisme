@@ -302,7 +302,7 @@ elif mode == "Par pays":
                 st.write(top_pays_4s[colonnes[0]])
                 top_3_first_df = top_pays_4s[colonnes[0]].to_string(header=False, index=False).split(",")
                 top_3_modif = "\n".join(top_3_first_df)
-                st.write("Top volume : ",top_pays_4s[colonnes[0]].to_string(header=False, index=False))
+                st.write("Top volume : ",top_3_modif)
                 st.write(top_pays_4s[colonnes[1]])
                 st.write(top_pays_4s[colonnes[2]])
                 st.title("Volumes mensuel des 3 dernières années")
