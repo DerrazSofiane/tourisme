@@ -286,15 +286,13 @@ elif mode == "Par pays":
                     top_6 = recap.head(6)
                     pays = list(top_6.index)
                     annees = list(pd.unique(evolution_annee["annee"]))
-                    colonne = list(evolution_annee.columns)
-                    colonnes_replace = colonne.replace("annee", "année"
-                    evolution_annee.columns = colonnes_replace        
+                    
                     #f, ax = plt.subplots(2,3,figsize=(10,4))
                     for p in pays:
                         st.write(p)
-                        annee1 = evolution_annee[p][(evolution_annee["année"] == "2019")].reset_index().drop("index", axis=1)
-                        annee2 = evolution_annee[p][(evolution_annee["année"] == "2020")].reset_index().drop("index", axis=1)
-                        annee3 = evolution_annee[p][(evolution_annee["année"] == "2021")].reset_index().drop("index", axis=1)
+                        annee1 = evolution_annee[p][(evolution_annee["annee"] == "2019")].reset_index().drop("index", axis=1)
+                        annee2 = evolution_annee[p][(evolution_annee["annee"] == "2020")].reset_index().drop("index", axis=1)
+                        annee3 = evolution_annee[p][(evolution_annee["annee"] == "2021")].reset_index().drop("index", axis=1)
                         last = pd.concat([annee1, annee2, annee3], axis=1)
                         last.columns = [p+" 2019", p+" 2020", p+" 2021"]
                         last.fillna(0, inplace=True)
