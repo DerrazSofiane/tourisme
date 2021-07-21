@@ -268,7 +268,7 @@ elif mode == "Par pays":
                 
             if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 mensuel"):
                 def top_last_mois_annee(recap, mois, annee):
-                    evolution_annee = evolutions_mois_annee(fichier, mois, annee)
+                    evolution_annee = evolutions_sum_annees(fichier, annee)
                     top_6 = recap.head(6)
                     pays = list(top_6.index)
                     annees = list(pd.unique(evolution_annee["annee"]))
