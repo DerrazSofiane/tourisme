@@ -279,7 +279,7 @@ elif mode == "Par pays":
                 top_last_annee(recap_2s.head(6))
                 
                 
-            if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 mensuel"):
+            elif st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 mensuel"):
                 def top_last_mois_annee(recap, mois, annee):
                     evolution_annee = evolutions_sum_annees(fichier, annee)
                     top_6 = recap.head(6)
@@ -373,7 +373,7 @@ elif mode == "Par pays":
                 plt.xticks(rotation=90)
                 st.pyplot(fig2)
             
-            if st.sidebar.checkbox("Volumes des 3 dernières années du top 6 trimestriel"):
+            elif st.sidebar.checkbox("Volumes des 3 dernières années du top 6 trimestriel"):
                 st.title("Les Tops trimestriel")
                 top_pays_12s = tops_pays(recap_12s, fichier, "TOP 12 SEMAINES")
                 colonnes = list(top_pays_12s.columns)
