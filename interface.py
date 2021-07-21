@@ -375,14 +375,22 @@ elif mode == "Par pays":
                 derniere_annee_melt2 = pd.melt(derniere_annee_annee2.reset_index(), 
                                                id_vars="index", var_name="annee",
                                                value_name="valeur")
-                fig2 = plt.figure()
+                fig_mensuel2, ax_mensuel2 = plt.subplots(figsize=(10,10))
 
-                ax2 = (sns.barplot(x="index", y="valeur", hue="annee", 
+                ax_mensuel2 = (sns.barplot(x="index", y="valeur", hue="annee", 
                                    data=derniere_annee_melt2.sort_values(by=["annee"])))
-                ax2.set(xlabel="Région", ylabel='Volume')
+                ax_mensuel2.set(xlabel="Région", ylabel='Volume')
                 plt.xticks(rotation=90)
-                
-                st.pyplot(fig2)
+                ax_mensuel2.grid()
+                for p in ax_mensuel2.patches:
+                    ax_mensuel2.annotate(" "+str(format(p.get_height(), '.1f')), 
+                        (p.get_x() + p.get_width() / 2., p.get_height()), 
+                        ha = 'center', va = 'bottom', 
+                        size=9,
+                        xytext = (0, 1), 
+                        textcoords = 'offset points',
+                        rotation=90)
+                st.pyplot()
                 
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
