@@ -433,7 +433,7 @@ elif mode == "Par pays":
                 
                 
         if st.sidebar.checkbox("3- Les variation (%) des 3 dernières années du top 6"):
-            if st.sidebar.checkbox("Variation (%) hebdo"):
+            if st.sidebar.checkbox("Les variation (%) hebdomadaire"):
                 st.title("Les variation (%) hebdomadaire")
                 variation_hebdo = variation_hebdo(fichier, date_calendar, recap_2s)
                 variation_hebdo_s_s1 = variation_hebdo.head(2)
