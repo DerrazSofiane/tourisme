@@ -631,8 +631,18 @@ elif mode == "Par pays":
                 st.title(f"les variation du 1er Trimestre de l'année {mode_annee} et {mode_annee-1}")
 
                 t2 = variation_trimestrielle[colonnes[1]].reset_index()
+                fig2, ax2 = plt.subplots(figsize=(10,10))
+
                 st.write(sns.barplot(x="index",y = colonnes[1], data=t2))
-                
+                ax2.grid()
+                for p in ax2.patches:
+                    ax2.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
+                        (p.get_x() + p.get_width() / 2., p.get_height()), 
+                        ha = 'center', va = 'top', 
+                        size=9,
+                        xytext = (0, 1), 
+                        textcoords = 'offset points',
+                        rotation=90)
                 plt.xticks(rotation=90)
                 st.pyplot()
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
