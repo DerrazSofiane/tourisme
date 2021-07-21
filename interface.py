@@ -343,9 +343,7 @@ elif mode == "Par pays":
                
                 brute_3ans = brute_3ans.T
                 str_annee = [str(i) for i in brute_3ans]
-                st.write(brute_3ans)
-                derniere_annee_annee1 = brute_3ans[[str_annee[0], str_annee[1]]]
-                st.write(derniere_annee_annee1)
+                derniere_annee_annee1 = brute_3ans[[str_annee[1], str_annee[-1]]]
                 top_6_mensuel = list(recap_4s.head(6).index)
                 
                 derniere_annee_annee1 = derniere_annee_annee1.loc[top_6_mensuel,:]
