@@ -587,16 +587,25 @@ elif mode == "Par pays":
                                                           recap_12s)
                 variation_trimestrielle = variation_trimestrielle(moyenne_trimestre)
                 colonnes = list(variation_trimestrielle.columns)
-
+                fig, ax = plt.subplots(figsize=(10,10))
                 t1 = variation_trimestrielle[colonnes[0]].reset_index()
                 st.title(f"Variation du 1er Trimestre de l'année {mode_annee} et {mode_annee-2}")
                 st.write(sns.barplot(x="index",y = colonnes[0], data=t1))
+                ax.grid()
+                for p in ax.patches:
+                    ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
+                        (p.get_x() + p.get_width() / 2., p.get_height()), 
+                        ha = 'center', va = 'top', 
+                        size=9,
+                        xytext = (0, 1), 
+                        textcoords = 'offset points')
                 plt.xticks(rotation=90)
                 st.pyplot()
                 st.title(f"Variation du 1er Trimestre de l'année {mode_annee} et {mode_annee-1}")
 
                 t2 = variation_trimestrielle[colonnes[1]].reset_index()
                 st.write(sns.barplot(x="index",y = colonnes[1], data=t2))
+                
                 plt.xticks(rotation=90)
                 st.pyplot()
                 
