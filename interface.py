@@ -523,13 +523,18 @@ elif mode == "Par pays":
                 variation_hebdo_s_s1 = variation_hebdo_s_s1.reset_index()
                 variation_hebdo_s_s1 = variation_hebdo_s_s1.rename({list(variation_hebdo_s_s1.columns)[0]: "semaine"}, 
                                      axis=1)
-                #variation_hebdo_s_s1 = variation_hebdo_s_s1[::-1]
 
+                variation_hebdo_s1_s2 = variation_hebdo_s1_s2.reset_index()
+                variation_hebdo_s1_s2 = variation_hebdo_s1_s2.rename({list(variation_hebdo_s1_s2.columns)[0]: "semaine"}, 
+                                     axis=1)
                 st.write(variation_hebdo_s_s1)
                 # Transformation du tableau pour pouvoir le manipuler
                 data_melted_s = pd.melt(variation_hebdo_s_s1, id_vars="semaine", 
                                         var_name="pays", value_name="valeur")
   
+                data_melted_s1 = pd.melt(variation_hebdo_s1_s2, id_vars="semaine",
+                                         var_name="pays", value_name="valeur")
+                
                 st.title("Variation en % de S/S-1")
                 fig, ax = plt.subplots(figsize=(10,10))
                 st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
@@ -547,13 +552,6 @@ elif mode == "Par pays":
                 ax.set(xlabel="Région", ylabel='Variation (%)')
                 st.pyplot()
                 
-                variation_hebdo_s1_s2 = variation_hebdo_s1_s2.reset_index()
-                variation_hebdo_s1_s2 = variation_hebdo_s1_s2.rename({list(variation_hebdo_s1_s2.columns)[0]: "semaine"}, 
-                                     axis=1)
-                variation_hebdo_s1_s2 = variation_hebdo_s1_s2.iloc[::-1]
-                
-                data_melted_s1 = pd.melt(variation_hebdo_s1_s2, id_vars="semaine",
-                                         var_name="pays", value_name="valeur")
                 st.title("Variations en % de S-1 / S-2")
                 fig, ax = plt.subplots(figsize=(10,10))
                 st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
