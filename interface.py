@@ -402,7 +402,7 @@ elif mode == "Par pays":
                 for p in ax.patches:
                     ax.annotate(format(p.get_height(), '.1f'), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
-                        ha = 'center', va = 'center', 
+                        ha = 'center', va = 'bottom', 
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points',
@@ -410,6 +410,7 @@ elif mode == "Par pays":
                 plt.xticks(rotation=90)
 
                 st.pyplot()
+                
                 moyenne_trimestre_melted_filtreN3 = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2019)]
                 concat_N2 = pd.concat([moyenne_trimestre_melted_filtreN,moyenne_trimestre_melted_filtreN3])
                 st.title("Volume de l'année N sur N-2")
@@ -419,9 +420,9 @@ elif mode == "Par pays":
                                      data=concat_N2))
                 ax2.grid()
                 for p in ax2.patches:
-                    ax.annotate(format(p.get_height(), '.1f'), 
+                    ax2.annotate(format(p.get_height(), '.1f'), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
-                        ha = 'center', va = 'center', 
+                        ha = 'center', va = 'bottom', 
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points',
