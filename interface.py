@@ -275,7 +275,7 @@ elif mode == "Par pays":
                 top_pays_concat.columns = colonne
                 top_pays_concat.index = index
                 st.write(top_pays_concat)
-                st.table("Volumes brutes des 3 dernières années du top 6 hebdo")
+                st.title("Volumes brutes des 3 dernières années du top 6 hebdo")
                 top_last_annee(recap_2s.head(6))
                 
                 
