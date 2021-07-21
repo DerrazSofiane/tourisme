@@ -528,6 +528,8 @@ elif mode == "Par pays":
                         xytext = (0, 1), 
                         textcoords = 'offset points')
                 plt.xticks(rotation=90)
+                ax.set(xlabel="Région", ylabel='Valeur (%)')
+
                 legend = str(mode_mois)+" "+str(mode_annee)+"/"+str(mode_annee-1)
                 plt.title(legend)
                 #Permet d'afficher le graphique
@@ -541,18 +543,20 @@ elif mode == "Par pays":
                 for p in ax.patches:
                     ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
-                        ha = 'center', va = 'bottom', 
+                        ha = 'center', va = 'top', 
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points')
                 plt.xticks(rotation=90)
                 legend2 = str(mode_mois)+" "+str(mode_annee)+"/"+str(mode_annee-2)
                 plt.title(legend2)
+                ax.set(xlabel="Région", ylabel='Valeur (%)')
+
                 #Permet d'afficher le graphique
                 st.pyplot()
             
-            if st.sidebar.checkbox("les variation (%) mensuelle"):
-                st.title("les variation (%) mensuelle")
+            if st.sidebar.checkbox("les variation (%) trimestrielle"):
+                st.title("les variation (%) trimestrielle")
                 derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
                 derniere_3annees.sort(reverse=True)
                 mode_annee = st.selectbox(
@@ -565,11 +569,12 @@ elif mode == "Par pays":
                 colonnes = list(variation_trimestrielle.columns)
 
                 t1 = variation_trimestrielle[colonnes[0]].reset_index()
-                st.title("Variation du 1er Trimestre de l'année N et N-2")
+                st.title(f"Variation du 1er Trimestre de l'année {mode_annee} et {mode_annee-2}")
                 st.write(sns.barplot(x="index",y = colonnes[0], data=t1))
                 plt.xticks(rotation=90)
                 st.pyplot()
-                st.title("Variation du 1er Trimestre de l'année N et N-1")
+                st.title(f"Variation du 1er Trimestre de l'année {mode_annee} et {mode_annee-1}")
+
                 t2 = variation_trimestrielle[colonnes[1]].reset_index()
                 st.write(sns.barplot(x="index",y = colonnes[1], data=t2))
                 plt.xticks(rotation=90)
