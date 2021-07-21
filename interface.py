@@ -62,9 +62,9 @@ if mode == "Générique":
             st.write(top3_generique[colonnes[0]])
             st.write(top3_generique[colonnes[1]])
             st.write(top3_generique[colonnes[2]])
-        if st.sidebar.checkbox("Volumes bruts") and uploaded_file != "None":
+        if st.sidebar.checkbox("Volumes") and uploaded_file != "None":
             # Checkbox de la partie Volume brutes des 2 dernières semaines
-            st.title("Volumes brutes des 2 dernières semaines")
+            st.title("Volumes des 2 dernières semaines")
             volume_brute = volumes_brutes.set_index(list(fichier.columns)[0])
             
             tmp = volume_brute.copy()
