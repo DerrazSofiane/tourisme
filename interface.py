@@ -431,6 +431,7 @@ elif mode == "Par pays":
                         textcoords = 'offset points',
                         rotation=90)
                 plt.xticks(rotation=90)
+                ax3.set(xlabel="Région", ylabel='Volume')
 
                 st.pyplot()
                 
@@ -451,6 +452,8 @@ elif mode == "Par pays":
                         textcoords = 'offset points',
                         rotation=90)
                 plt.xticks(rotation=90)
+                ax4.set(xlabel="Région", ylabel='Volume')
+
                 st.pyplot()
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
