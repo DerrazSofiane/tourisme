@@ -513,7 +513,7 @@ elif mode == "Par pays":
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
         
         # VARIATION PAR PAYS        
-        elif st.sidebar.checkbox("3- Les variation (%) des 3 dernières années du top 6"):
+        if st.sidebar.checkbox("3- Les variation (%) des 3 dernières années du top 6"):
             status2 = st.sidebar.radio("Période d'analyse': ", ('Hebdomadaire', 'Mensuel','Trimestrielle'))
             # VARIATION HEBDOMADAIRE
             if status2 == "Hebdomadaire":
