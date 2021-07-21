@@ -395,11 +395,11 @@ elif mode == "Par pays":
                 concat_N = pd.concat([moyenne_trimestre_melted_filtreN,moyenne_trimestre_melted_filtreN2])
                 
                 st.title("Volume de l'année N sur N-1")
-                fig2, ax2 = plt.subplots(figsize=(10,10))
+                fig, ax = plt.subplots(figsize=(10,10))
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
                                      data=concat_N))
-                ax2.grid()
-                for p in ax2.patches:
+                ax.grid()
+                for p in ax.patches:
                     ax.annotate(format(p.get_height(), '.1f'), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
                         ha = 'center', va = 'center', 
