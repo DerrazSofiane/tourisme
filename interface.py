@@ -458,7 +458,7 @@ elif mode == "Par pays":
                 for p in ax.patches:
                     ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
-                        ha = 'center', va = 'center', 
+                        ha = 'center', va = 'bottom', 
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points')
@@ -474,7 +474,7 @@ elif mode == "Par pays":
                 for p in ax.patches:
                     ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
-                        ha = 'center', va = 'center', 
+                        ha = 'center', va = 'bottom', 
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points')
@@ -515,17 +515,15 @@ elif mode == "Par pays":
                 variation_mensuelle = variation_mensuelle.reset_index()
 
                 colonnes_annee_mois = list(variation_mensuelle.columns)
-                st.title("Evolution en % du mois de N/N-1")
-                st.write(variation_mensuelle)
-               
+                st.title(f"Evolution en % du mois {mode_mois} de l'année {mode_annee} et {mode_annee-1}")               
                 
                 fig, ax = plt.subplots(figsize=(10,10))
                 st.write(plt.bar(variation_mensuelle[colonnes_annee_mois[0]],variation_mensuelle[colonnes_annee_mois[1]]))
                 ax.grid()
                 for p in ax.patches:
-                    ax.annotate(format(p.get_height(), '.1f'), 
+                    ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
-                        ha = 'center', va = 'center', 
+                        ha = 'center', va = 'top', 
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points')
@@ -535,15 +533,15 @@ elif mode == "Par pays":
                 #Permet d'afficher le graphique
                 st.pyplot()
                 
-                st.title("Evolution en % du mois de N/N-2")
+                st.title(f"Evolution en % du mois {mode_mois} de l'année {mode_annee} et {mode_annee-2}")
                 
                 fig, ax = plt.subplots(figsize=(10,10))
                 st.write(plt.bar(variation_mensuelle[colonnes_annee_mois[0]],variation_mensuelle[colonnes_annee_mois[2]]))
                 ax.grid()
                 for p in ax.patches:
-                    ax.annotate(format(p.get_height(), '.1f'), 
+                    ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
-                        ha = 'center', va = 'center', 
+                        ha = 'center', va = 'bottom', 
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points')
