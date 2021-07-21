@@ -571,7 +571,7 @@ elif mode == "Par pays":
                         ha = 'center', va = 'top', 
                         size=9,
                         xytext = (0, 1), 
-                        textcoords = 'offset points', rotation=90)
+                        textcoords = 'offset points')
                 plt.xticks(rotation=90)
                 ax.set(xlabel="Région", ylabel='Variation (%)')
 
@@ -591,7 +591,7 @@ elif mode == "Par pays":
                         ha = 'center', va = 'top', 
                         size=9,
                         xytext = (0, 1), 
-                        textcoords = 'offset points', rotation=90)
+                        textcoords = 'offset points')
                 plt.xticks(rotation=90)
                 legend2 = str(mode_mois)+" "+str(mode_annee)+"/"+str(mode_annee-2)
                 plt.title(legend2)
