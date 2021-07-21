@@ -285,7 +285,7 @@ elif mode == "Par pays":
             cols = st.beta_columns(3)
            
             # VOLUME HEBDO
-            if status == "hebdo":
+            if status == "Hebdomadaire":
                 st.title("Les tops hebdomadaires")
                 
                 # Récupération du top 3 sur 2 semaines
@@ -305,7 +305,7 @@ elif mode == "Par pays":
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
            
             # VOLUME MENSUEL
-            elif status == "mensuel":
+            elif status == "Mensuel":
                 def top_last_mois_annee(recap, mois, annee):
                     evolution_annee = evolutions_sum_annees(fichier, annee)
                     top_6 = recap.head(6)
@@ -430,7 +430,7 @@ elif mode == "Par pays":
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
             
             # VOLUME TRIMESTRIEL
-            elif status == "trimestrielle":
+            elif status == "Trimestrielle":
                 st.title("Les Tops trimestriel")
                 top_pays_12s = tops_pays(recap_12s, fichier, "TOP 12 SEMAINES")
                 colonnes = list(top_pays_12s.columns)
