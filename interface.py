@@ -300,6 +300,7 @@ elif mode == "Par pays":
                 top_pays_4s = tops_pays(recap_4s, fichier, "TOP 4 SEMAINES")
                 colonnes = list(top_pays_4s.columns)
                 st.write(top_pays_4s[colonnes[0]])
+                st.write("Top volume : ",list(top_pays_4s.iloc[:,colonnes[0]]))
                 st.write(top_pays_4s[colonnes[1]])
                 st.write(top_pays_4s[colonnes[2]])
                 st.title("Volumes mensuel des 3 dernières années")
