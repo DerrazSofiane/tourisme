@@ -456,13 +456,14 @@ elif mode == "Par pays":
                                      data=data_melted_s))
                 ax.grid(axis="x")
                 for p in ax.patches:
-                    ax.annotate(format(p.get_height(), '.1f'), 
+                    ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
                         ha = 'center', va = 'center', 
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points')
                 #Permet d'afficher le graphique
+                ax.set(xlabel="Région", ylabel='Valeur (%)')
                 st.pyplot()
                 
                 st.title("Variation en % de S-1 / S-2")
@@ -471,15 +472,17 @@ elif mode == "Par pays":
                                      data=data_melted_s1))
                 ax.grid(axis="x")
                 for p in ax.patches:
-                    ax.annotate(format(p.get_height(), '.1f'), 
+                    ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
                         ha = 'center', va = 'center', 
                         size=9,
                         xytext = (0, 1), 
                         textcoords = 'offset points')
                 #Permet d'afficher le graphique
-               
+                ax.set(xlabel="Région", ylabel='Valeur (%)')
+
                 st.pyplot()
+                
             if st.sidebar.checkbox("Les variation (%) mensuelle"):
                 st.title("Les variation (%) mensuelle")
                 mois = {"janvier": 1, 
