@@ -523,7 +523,7 @@ elif mode == "Par pays":
                 variation_hebdo_s_s1 = variation_hebdo_s_s1.reset_index()
                 variation_hebdo_s_s1 = variation_hebdo_s_s1.rename({list(variation_hebdo_s_s1.columns)[0]: "semaine"}, 
                                      axis=1)
-                variation_hebdo_s_s1 = variation_hebdo_s_s1.iloc[-1:]
+                variation_hebdo_s_s1 = variation_hebdo_s_s1[-1::]
 
                 st.write(variation_hebdo_s_s1)
                 # Transformation du tableau pour pouvoir le manipuler
