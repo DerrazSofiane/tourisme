@@ -110,7 +110,28 @@ if mode == "Générique":
                     rotation=90)
             #Permet d'afficher le graphique
             st.pyplot()
+        def graph_volumes(data):
+            fig, ax = plt.subplots(figsize=(12,5), dpi=300)
         
+            # YlGnBu RdBu OrRd PRGn Spectral YlOrBr
+            sns.barplot(x="pays", y="volume", hue="semaine", data=data,
+                        palette=sns.color_palette("YlGnBu"))
+        
+            ax.legend(loc='lower center', bbox_to_anchor=(0.5, 1.01),
+                      fancybox=True, shadow=False, ncol=3)
+        
+            # Ecriture des valeurs audessus des bars 
+            for p in ax.patches:
+                text = format(p.get_height(), '.2f')+" "
+                x = p.get_x() + p.get_width() / 2.
+                y = p.get_height()
+                ax.annotate(text, (x,y), ha = 'center', va = 'top', size=10, color='white',
+                            xytext = (0, 1), textcoords = 'offset points', rotation=90)
+                
+            return fig
+        st.title("test")
+        graph_volumes(data_melted)
+
         # PARTIE VARIATION
         if st.sidebar.checkbox("3 - Les variation (%)") and uploaded_file != "None":
 
@@ -257,7 +278,7 @@ elif mode == "Par pays":
        
         # LES VOLUMES PAR PAYS
         if st.sidebar.checkbox("2- Les volumes des 3 dernières années du top 6"):
-            status = st.sidebar.radio("Select volume: ", ('hebdo', 'mensuel','trimestrielle'))
+            status = st.sidebar.radio("Période d'analyse': ", ('Hebdomadaire', 'Mensuel','Trimestrielle'))
             def top_last_annee(recap):
                 """ Fonction générale permettant de créer de façon dynamique
                 des graphiques sur 3 années.
@@ -514,9 +535,9 @@ elif mode == "Par pays":
         
         # VARIATION PAR PAYS        
         if st.sidebar.checkbox("3- Les variation (%) des 3 dernières années du top 6"):
-           
+            status2 = st.sidebar.radio("Période d'analyse': ", ('Hebdomadaire', 'Mensuel','Trimestrielle'))
             # VARIATION HEBDOMADAIRE
-            if st.sidebar.checkbox("Les variation (%) hebdomadaire"):
+            if status2 == "Hebdomadaire":
                 st.title("Les variations (%) hebdomadaire")
                 variation_hebdo = variation_hebdo(fichier, date_calendar, recap_2s)
                 variation_hebdo_s_s1 = variation_hebdo.head(2)
@@ -575,7 +596,8 @@ elif mode == "Par pays":
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
             
             # VARIATION MENSUELLE
-            elif st.sidebar.checkbox("Les variations (%) mensuelle"):
+            elif status2 == "Mensuel":
+                
                 st.title("Les variations (%) mensuelle")
                 mois = {"janvier": 1, 
                         "février": 2, 
@@ -653,9 +675,9 @@ elif mode == "Par pays":
                 
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
-            
+                
             # VARIATION TRIMESTRIELLE
-            elif st.sidebar.checkbox("Les variation (%) trimestrielle"):
+            elif status2 == "Trimestrielle":
                 st.title("les variation (%) trimestrielle")
                 derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
                 derniere_3annees.sort(reverse=True)
