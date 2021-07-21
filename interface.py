@@ -62,7 +62,7 @@ if mode == "Générique":
             st.write(top3_generique[colonnes[0]])
             st.write(top3_generique[colonnes[1]])
             st.write(top3_generique[colonnes[2]])
-        if st.sidebar.checkbox("Volumes") and uploaded_file != "None":
+        if st.sidebar.checkbox("2 - Volumes") and uploaded_file != "None":
             # Checkbox de la partie Volume brutes des 2 dernières semaines
             st.title("Volumes des 2 dernières semaines")
             volume_brute = volumes_brutes.set_index(list(fichier.columns)[0])
@@ -87,7 +87,7 @@ if mode == "Générique":
             # Transformation du tableau pour pouvoir le manipuler
             data_melted = pd.melt(tableau, id_vars="semaine", var_name="pays", 
                                   value_name="valeur")
-            st.title("Volumes brutes de la semaine S et de la semaine (S-1)")
+            st.title("Volumes de la semaine S et de la semaine (S-1)")
             fig, ax = plt.subplots(figsize=(10,10))
             st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                  data=data_melted))
@@ -103,10 +103,10 @@ if mode == "Générique":
             st.pyplot()
             
         if st.sidebar.checkbox("Variation (%)") and uploaded_file != "None":
-            """ Checkbox de la partie Variation, il retourne un tableau de
-            variation des 4 semaines ainsi que 2 graphique, S sur S-1
-            ainsi que S-1 sur S-2
-            """
+            #Checkbox de la partie Variation, il retourne un tableau de
+            #variation des 4 semaines ainsi que 2 graphique, S sur S-1
+            #ainsi que S-1 sur S-2
+            
             st.title("Variations (%) des 4 dernières semaines")
             variation_copy = variation.copy()
             variation_colonnes = variation.columns
@@ -128,7 +128,7 @@ if mode == "Générique":
             evolution_melted = pd.melt(var_S_S1.sort_index(ascending=False), 
                                        id_vars="semaine", var_name="pays", 
                                        value_name="valeur")
-            st.title("Variations (%) de S/S-1")
+            st.title("Variation hebdomadaire des volumes (en %)")
             fig, ax = plt.subplots(figsize=(10,10))
             st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                  data=evolution_melted))
@@ -147,7 +147,7 @@ if mode == "Générique":
             var_S1_S2 = var_S1_S2.rename({"index": "semaine"}, axis=1)
             evolution_s1_melted = pd.melt(var_S1_S2.sort_index(ascending=False), 
                                           id_vars="semaine", var_name="pays", value_name="valeur")
-            st.title("Variations (%) de S-1/S-2")
+            st.title("Variation hebdomadaire des volumes (en %) de la semaine passée")
             fig, ax = plt.subplots(figsize=(10,10))
             st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                  data=evolution_s1_melted))
