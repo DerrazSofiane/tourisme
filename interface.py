@@ -96,7 +96,7 @@ if mode == "Générique":
                                   value_name="valeur")
 
             st.title("Volumes de la semaine S et de la semaine (S-1)")
-            fig, ax = plt.subplots(figsize=(10,10))
+            fig, ax = plt.subplots(figsize=(12,5), dpi=300)
             st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                  data=data_melted))
             ax.grid(axis="x")
@@ -136,7 +136,7 @@ if mode == "Générique":
                                        id_vars="semaine", var_name="pays", 
                                        value_name="valeur")
             st.title("Variations hebdomadaires des volumes")
-            fig, ax = plt.subplots(figsize=(10,10))
+            fig, ax = plt.subplots(figsize=(12,5), dpi=300)
             st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
                                  data=evolution_melted))
             ax.grid(axis="x")
