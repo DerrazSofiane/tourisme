@@ -67,6 +67,7 @@ if mode == "Générique":
             top3_generique2.columns = colonne
             top3_generique2.index = index
             st.table(top3_generique2)
+        
         if st.sidebar.checkbox("2 - Les volumes") and uploaded_file != "None":
             # Checkbox de la partie Volume brutes des 2 dernières semaines
             st.title("Volumes des 2 dernières semaines")
@@ -618,6 +619,8 @@ elif mode == "Par pays":
                 st.title(f"Les variation du 1er Trimestre de l'année {mode_annee} et {mode_annee-2}")
                 st.write(sns.barplot(x="index",y = colonnes[0], data=t1))
                 ax.grid()
+                ax.set(xlabel="Région", ylabel='Variation (%)')
+
                 for p in ax.patches:
                     ax.annotate(" "+str(format(p.get_height(), '.1f')+"%"), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
@@ -643,6 +646,8 @@ elif mode == "Par pays":
                         xytext = (0, 1), 
                         textcoords = 'offset points')
                 plt.xticks(rotation=90)
+                ax2.set(xlabel="Région", ylabel='Variation (%)')
+
                 st.pyplot()
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s3 = st.text_area("Emplacement du commentaire", "")
