@@ -339,7 +339,7 @@ elif mode == "Par pays":
                                               value_name="valeur")
                 fig1 = plt.figure()
 
-                ax = (sns.barplot(x="index", y="valeur", hue="annee", 
+                ax1 = (sns.barplot(x="index", y="valeur", hue="annee", 
                                   data=derniere_annee_melt.sort_values(by=["annee"])))
                 plt.xticks(rotation=90)
                 st.pyplot(fig1)
@@ -394,13 +394,13 @@ elif mode == "Par pays":
                 moyenne_trimestre_melted_filtreN2 = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2020)]
                 concat_N = pd.concat([moyenne_trimestre_melted_filtreN,moyenne_trimestre_melted_filtreN2])
                 
-                st.title("Volume de l'année N sur N-1")
-                fig, ax = plt.subplots(figsize=(10,10))
+                st.title(f"Volume du 1er Trimestre de l'année {colonnes[0]} et {colonnes[1]}")
+                fig3, ax3 = plt.subplots(figsize=(10,10))
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
                                      data=concat_N))
-                ax.grid()
+                ax3.grid()
                 for p in ax.patches:
-                    ax.annotate(format(p.get_height(), '.1f'), 
+                    ax3.annotate(format(p.get_height(), '.1f'), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
                         ha = 'center', va = 'bottom', 
                         size=9,
@@ -414,12 +414,12 @@ elif mode == "Par pays":
                 moyenne_trimestre_melted_filtreN3 = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2019)]
                 concat_N2 = pd.concat([moyenne_trimestre_melted_filtreN,moyenne_trimestre_melted_filtreN3])
                 st.title(f"Volume du 1er Trimestre de l'année {colonnes[0]} et {colonnes[2]}")
-                fig2, ax2 = plt.subplots(figsize=(10,10))
+                fig4, ax4 = plt.subplots(figsize=(10,10))
 
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
                                      data=concat_N2))
-                ax2.grid()
-                for p in ax2.patches:
+                ax4.grid()
+                for p in ax4.patches:
                     ax2.annotate(format(p.get_height(), '.1f'), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
                         ha = 'center', va = 'bottom', 
