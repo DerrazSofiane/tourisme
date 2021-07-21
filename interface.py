@@ -571,7 +571,7 @@ elif mode == "Par pays":
                         ha = 'center', va = 'top', 
                         size=9,
                         xytext = (0, 1), 
-                        textcoords = 'offset points')
+                        textcoords = 'offset points', rotation=90)
                 plt.xticks(rotation=90)
                 ax.set(xlabel="Région", ylabel='Variation (%)')
 
