@@ -268,7 +268,8 @@ elif mode == "Par pays":
                 colonnes = list(top_pays_2s.columns)
                 top_pays_concat = pd.concat([top_pays_2s[colonnes[0]], top_pays_2s[colonnes[1]], top_pays_2s[colonnes[2]]])
                 index = [1,2,3]
-                colonne = "Top 3"
+                colonne = "Top volume"
+                
                 top_pays_concat.columns = colonne
                 top_pays_concat.index = index
                 st.write(top_pays_concat)
