@@ -18,7 +18,7 @@ from main import (traitements_informations, generique_variation,
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-st.title("OBSERVATOIRE DU TOURISME SUR INTERNET")
+st.title("OBSERVATOIRE DU TOURISME")
 st.image("https://nicolasbaudy.files.wordpress.com/2020/02/cropped-logo-new-2.png", use_column_width=False)
 
 
@@ -520,6 +520,7 @@ elif mode == "Par pays":
                 plt.title(legend2)
                 #Permet d'afficher le graphique
                 st.pyplot()
+            
             if st.sidebar.checkbox("Variation (%) trimestrielle"):
                 st.title("Variation (%) trimestrielle")
                 derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
