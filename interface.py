@@ -264,7 +264,7 @@ elif mode == "Par pays":
             
             cols = st.beta_columns(3)
            
-            if st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 hebdo"):
+            if st.sidebar.checkbox("Volumes des 3 dernières années du top 6 hebdo"):
                 st.title("Les tops hebdomadaires")
                 top_pays_2s = tops_pays(recap_2s,fichier, "TOP 2 SEMAINES")
                 colonnes = list(top_pays_2s.columns)
@@ -275,12 +275,12 @@ elif mode == "Par pays":
                 top_pays_concat.columns = colonne
                 top_pays_concat.index = index
                 st.table(top_pays_concat)
-                st.title("Volumes brutes des 3 dernières années du top 6 hebdo")
+                st.title("Volumes des 3 dernières années du top 6 hebdo")
                 top_last_annee(recap_2s.head(6))
                 
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
-            elif st.sidebar.checkbox("Volumes brutes des 3 dernières années du top 6 mensuel"):
+            elif st.sidebar.checkbox("Volumes  des 3 dernières années du top 6 mensuel"):
                 def top_last_mois_annee(recap, mois, annee):
                     evolution_annee = evolutions_sum_annees(fichier, annee)
                     top_6 = recap.head(6)
