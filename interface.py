@@ -393,27 +393,39 @@ elif mode == "Par pays":
                 moyenne_trimestre_melted_filtreN = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2021)]
                 moyenne_trimestre_melted_filtreN2 = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2020)]
                 concat_N = pd.concat([moyenne_trimestre_melted_filtreN,moyenne_trimestre_melted_filtreN2])
+                
                 st.title("Volume de l'année N sur N-1")
+                fig2, ax2 = plt.subplots(figsize=(10,10))
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
                                      data=concat_N))
+                ax2.grid()
+                for p in ax2.patches:
+                    ax.annotate(format(p.get_height(), '.1f'), 
+                        (p.get_x() + p.get_width() / 2., p.get_height()), 
+                        ha = 'center', va = 'center', 
+                        size=9,
+                        xytext = (0, 1), 
+                        textcoords = 'offset points',
+                        rotation=90)
                 plt.xticks(rotation=90)
 
                 st.pyplot()
                 moyenne_trimestre_melted_filtreN3 = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2019)]
                 concat_N2 = pd.concat([moyenne_trimestre_melted_filtreN,moyenne_trimestre_melted_filtreN3])
                 st.title("Volume de l'année N sur N-2")
-                fig, ax = plt.subplots(figsize=(10,10))
+                fig2, ax2 = plt.subplots(figsize=(10,10))
 
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
                                      data=concat_N2))
-                ax.grid()
-                for p in ax.patches:
+                ax2.grid()
+                for p in ax2.patches:
                     ax.annotate(format(p.get_height(), '.1f'), 
                         (p.get_x() + p.get_width() / 2., p.get_height()), 
                         ha = 'center', va = 'center', 
                         size=9,
                         xytext = (0, 1), 
-                        textcoords = 'offset points')
+                        textcoords = 'offset points',
+                        rotation=90)
                 plt.xticks(rotation=90)
                 st.pyplot()
                 
