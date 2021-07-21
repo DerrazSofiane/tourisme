@@ -269,9 +269,9 @@ elif mode == "Par pays":
                 top_pays_concat = pd.concat([top_pays_2s[colonnes[0]], top_pays_2s[colonnes[1]], top_pays_2s[colonnes[2]]])
                 index = [1,2,3]
                 colonne = "Top 3"
-                top_pays_2s.columns = colonne
-                top_pays_2s.index = index
-                st.write(top_pays_2s)
+                top_pays_concat.columns = colonne
+                top_pays_concat.index = index
+                st.write(top_pays_concat)
                 st.title("Volumes brutes des 3 dernières années du top 6 hebdo")
                 top_last_annee(recap_2s.head(6))
                 
