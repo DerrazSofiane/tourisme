@@ -195,7 +195,7 @@ elif mode == "Par pays":
         recap_2s, recap_4s, recap_12s = moyenne_donnees_brutes(periode_choisi)
         
         if st.sidebar.checkbox("1- Les Tops") and uploaded_file != "None":
-            st.title("Moyenne des données brutes sur les 2 dernières semaines, des 4 dernières semaines, des 12 dernières semaines")
+            st.title("Volumes hebdomadaires moyens des 2, 4, 12 dernières semaines")
             
             def arrondie_str(x):
                 x = str(x)
