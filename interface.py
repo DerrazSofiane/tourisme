@@ -566,7 +566,7 @@ elif mode == "Par pays":
                         ha = 'center', va = 'top', 
                         size=9,
                         xytext = (0, 1), 
-                        textcoords = 'offset points')
+                        textcoords = 'offset points', rotation=90)
                 plt.xticks(rotation=90)
                 legend2 = str(mode_mois)+" "+str(mode_annee)+"/"+str(mode_annee-2)
                 plt.title(legend2)
@@ -598,7 +598,8 @@ elif mode == "Par pays":
                         ha = 'center', va = 'top', 
                         size=9,
                         xytext = (0, 1), 
-                        textcoords = 'offset points')
+                        textcoords = 'offset points',
+                        rotation=90)
                 plt.xticks(rotation=90)
                 st.pyplot()
                 st.title(f"Variation du 1er Trimestre de l'année {mode_annee} et {mode_annee-1}")
