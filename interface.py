@@ -366,11 +366,11 @@ elif mode == "Par pays":
                 st.write(top_pays_12s[colonnes[1]])
                 st.write(top_pays_12s[colonnes[2]])
                 
-                derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
-                derniere_3annees.sort(reverse=True)
+                derniere_3annees_trim = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
+                derniere_3annees_trim.sort(reverse=True)
                 mode_annee = st.selectbox(
                         "Quelle annee?",
-                        (derniere_3annees)
+                        (derniere_3annees_trim)
                         )
                 
                 
