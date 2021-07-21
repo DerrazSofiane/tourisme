@@ -110,28 +110,6 @@ if mode == "Générique":
                     rotation=90)
             #Permet d'afficher le graphique
             st.pyplot()
-        def graph_volumes(data):
-            fig, ax = plt.subplots(figsize=(12,5), dpi=300)
-        
-            # YlGnBu RdBu OrRd PRGn Spectral YlOrBr
-            sns.barplot(x="pays", y="volume", hue="semaine", data=data,
-                        palette=sns.color_palette("YlGnBu"))
-        
-            ax.legend(loc='lower center', bbox_to_anchor=(0.5, 1.01),
-                      fancybox=True, shadow=False, ncol=3)
-        
-            # Ecriture des valeurs audessus des bars 
-            for p in ax.patches:
-                text = format(p.get_height(), '.2f')+" "
-                x = p.get_x() + p.get_width() / 2.
-                y = p.get_height()
-                ax.annotate(text, (x,y), ha = 'center', va = 'top', size=10, color='white',
-                            xytext = (0, 1), textcoords = 'offset points', rotation=90)
-                
-            return fig
-        st.title("test")
-        graph_volumes(data_melted)
-        st.pyplot()
 
         # PARTIE VARIATION
         if st.sidebar.checkbox("3 - Les variation (%)") and uploaded_file != "None":
@@ -679,7 +657,7 @@ elif mode == "Par pays":
                 
             # VARIATION TRIMESTRIELLE
             elif status2 == "Trimestrielle":
-                st.title("les variation (%) trimestrielle")
+                st.title("les variations (%) trimestrielle")
                 derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
                 derniere_3annees.sort(reverse=True)
                 mode_annee = st.selectbox(
