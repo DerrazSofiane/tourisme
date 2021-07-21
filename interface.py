@@ -269,7 +269,7 @@ elif mode == "Par pays":
                 top_pays_concat = pd.concat([top_pays_2s[colonnes[0]], top_pays_2s[colonnes[1]], top_pays_2s[colonnes[2]]])
                 index = [1,2,3]
                 colonne = "Top 3"
-                st.write(top_pays_concat.columns)
+                
                 top_pays_concat.columns = colonne
                 top_pays_concat.index = index
                 st.write(top_pays_concat)
@@ -299,9 +299,13 @@ elif mode == "Par pays":
                 st.title("Les Tops mensuel")
                 top_pays_4s = tops_pays(recap_4s, fichier, "TOP 4 SEMAINES")
                 colonnes = list(top_pays_4s.columns)
-                st.write(top_pays_4s[colonnes[0]])
-                st.write(top_pays_4s[colonnes[1]])
-                st.write(top_pays_4s[colonnes[2]])
+                top_pays_concat2 = pd.concat([top_pays_4s[colonnes[0]], top_pays_4s[colonnes[1]], top_pays_4s[colonnes[2]]])
+                index = [1,2,3]
+                colonne = "Top 3"
+                
+                top_pays_concat2.columns = colonne
+                top_pays_concat2.index = index
+                st.write(top_pays_concat2)
                 st.title("Volumes mensuel des 3 dernières années")
                
                 mois = {"janvier": 1, 
