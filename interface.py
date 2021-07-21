@@ -413,7 +413,7 @@ elif mode == "Par pays":
                 
                 moyenne_trimestre_melted_filtreN3 = moyenne_trimestre_melted[(moyenne_trimestre_melted["annee"] == 2019)]
                 concat_N2 = pd.concat([moyenne_trimestre_melted_filtreN,moyenne_trimestre_melted_filtreN3])
-                st.title("Volume de l'année N sur N-2")
+                st.title(f"Volume du 1er Trimestre de l'année {colonnes[0]} et {colonnes[2]}")
                 fig2, ax2 = plt.subplots(figsize=(10,10))
 
                 st.write(sns.barplot(x="pays", y="valeur", hue="annee", 
