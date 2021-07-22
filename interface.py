@@ -7,6 +7,7 @@ import numpy as np
 import datetime
 from calendar import monthrange
 import os
+from gsheetsdb import connect
 
 from main import (traitements_informations, generique_variation, 
                   generique_volume, generique_potentiel, moyenne_donnees_brutes,
@@ -14,6 +15,9 @@ from main import (traitements_informations, generique_variation,
                   valeurs_brutes_3annees, variation_hebdo, evolutions_mois_annee,
                   variation_mensuel, moyenne_trimestrielle, valeur_trimestrielle,
                   variation_trimestrielle)
+
+# Objet de connection pour lire la GoogleSheet
+conn = connect()
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -183,9 +187,17 @@ if mode == "Générique":
 # MODE PAR PAYS
 elif mode == "Par pays":
     my_expander = st.sidebar.beta_expander("Ouvrir", expanded=True)
-    with my_expander:
-        st.write("Choisir un fichier :open_file_folder:")
-        uploaded_file = st.file_uploader("")
+    #with my_expander:
+    #    st.write("Choisir un fichier :open_file_folder:")
+    #    uploaded_file = st.file_uploader("")
+    
+    @st.cache(ttl=600)
+    def run_query(query):
+        rows = conn.execute(query, headers=1)
+        return rows
+
+    sheet_url = st.secrets["public_gsheets_url"]
+    uploaded_file = run_query(f'SELECT * FROM "{sheet_url}"')
     try:
         fichier = traitements_informations(uploaded_file)
         colonnes = list(fichier.columns)
