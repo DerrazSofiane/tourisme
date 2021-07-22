@@ -305,7 +305,7 @@ elif mode == "Par pays":
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
            
             # VOLUME MENSUEL
-            elif status == "Mensuel":
+            elif status == "Mensuelle":
                 def top_last_mois_annee(recap, mois, annee):
                     evolution_annee = evolutions_sum_annees(fichier, annee)
                     top_6 = recap.head(6)
