@@ -257,7 +257,7 @@ elif mode == "Par pays":
        
         # LES VOLUMES PAR PAYS
         if st.sidebar.checkbox("2- Les volumes des 3 dernières années du top 6"):
-            status = st.sidebar.radio("Période d'analyse': ", ('Hebdomadaire', 'Mensuel','Trimestrielle'))
+            status = st.sidebar.radio("Période d'analyse: ", ('Hebdomadaire', 'Mensuel','Trimestrielle'))
             def top_last_annee(recap):
                 """ Fonction générale permettant de créer de façon dynamique
                 des graphiques sur 3 années.
@@ -514,10 +514,10 @@ elif mode == "Par pays":
         
         # VARIATION PAR PAYS        
         if st.sidebar.checkbox("3- Les variation (%) des 3 dernières années du top 6"):
-            status2 = st.sidebar.radio("Période d'analyse': ", ('Hebdomadaire', 'Mensuel','Trimestrielle'))
+            status2 = st.sidebar.radio("Période d'analyse: ", ('Hebdomadaire', 'Mensuel','Trimestrielle'))
             # VARIATION HEBDOMADAIRE
             if status2 == "Hebdomadaire":
-                st.title("Les variations (%) hebdomadaire")
+                st.title("Les variations (%) hebdomadaires")
                 variation_hebdo = variation_hebdo(fichier, date_calendar, recap_2s)
                 variation_hebdo_s_s1 = variation_hebdo.head(2)
                 variation_hebdo_s1_s2 = variation_hebdo.tail(2)
@@ -575,9 +575,9 @@ elif mode == "Par pays":
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
             
             # VARIATION MENSUELLE
-            elif status2 == "Mensuel":
+            elif status2 == "Mensuelle":
                 
-                st.title("Les variations (%) mensuelle")
+                st.title("Les variations (%) mensuelles")
                 mois = {"janvier": 1, 
                         "février": 2, 
                         "mars": 3, 
@@ -649,7 +649,7 @@ elif mode == "Par pays":
                 plt.xticks(rotation=90)
                 legend2 = str(mode_mois)+" "+str(mode_annee)+"/"+str(mode_annee-2)
                 plt.title(legend2)
-                ax.set(xlabel="Région", ylabel='Variation (%)')
+                ax.set(xlabel="Région", ylabel='Variation (%))
                 st.pyplot()
                 
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
@@ -657,7 +657,7 @@ elif mode == "Par pays":
                 
             # VARIATION TRIMESTRIELLE
             elif status2 == "Trimestrielle":
-                st.title("les variations (%) trimestrielle")
+                st.title("les variations (%) trimestrielles")
                 derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
                 derniere_3annees.sort(reverse=True)
                 mode_annee = st.selectbox(
