@@ -59,7 +59,7 @@ if mode == "Générique":
         # PARTIE TOP
         if st.sidebar.checkbox("1 - Les tops") and uploaded_file != "None":
             # Checkbox de la partie "Les tops pays"
-            st.title("1- Les meilleures pays pour le tourisme durant les 4 dernières semaines")
+            st.title("1- Les meilleurs pays pour le tourisme durant les 4 dernières semaines")
             colonnes = list(top3_generique.columns)
             top3_generique2 = pd.concat([top3_generique[colonnes[0]], top3_generique[colonnes[1]], top3_generique[colonnes[2]]])
             index = [1,2,3]
