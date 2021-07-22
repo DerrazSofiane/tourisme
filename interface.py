@@ -15,8 +15,6 @@ from main import (traitements_informations, generique_variation,
                   variation_mensuel, moyenne_trimestrielle, valeur_trimestrielle,
                   variation_trimestrielle)
 
-# Objet de connection pour lire la GoogleSheet
-conn = connect()
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
