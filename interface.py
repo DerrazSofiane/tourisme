@@ -26,7 +26,7 @@ st.image("https://nicolasbaudy.files.wordpress.com/2020/02/cropped-logo-new-2.pn
 # Sélection du mode
 st.sidebar.write("# Bienvenue :computer:")
 mode = st.sidebar.selectbox(
-    "1- ANALYSE : choisissez le mode => Générique // Par Pays ",
+    "1- ANALYSE XXXX : choisissez le mode => Générique // Par Pays ",
     ("Générique", "Par pays")
 )
 
