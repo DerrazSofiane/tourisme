@@ -514,7 +514,7 @@ elif mode == "Par pays":
         
         # VARIATION PAR PAYS        
         if st.sidebar.checkbox("3- Les variation (%) des 3 dernières années du top 6"):
-            status2 = st.sidebar.radio("Période d'analyse: ", ('Hebdomadaire', 'Mensuel','Trimestrielle'))
+            status2 = st.sidebar.radio("Période d'analyse: ", ('Hebdomadaire', 'Mensuelle','Trimestrielle'))
             # VARIATION HEBDOMADAIRE
             if status2 == "Hebdomadaire":
                 st.title("Les variations (%) hebdomadaires")
