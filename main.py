@@ -43,8 +43,8 @@ def traitements_informations(fichier):
 
 
 def moyenne_variation(fichier, nb_semaine):
-    """ Fonction permettant de calculer la moyenne des variations sur X 
-    semaines
+    """ Fonction permettant de calculer la moyenne des variations sur un 
+    nombre de semaines défini.
     Pour la calculer, la formule est la suivante:
     ((Va - Vd) / Vd) * 100
     Va : Valeur d'arrivée (semaine actuelle)
