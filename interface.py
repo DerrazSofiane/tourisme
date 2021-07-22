@@ -257,7 +257,7 @@ elif mode == "Par pays":
        
         # LES VOLUMES PAR PAYS
         if st.sidebar.checkbox("2- Les volumes des 3 dernières années du top 6"):
-            status = st.sidebar.radio("Période d'analyse: ", ('Hebdomadaire', 'Mensuel','Trimestrielle'))
+            status = st.sidebar.radio("Période d'analyse: ", ('Hebdomadaire', 'Mensuelle','Trimestrielle'))
             def top_last_annee(recap):
                 """ Fonction générale permettant de créer de façon dynamique
                 des graphiques sur 3 années.
