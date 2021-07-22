@@ -59,7 +59,7 @@ if mode == "Générique":
         # PARTIE TOP
         if st.sidebar.checkbox("1 - Les tops") and uploaded_file != "None":
             # Checkbox de la partie "Les tops pays"
-            st.title("1- Les meilleurs pays pour le tourisme durant les 4 dernières semaines")
+            st.title("1- Les meilleures pays pour le tourisme durant les 4 dernières semaines")
             colonnes = list(top3_generique.columns)
             top3_generique2 = pd.concat([top3_generique[colonnes[0]], top3_generique[colonnes[1]], top3_generique[colonnes[2]]])
             index = [1,2,3]
@@ -257,7 +257,7 @@ elif mode == "Par pays":
        
         # LES VOLUMES PAR PAYS
         if st.sidebar.checkbox("2- Les volumes des 3 dernières années du top 6"):
-            status = st.sidebar.radio("Période d'analyse: ", ('Hebdomadaire', 'Mensuelle','Trimestrielle'))
+            status = st.sidebar.radio("Période d'analyse': ", ('Hebdomadaire', 'Mensuel','Trimestrielle'))
             def top_last_annee(recap):
                 """ Fonction générale permettant de créer de façon dynamique
                 des graphiques sur 3 années.
@@ -305,7 +305,7 @@ elif mode == "Par pays":
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
            
             # VOLUME MENSUEL
-            elif status == "Mensuelle":
+            elif status == "Mensuel":
                 def top_last_mois_annee(recap, mois, annee):
                     evolution_annee = evolutions_sum_annees(fichier, annee)
                     top_6 = recap.head(6)
@@ -514,10 +514,10 @@ elif mode == "Par pays":
         
         # VARIATION PAR PAYS        
         if st.sidebar.checkbox("3- Les variation (%) des 3 dernières années du top 6"):
-            status2 = st.sidebar.radio("Période d'analyse: ", ('Hebdomadaire', 'Mensuelle','Trimestrielle'))
+            status2 = st.sidebar.radio("Période d'analyse': ", ('Hebdomadaire', 'Mensuel','Trimestrielle'))
             # VARIATION HEBDOMADAIRE
             if status2 == "Hebdomadaire":
-                st.title("Les variations (%) hebdomadaires")
+                st.title("Les variations (%) hebdomadaire")
                 variation_hebdo = variation_hebdo(fichier, date_calendar, recap_2s)
                 variation_hebdo_s_s1 = variation_hebdo.head(2)
                 variation_hebdo_s1_s2 = variation_hebdo.tail(2)
@@ -575,9 +575,9 @@ elif mode == "Par pays":
                     commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
             
             # VARIATION MENSUELLE
-            elif status2 == "Mensuelle":
+            elif status2 == "Mensuel":
                 
-                st.title("Les variations (%) mensuelles")
+                st.title("Les variations (%) mensuelle")
                 mois = {"janvier": 1, 
                         "février": 2, 
                         "mars": 3, 
@@ -657,7 +657,7 @@ elif mode == "Par pays":
                 
             # VARIATION TRIMESTRIELLE
             elif status2 == "Trimestrielle":
-                st.title("les variations (%) trimestrielles")
+                st.title("les variations (%) trimestrielle")
                 derniere_3annees = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
                 derniere_3annees.sort(reverse=True)
                 mode_annee = st.selectbox(
