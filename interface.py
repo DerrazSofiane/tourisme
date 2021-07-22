@@ -649,7 +649,7 @@ elif mode == "Par pays":
                 plt.xticks(rotation=90)
                 legend2 = str(mode_mois)+" "+str(mode_annee)+"/"+str(mode_annee-2)
                 plt.title(legend2)
-                ax.set(xlabel="Région", ylabel='Variation (%))
+                ax.set(xlabel="Région", ylabel='Variation (%)')
                 st.pyplot()
                 
                 if st.checkbox("Voulez vous mettre un commentaire ?"):
