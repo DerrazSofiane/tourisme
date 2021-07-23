@@ -15,7 +15,6 @@ from main import (traitements_informations, generique_variation,
                   variation_mensuel, moyenne_trimestrielle, valeur_trimestrielle,
                   variation_trimestrielle)
 
-
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 
@@ -27,7 +26,7 @@ st.image("https://nicolasbaudy.files.wordpress.com/2020/02/cropped-logo-new-2.pn
 # Sélection du mode
 st.sidebar.write("# Bienvenue :computer:")
 mode = st.sidebar.selectbox(
-    "1- ANALYSE XXXX : choisissez le mode => Générique // Par Pays ",
+    "1- ANALYSE : choisissez le mode => Générique // Par Pays ",
     ("Générique", "Par pays")
 )
 
@@ -63,10 +62,10 @@ if mode == "Générique":
             st.title("1- Les meilleurs pays pour le tourisme durant les 4 dernières semaines")
             colonnes = list(top3_generique.columns)
             top3_generique2 = pd.concat([top3_generique[colonnes[0]], top3_generique[colonnes[1]], top3_generique[colonnes[2]]])
-            index = [1,2,3]
+            index = ["Top Volume","Top Progression","Top Potentiel"]
             colonne = "Top 3"
-            top3_generique2.columns = colonne
             top3_generique2.index = index
+            top3_generique2.name = "Top 3"
             st.table(top3_generique2)
         
         # PARTIE VOLUME
@@ -293,10 +292,10 @@ elif mode == "Par pays":
                 top_pays_2s = tops_pays(recap_2s,fichier, "TOP 2 SEMAINES")
                 colonnes = list(top_pays_2s.columns)
                 top_pays_concat = pd.concat([top_pays_2s[colonnes[0]], top_pays_2s[colonnes[1]], top_pays_2s[colonnes[2]]])
-                index = [1,2,3]
+                index = ["Top Volume","Top Progression","Top Potentiel"]
                 colonne = "Top 3"
-                top_pays_concat.columns = colonne
                 top_pays_concat.index = index
+                top_pays_concat.name = "Top 3"
                 st.table(top_pays_concat)
                 st.title("Volumes des 3 dernières années du top 6 hebdo")
                 # Appel de la fonction de création des graphique sur 3 ans
@@ -329,11 +328,10 @@ elif mode == "Par pays":
                 top_pays_4s = tops_pays(recap_4s, fichier, "TOP 4 SEMAINES")
                 colonnes = list(top_pays_4s.columns)
                 top_pays_concat_mensuel = pd.concat([top_pays_4s[colonnes[0]], top_pays_4s[colonnes[1]], top_pays_4s[colonnes[2]]])
-                index = [1,2,3]
+                index = ["Top Volume","Top Progression","Top Potentiel"]
                 colonne = "Top 3"
-                
-                top_pays_concat_mensuel.columns = colonne
                 top_pays_concat_mensuel.index = index
+                top_pays_concat_mensuel.name = "Top 3"
                 st.table(top_pays_concat_mensuel)
                 st.title("Volumes mensuels des 3 dernières années")
                
@@ -438,11 +436,10 @@ elif mode == "Par pays":
                 top_pays_concat_trim = pd.concat([top_pays_12s[colonnes[0]],
                                                   top_pays_12s[colonnes[1]], 
                                                   top_pays_12s[colonnes[2]]])
-                index = [1,2,3]
+                index = ["Top Volume","Top Progression","Top Potentiel"]
                 colonne = "Top 3"
-                
-                top_pays_concat_trim.columns = colonne
                 top_pays_concat_trim.index = index
+                top_pays_concat_trim.name = "Top 3"
                 st.table(top_pays_concat_trim)
                 
                 derniere_3annees_trim = list(pd.unique(fichier["Semaine"].map(lambda x: x.year)))
