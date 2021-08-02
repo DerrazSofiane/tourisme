@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
-
-# POUR LANCER LE CODE EN LOCAL: streamlit run interface.py
-
 import streamlit as st
 import pandas as pd
-import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import random
-import os
 import pycountry
 import gettext
-from calendar import monthrange
 from datetime import datetime, timedelta
+from scipy.signal import savgol_filter
+
+# POUR LANCER LE CODE EN LOCAL: streamlit run interface.py
 
 français = gettext.translation('iso3166', pycountry.LOCALES_DIR, languages=['fr'])
 français.install()
@@ -451,7 +448,6 @@ def graph_3_ans(data, pays, lissage=False):
     ajusté de manière optimale par rapport à ses voisins. Cela fonctionne très 
     bien même avec des échantillons bruyants provenant de sources non 
     périodiques et non linéaires."""
-    from scipy.signal import savgol_filter
 
     a = max(data.index).year
     j1 = data[data.index >= datetime(a, 1, 1).date()].index[0]
@@ -487,139 +483,6 @@ def graph_3_ans(data, pays, lissage=False):
            rotation=45) 
 
     return fig
-
-
-    """ Graphiques sur 3 années. Elle prends en paramettre le récapitulatif
-    choisi de X semaines."""
-
-    annee = date_calendar.year
-    evolution_annee = evolutions_sum_annees(data, annee)
-    top_6 = recap.head(6)
-    pays = list(top_6.index)
-    annees = list(pd.unique(evolution_annee["annee"]))
-    #f, ax = plt.subplots(2,3,figsize=(10,4))
-    for p in pays:
-        st.write(p)
-        annee1 = evolution_annee[p][(evolution_annee["annee"] == "2019")].reset_index().drop("index", axis=1)
-        annee2 = evolution_annee[p][(evolution_annee["annee"] == "2020")].reset_index().drop("index", axis=1)
-        annee3 = evolution_annee[p][(evolution_annee["annee"] == "2021")].reset_index().drop("index", axis=1)
-        last = pd.concat([annee1, annee2, annee3], axis=1)
-        last.columns = [p+" 2019", p+" 2020", p+" 2021"]
-        last.fillna(0, inplace=True)
-        fig, ax = plt.subplots(figsize=(10,6), dpi=300)
-        ax.plot(last)
-        # TODO ax.legend(last.columns)
-    
-    return fig
-
-#---> Magic Lee-Roy code! 
-def annotation_barres(ax, unite='%'):
-    for p in ax.patches:
-        ax.annotate(
-            " "+str(format(p.get_height(), '.1f')+unite), 
-            (p.get_x() + p.get_width() / 2., p.get_height()), 
-            ha = 'center', va = 'bottom', size=9, xytext = (0, 1),
-            textcoords = 'offset points', rotation=90
-        )
-
-def graph_3(data):
-    for colonne in colonnes:
-        variation[colonne] = variation[colonne].apply(arrondie_str)
-        
-    st.write(variation)
-    # Récupération des 2 premieres semaines
-    var_S_S1 = variation.head(2).reset_index()
-    var_S_S1 = var_S_S1.rename({"index": "semaine"}, axis=1)
-    # Transformation du tableau pour pouvoir le manipuler
-    evolution_melted = pd.melt(var_S_S1.sort_index(ascending=False), 
-                               id_vars="semaine", var_name="pays", 
-                               value_name="valeur")
-    st.title("Variations hebdomadaires des volumes")
-    fig, ax = plt.subplots(figsize=(12,7), dpi=300)
-    st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
-                         data=evolution_melted))
-    ax.grid(axis="x")
-    ax.set(xlabel="Pays", ylabel='Variation (%)')
-    annotation_barres(ax)
-    st.pyplot()
-    
-    # Récupération des 2 dernières semaines
-    var_S1_S2 = variation.tail(2).reset_index()
-    var_S1_S2 = var_S1_S2.rename({"index": "semaine"}, axis=1)
-    evolution_s1_melted = pd.melt(var_S1_S2.sort_index(ascending=False), 
-                                  id_vars="semaine", var_name="pays", value_name="valeur")
-    st.title("Variations hebdomadaires des volumes de la semaine passée")
-    fig, ax = plt.subplots(figsize=(12,7), dpi=300)
-    st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
-                         data=evolution_s1_melted))
-    ax.grid(axis="x")
-    ax.set(xlabel="Pays", ylabel='Variation (%)')
-    annotation_barres(ax)
-        
-    return fig
-
-
-def variations_differents_horizons(data):
-    
-    # Calcul des variations de volume sur plusieurs horizon de temps    
-    variations, col_pays, col_horizons = [], [], []
-    for pays in list(data.columns):
-        for i in [12, 8, 6, 4, 2, 1]:
-            variations += [100*variation(data[pays], timedelta(days=i*7))]
-            col_pays += [pays]
-            if i == 1:
-                col_horizons += ["variation de la dernière semaine"]
-            else:
-                col_horizons += ["variation des "+str(i)+" dernières semaines"]
-
-    data_graph  = pd.DataFrame({'Pays': col_pays, 'Variation %': variations, 'Horizon': col_horizons})
-
-    # Les volumes sont ensuite représenter à l'aide de barres
-    # différentes palettes de couleurs ont été testées:
-    # YlGnBu RdBu OrRd PRGn Spectral YlOrBr
-    fig, ax = plt.subplots(figsize=(10,6), dpi=300)
-    sns.barplot(x="Pays", y="Variation %", hue="Horizon", data=data_graph,
-                palette=sns.color_palette("YlGnBu"))
-
-    # Les différentes semaines sont données en légende
-    ax.legend(loc='lower center', bbox_to_anchor=(0.5, 1.01),
-              fancybox=True, shadow=False, ncol=2)
-
-    # Les volumes sont écrits en blanc en haut des barres 
-    for p in ax.patches:
-        text = format(p.get_height(), '.1f')+" "
-        x = p.get_x() + p.get_width() / 2.
-        y = p.get_height()
-        ax.annotate(text, (x,y), ha = 'center', va = 'bottom', size=7, color='blue',
-                    xytext = (0, 1), textcoords = 'offset points', rotation=90)
-    
-    return fig 
-
-def top_last_annee(recap):
-    """ Graphiques sur 3 années. Elle prends en paramettre le récapitulatif
-    choisi de X semaines."""
-
-    annee = date_calendar.year
-    evolution_annee = evolutions_sum_annees(data, annee)
-    top_6 = recap.head(6)
-    pays = list(top_6.index)
-    annees = list(pd.unique(evolution_annee["annee"]))
-    #f, ax = plt.subplots(2,3,figsize=(10,4))
-    for p in pays:
-        st.write(p)
-        annee1 = evolution_annee[p][(evolution_annee["annee"] == "2019")].reset_index().drop("index", axis=1)
-        annee2 = evolution_annee[p][(evolution_annee["annee"] == "2020")].reset_index().drop("index", axis=1)
-        annee3 = evolution_annee[p][(evolution_annee["annee"] == "2021")].reset_index().drop("index", axis=1)
-        last = pd.concat([annee1, annee2, annee3], axis=1)
-        last.columns = [p+" 2019", p+" 2020", p+" 2021"]
-        last.fillna(0, inplace=True)
-        fig, ax = plt.subplots(figsize=(10,6), dpi=300)
-        ax.plot(last)
-        # TODO ax.legend(last.columns)
-    
-    return fig
-
-
 
 ### IV - INTERFACES
 
@@ -791,8 +654,8 @@ def interface():
                 visualisation_variations(data)
     
             # COMMENTAIRE à inclure dans le rapport
-            if st.checkbox("Voulez-vous mettre un commentaire?"):
-                commentaire_1 = st.text_area("Commentaire", "")
+            #if st.checkbox("Voulez-vous mettre un commentaire?"):
+            #    commentaire_1 = st.text_area("Commentaire", "")
     
         except:
             pass
@@ -863,125 +726,8 @@ sur des périodes, de respectivement:
 
             ### 3 - LES VARIATIONS
             if st.sidebar.checkbox("3- Les variation des 3 dernières années du top 6"):
-                status2 = st.sidebar.radio("Période d'analyse': ", ('Hebdomadaire', 'Mensuelle','Trimestrielle'))
-                ### VARIATION HEBDOMADAIRE
-                if status2 == "Hebdomadaire":
-                    st.title("Les variations (%) hebdomadaire")
-                    variation_hebdo = variation_hebdo(data, date_calendar, recap_2s)
-                    variation_hebdo_s_s1 = variation_hebdo.head(2)
-                    variation_hebdo_s1_s2 = variation_hebdo.tail(2)
-                    variation_hebdo_s_s1 = variation_hebdo_s_s1.reset_index()
-                    variation_hebdo_s_s1 = variation_hebdo_s_s1.rename({list(variation_hebdo_s_s1.columns)[0]: "semaine"}, axis=1)
-    
-                    variation_hebdo_s1_s2 = variation_hebdo_s1_s2.reset_index()
-                    variation_hebdo_s1_s2 = variation_hebdo_s1_s2.rename({list(variation_hebdo_s1_s2.columns)[0]: "semaine"}, axis=1)
-                    variation_hebdo_s_s1 = variation_hebdo_s_s1[::-1]
-                    # Transformation du tableau pour pouvoir le manipuler
-                    data_melted_s = pd.melt(variation_hebdo_s_s1, id_vars="semaine", var_name="pays", value_name="valeur")
-                    variation_hebdo_s1_s2 = variation_hebdo_s1_s2[::-1]
-    
-                    data_melted_s1 = pd.melt(variation_hebdo_s1_s2, id_vars="semaine", var_name="pays", value_name="valeur")
-                    
-                    st.title("Variation en % de S/S-1")
-                    fig, ax = plt.subplots(figsize=(12,7), dpi=300)
-                    st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
-                                         data=data_melted_s))
-                    ax.grid(axis="x")
-                    annotation_barres(ax, unite='')
-                    plt.xticks(rotation=90)
-                    ax.set(xlabel="Région", ylabel='Variation (%)')
-                    st.pyplot()
-                    
-                    st.title("Variations en % de S-1 / S-2")
-                    fig, ax = plt.subplots(figsize=(12,7), dpi=300)
-                    st.write(sns.barplot(x="pays", y="valeur", hue="semaine", 
-                                         data=data_melted_s1))
-                    ax.grid(axis="x")
-                    annotation_barres(ax, unite='%')
-                    #Permet d'afficher le graphique
-                    ax.set(xlabel="Région", ylabel='Variation (%)')
-    
-                    st.pyplot()
-                    if st.checkbox("Voulez vous mettre un commentaire ?"):
-                        commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
-                
-                ### VARIATION MENSUELLE
-                elif status2 == "Mensuelle":
-                    st.title("Les variations (%) mensuelle")
-                    
-                    mois_str = list(month_str.keys())
-                    mode_mois = st.selectbox("Quel mois?", (mois_str))
+                st.text("En cours de refonte")
 
-                    derniere_3annees = list(pd.unique(data["Semaine"].map(lambda x: x.year)))
-                    derniere_3annees.sort(reverse=True)
-                    mode_annee = st.selectbox("Quelle année?",(derniere_3annees))
-                    variation_mensuelle = variation_mensuel(data, mode_annee, month_str[mode_mois],recap_4s)
-                    variation_mensuelle = variation_mensuelle.reset_index()
-    
-                    colonnes_annee_mois = list(variation_mensuelle.columns)
-                    st.title(f"Evolution en % du mois {mode_mois} de l'année {mode_annee} et {mode_annee-1}")
-                    
-                    fig, ax = plt.subplots(figsize=(12,7), dpi=300)
-                    st.write(plt.bar(variation_mensuelle[colonnes_annee_mois[0]], variation_mensuelle[colonnes_annee_mois[1]]))
-                    ax.grid()
-                    annotation_barres(ax, unite='%')
-                    plt.xticks(rotation=90)
-                    ax.set(xlabel="Région", ylabel='Variation (%)')
-                    legend = str(mode_mois)+" "+str(mode_annee)+"/"+str(mode_annee-1)
-                    plt.title(legend)
-                    st.pyplot()
-                    
-                    st.title(f"Evolution en % du mois {mode_mois} de l'année {mode_annee} et {mode_annee-2}")
-                    
-                    fig, ax = plt.subplots(figsize=(12,7), dpi=300)
-                    st.write(plt.bar(variation_mensuelle[colonnes_annee_mois[0]],
-                                     variation_mensuelle[colonnes_annee_mois[2]]))
-                    ax.grid()
-                    annotation_barres(ax, unite='%')
-                    
-                    plt.xticks(rotation=90)
-                    legend2 = str(mode_mois)+" "+str(mode_annee)+"/"+str(mode_annee-2)
-                    plt.title(legend2)
-                    ax.set(xlabel="Région", ylabel='Variation (%)')
-                    st.pyplot()
-                    
-                    if st.checkbox("Voulez vous mettre un commentaire ?"):
-                        commentaire_graph_s2 = st.text_area("Emplacement du commentaire", "")
-                    
-                ### VARIATION TRIMESTRIELLE
-                elif status2 == "Trimestrielle":
-                    st.title("les variations (%) trimestrielle")
-                    derniere_3annees = list(pd.unique(data["Semaine"].map(lambda x: x.year)))
-                    derniere_3annees.sort(reverse=True)
-                    mode_annee = st.selectbox("Quelle annee?", (derniere_3annees))
-                    moyenne_trimestre = moyenne_trimestrielle(data, mode_annee, recap_12s)
-                    variation_trimestrielle = variation_trimestrielle(moyenne_trimestre)
-                    colonnes = list(variation_trimestrielle.columns)
-                    fig, ax = plt.subplots(figsize=(12,7), dpi=300)
-                    t1 = variation_trimestrielle[colonnes[0]].reset_index()
-                    st.title(f"Les variations du 1er Trimestre de l'année {mode_annee} et {mode_annee-2}")
-                    st.write(sns.barplot(x="index",y = colonnes[0], data=t1))
-                    ax.grid()
-                    ax.set(xlabel="Région", ylabel='Variation (%)')
-                    annotation_barres(ax, unite='%')
-                   
-                    plt.xticks(rotation=90)
-                    st.pyplot()
-                    st.title(f"les variations du 1er Trimestre de l'année {mode_annee} et {mode_annee-1}")
-    
-                    t2 = variation_trimestrielle[colonnes[1]].reset_index()
-                    fig2, ax2 = plt.subplots(figsize=(12,7), dpi=300)
-    
-                    st.write(sns.barplot(x="index",y = colonnes[1], data=t2))
-                    ax2.grid()
-                    annotation_barres(ax, unite='%')
-                    plt.xticks(rotation=90)
-                    ax2.set(xlabel="Région", ylabel='Variation (%)')
-    
-                    st.pyplot()
-                    if st.checkbox("Voulez vous mettre un commentaire ?"):
-                        commentaire_graph_s3 = st.text_area("Emplacement du commentaire", "")
-                    
         except:
             pass
 
@@ -1005,42 +751,6 @@ if test:
     date1 = datetime(2021, 5,  9).date()
     date2 = datetime(2021, 5, 30).date()
     print("\tdu", date1, " au ", date2, ": ", duree_str(date1, date2))
-    
-    """
-    print("lecture d'un fichier sur le drive")
-    from gsheetsdb import connect
-    from google.oauth2.service_account import Credentials
-    # Création de l'objet de connexion.
-    scope = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
-    credentials = Credentials.from_service_account_file('./gsheet-tourisme.json', scopes=scope)
-    conn = connect(credentials=credentials)
-    
-    #Méthode d'exécution de requêtes sql, avec un temps de rafraîchissement (ttl)
-    #exprimé en secondes, ici 10 minutes par défaut.
-    @st.cache(ttl=600)
-    def run_query(query):
-        rows = conn.execute(query, headers=0)
-        return rows
-    sheet_url = "https://docs.google.com/spreadsheets/d/1J86wXAb6Hny55o0wWSV4Har8IEzZcYLz/edit#gid=718637800"
-    rows = run_query(f'SELECT * FROM "{sheet_url}"')
-    print(rows)
-    
-    
-    page_token = None
-    while True:
-        response = drive_service.files().list(q="mimeType='image/jpeg'",
-                                              spaces='drive',
-                                              fields='nextPageToken, files(id, name)',
-                                              pageToken=page_token).execute()
-        for file in response.get('files', []):
-            # Process change
-            print('Found file: %s (%s)' % (file.get('name'), file.get('id')))
-        page_token = response.get('nextPageToken', None)
-        if page_token is None:
-            break
-    """
-
 
 
 ### VI - PROGRAMME PRINCIPAL
