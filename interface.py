@@ -11,6 +11,8 @@ from scipy.signal import savgol_filter
 
 # POUR LANCER LE CODE EN LOCAL: streamlit run interface.py
 
+st.set_option('deprecation.showPyplotGlobalUse', False)
+
 français = gettext.translation('iso3166', pycountry.LOCALES_DIR, languages=['fr'])
 français.install()
 
@@ -487,7 +489,6 @@ def graph_3_ans(data, pays, lissage=False):
 ### IV - INTERFACES
 
 def entete():
-    st.set_option('deprecation.showPyplotGlobalUse', False)
     st.text("Bienvenue à l’observatoire digital des destinations françaises de Atout")
     #st.text("Powered by:")
     #st.image("https://nicolasbaudy.files.wordpress.com/2020/02/cropped-logo-new-2.png", use_column_width=False)
