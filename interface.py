@@ -4,8 +4,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import random
-import pycountry
-import gettext
+#import pycountry
+#import gettext
 from datetime import datetime, timedelta
 from scipy.signal import savgol_filter
 
@@ -13,8 +13,8 @@ from scipy.signal import savgol_filter
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-français = gettext.translation('iso3166', pycountry.LOCALES_DIR, languages=['fr'])
-français.install()
+#français = gettext.translation('iso3166', pycountry.LOCALES_DIR, languages=['fr'])
+#français.install()
 
 # Code iso des pays traduits en noms français courts 
 df = pd.read_csv("Dictionnaire_Pays.csv")
@@ -96,7 +96,8 @@ def nom_pays(code_iso):
     """ Nom court en Français d'un pays à partir de son code iso en 2 lettres.
     Retourne par exemple "France" pour "FR" """
     try:
-        return _(noms_pays[code_iso].split(" (")[0]).split(" ")[0]
+        #return _(noms_pays[code_iso].split(" (")[0]).split(" ")[0]
+        return (noms_pays[code_iso].split(" (")[0]).split(" ")[0]
     except:
         return code_iso
 
