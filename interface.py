@@ -17,7 +17,7 @@ français = gettext.translation('iso3166', pycountry.LOCALES_DIR, languages=['fr
 français.install()
 
 # Code iso des pays traduits en noms français courts 
-df = pd.read_csv("./donnees_locales/Dictionnaire_Pays.csv")
+df = pd.read_csv("Dictionnaire_Pays.csv")
 noms_pays = df["Country"]
 noms_pays.index = df["2CODE"]
 
