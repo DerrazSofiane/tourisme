@@ -504,10 +504,11 @@ Baudy et Compagnie ©"""
     cols = st.beta_columns(2) # number of columns in each row! = 2
     cols[0].image("logo_Atout_France.png", use_column_width=True)
     cols[1].image("logo_Baudy_Co.png", use_column_width=True) 
+    #cols[1].image("https://nicolasbaudy.files.wordpress.com/2020/02/cropped-logo-new-2.png")
     st.title("Observatoire digital des destinations")
     st.text(txt)
 
-    #st.image("https://nicolasbaudy.files.wordpress.com/2020/02/cropped-logo-new-2.png")
+
 
 def introduction():
     txt = """
@@ -535,18 +536,22 @@ Paris et Disneyland Paris (toutes catégories)."""
 
 
 def choix_fichier_donnees():
-    my_expander = st.sidebar.beta_expander("Ouvrir", expanded=True)
-    with my_expander:
-        st.write("2- DONNÉES : chargez le fichier à analyser :open_file_folder:")
-        uploaded_file = st.file_uploader("")
+    #my_expander = st.sidebar.beta_expander("Ouvrir", expanded=True)
+    #with my_expander:
+    #    st.write(u"Fichier à analyser")
+    #    uploaded_file = st.file_uploader("")
+
+    uploaded_file = st.sidebar.file_uploader("Données de Google Trends:")
     return uploaded_file
+
+
+
 
 def selection_mode_analyse():
     global mode
-    st.sidebar.write("# Bienvenue :computer:")
-    txt = "1- ANALYSE : choisissez le mode => Générique // Par Pays " 
+    txt = "Type d'analyse: " 
     mode = st.sidebar.selectbox(txt, ("Générique", "Par pays"))
-    st.sidebar.success(f"Vous avez choisi le mode {mode}")
+    #st.sidebar.success(f"Vous avez choisi le mode {mode}")
 
 
 def visualisation_tops(data):
@@ -643,6 +648,9 @@ fluctuer."""
 
 def interface():
     entete()
+    if st.sidebar.checkbox("Introduction", value=True):
+        introduction()
+
     selection_mode_analyse()
 
     ### ANALYSE GLOBALE
@@ -655,10 +663,6 @@ def interface():
             # Identification du pays sur lequel porte les données
             pays = data.index.name
             st.sidebar.write(f"Vous analysez: **{pays}** :heavy_check_mark:")
-
-            ### INTRODUCTION EXPLICATIVE SUR LE CONTENU DE CETTE PARTIE
-            if st.sidebar.checkbox("Introduction"):
-                introduction()
 
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1 - Les tops") and fichier != "None":
