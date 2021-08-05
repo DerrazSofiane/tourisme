@@ -9,7 +9,12 @@ import random
 from datetime import datetime, timedelta
 from scipy.signal import savgol_filter
 
-# POUR LANCER LE CODE EN LOCAL: streamlit run interface.py
+# POUR LANCER L'INTERFACE EN LOCAL:
+#   streamlit run interface.py
+
+# POUR LANCER L'INTERFACE SUR LE WEB, après avoir mis le code sur le dépot 
+# https://github.com/Lee-RoyMannier/tourisme
+# https://share.streamlit.io/lee-roymannier/tourisme/main/interface.py
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -24,7 +29,7 @@ noms_pays.index = df["2CODE"]
 # TODO: 
 # Se référer à 2019 pour faire les prévisions. 
 
-### FORMATAGE DES DONNEES 
+### I - LECTURE DES DONNEES 
 def lecture_donnees(fichier):
     data = pd.read_csv(fichier, sep=";", encoding="latin-1", index_col=0)
     
@@ -49,7 +54,7 @@ def donnees_aleatoires(t0=datetime(2017, 6, 1).date(), nb_semaines=4*53):
     return data
 
 
-### I - MISE EN FORME
+### II - MISE EN FORME
 month_str = {
     1: "janvier" , 2: "février"  , 3: "mars", 
     4: "avril"   , 5: "mai"      , 6: "juin", 
@@ -107,7 +112,7 @@ def arrondie_str(x):
     return corps+','+decimales[:2]
 
 
-### II - CALCULS
+### III - CALCULS
 def variation(x, delta=timedelta(days=7)):
     t2 = max(x.index)
     t1 = t2-delta
@@ -384,7 +389,7 @@ def variation_mensuel(data, annee, mois, top_6_mensuel):
    
     return variation
 
-### III - GRAPHQUES
+### IV - GRAPHQUES
 
 def graph_volumes(data, nom_x, nom_y, nom_z):
     # Mise en forme des données (data) pour pouvoir utiliser seaborne, dans un 
@@ -487,12 +492,22 @@ def graph_3_ans(data, pays, lissage=False):
 
     return fig
 
-### IV - INTERFACES
+### V - GENERATION D'UN RAPPORT
+def rapport_pdf():
+    pass
+
+### VI - INTERFACES WEB
 
 def entete():
-    st.text("Bienvenue à l’observatoire digital des destinations françaises de Atout")
-    #st.text("Powered by:")
-    #st.image("https://nicolasbaudy.files.wordpress.com/2020/02/cropped-logo-new-2.png", use_column_width=False)
+    txt = u"""Bienvenue à l’observatoire digital des destinations françaises de Atout, powered by
+Baudy et Compagnie ©"""
+    cols = st.beta_columns(2) # number of columns in each row! = 2
+    cols[0].image("logo_Atout_France.png", use_column_width=True)
+    cols[1].image("logo_Baudy_Co.png", use_column_width=True) 
+    st.title("Observatoire digital des destinations")
+    st.text(txt)
+
+    #st.image("https://nicolasbaudy.files.wordpress.com/2020/02/cropped-logo-new-2.png")
 
 def introduction():
     txt = """
@@ -733,7 +748,7 @@ sur des périodes, de respectivement:
         except:
             pass
 
-### V - TESTS UNITAIRES
+### VI - TESTS UNITAIRES
 test = False
 
 if test:
@@ -755,5 +770,5 @@ if test:
     print("\tdu", date1, " au ", date2, ": ", duree_str(date1, date2))
 
 
-### VI - PROGRAMME PRINCIPAL
+### VII - PROGRAMME PRINCIPAL
 interface()
