@@ -620,20 +620,22 @@ fluctuer."""
     st.text(txt)
 
     st.header("a - Variations S/S-1 comparées à S-1/S-2")
-    st.text(f"{periode(-1,0)}")
+    #st.text(f"{periode(-1,0)}")
     var = variations(data, date(-1), date(0), delta=timedelta(7)).tail(2)
     table = var.applymap(lambda x: "{:.1f}".format(x))
-    table.index = table.index.map(lambda t: duree_str(t, t+timedelta(days=6)))
+    #table.index = table.index.map(lambda t: duree_str(t, t+timedelta(days=6)))
+    table.index = ["S-1/S-2", "S/S-1"]
     st.write(table)
 
     nom_x, nom_y, nom_z = "Pays", "Variation de l'indice Google Trends – %", "Semaine"
     st.pyplot(graph_volumes(var, nom_x, nom_y, nom_z))
 
     st.header("b - Variations S-1/S-2 comparées à S-2/S-3")
-    st.text(f"{periode(-2,-1)}")
+    #st.text(f"{periode(-2,-1)}")
     var = variations(data, date(-2), date(-1), delta=timedelta(7)).tail(2)
     table = var.applymap(lambda x: "{:.1f}".format(x))
-    table.index = table.index.map(lambda t: duree_str(t, t+timedelta(days=6)))
+    #table.index = table.index.map(lambda t: duree_str(t, t+timedelta(days=6)))
+    table.index = ["S-2/S-3", "S-1/S-2"]
     st.write(table)
 
     nom_x, nom_y, nom_z = "Pays", "Variation de l'indice Google Trends – %", "Semaine"
