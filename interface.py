@@ -12,6 +12,9 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from io import StringIO
 
+path = os.path.dirname(__file__)
+print("------------", path, "-------------")
+
 # POUR LANCER L'INTERFACE EN LOCAL:
 #   streamlit run interface.py
 
