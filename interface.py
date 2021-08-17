@@ -8,6 +8,9 @@ import random
 #import gettext
 from datetime import datetime, timedelta
 from scipy.signal import savgol_filter
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+from io import StringIO
 
 # POUR LANCER L'INTERFACE EN LOCAL:
 #   streamlit run interface.py
@@ -22,22 +25,32 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 #français.install()
 
 # Code iso des pays traduits en noms français courts 
-df = pd.read_csv("Dictionnaire_Pays.csv")
-noms_pays = df["Country"]
-noms_pays.index = df["2CODE"]
+pays = pd.read_csv("Dictionnaire_Pays.csv")
+noms_pays = pays["Country"]
+noms_pays.index = pays["2CODE"]
 
 # TODO: 
 # Se référer à 2019 pour faire les prévisions. 
 
 ### I - LECTURE DES DONNEES 
-def lecture_donnees(fichier):
-    data = pd.read_csv(fichier, sep=";", encoding="latin-1", index_col=0)
+def lecture_donnees(nom_tableau, DATA_DRIVE):
+    # A partir des identifiants Google, le tableau choisi par l'utilisateur
+    # est lu, transformé en tableau, reformaté et renvoyé
+    id_drive = DATA_DRIVE[nom_tableau]
+    gauth = GoogleAuth()
+    gauth.LoadCredentialsFile("mycreds.txt")
+    drive = GoogleDrive(gauth)
+    fichier_source = drive.CreateFile({'id': id_drive})
+    donnee_brut = fichier_source.GetContentString()
+    data = pd.read_csv(StringIO(donnee_brut), sep=";")
     
     # Formatage de l'index en date
+    data = data.set_index(data.columns[0])
     data.index = data.index.map(lambda x: datetime.strptime(x, "%Y-%m-%d").date())
 
     # Formatage des nombres à vigule en flottant
     data = data.applymap(lambda x: float(x.replace(",", ".")))
+    print("Tableau final:",data)
 
     return data
 
@@ -317,7 +330,6 @@ def moyenne_trimestrielle(data, annee, top6_trimestre):
     return tableau_moyenne
 
 
-
 def variation_hebdo(data, periode, top_6_hebdo):
     """ Fonction permettant de récupérer 4 semaines (S / S-1 et S-1 / S-2)
     et de calculer les variations sur une période donnée
@@ -394,9 +406,9 @@ def variation_mensuel(data, annee, mois, top_6_mensuel):
 def graph_volumes(data, nom_x, nom_y, nom_z):
     # Mise en forme des données (data) pour pouvoir utiliser seaborne, dans un 
     # tableau à trois colonnes (data_graph). La première est le temps, sous 
-    # forme de date; la deuxième est les valeurs (volumes, variations, etc...);
-    # la troixième les catégories (pays, région, etc..). Les légendes des axes
-    # du dessin sont:
+    # forme de date, la deuxième est les valeurs (volumes, variations, etc...),
+    # la troixième les catégories (pays, région, etc..).
+    # Les légendes des axes du dessin sont:
     # légende des catégories -> nom_x
     # légende des valeurs    -> nom_y
     # légende du temps       -> nom_z
@@ -406,14 +418,14 @@ def graph_volumes(data, nom_x, nom_y, nom_z):
         data_graph = data_graph.append(df, ignore_index=True)
 
     # Lorsque les valeurs sont des volumes, les dates représentent des 
-    # semaines. Elles ont mises sous un format plus lisible.
+    # semaines. Elles sont mises sous un format plus lisible.
     # Lorsque les valeurs sont des variations, les dates représentent le début
     # de la première semaine de variation 
-    dt = timedelta(days=6) # temps entre le début et la fin de la samaine 
+    dt = timedelta(days=6) # temps entre le début et la fin de la semaine 
     data_graph[nom_z] = data_graph[nom_z].apply(lambda t: duree_str(t, t+dt))
 
-    # Les volumes sont ensuite représenter à l'aide de barres
-    # différentes palettes de couleurs ont été testées:
+    # Les volumes sont ensuite représentés à l'aide de barres.
+    # Différentes palettes de couleurs ont été testées:
     # YlGnBu RdBu OrRd PRGn Spectral YlOrBr
     fig, ax = plt.subplots(figsize=(10,6), dpi=300)
     sns.barplot(x=nom_x, y=nom_y, hue=nom_z, data=data_graph,
@@ -439,7 +451,7 @@ def graph_volumes(data, nom_x, nom_y, nom_z):
                         color='red', xytext=(0,1), textcoords='offset points',
                         rotation=90)
 
-    # Des limites un peu plus large sont fixées en ordonnées afin d'être 
+    # Des limites un peu plus larges sont fixées en ordonnées afin d'être 
     # certain que les écritures précédentes ne dépassent du cadre
     ymin, ymax = min(data_graph[nom_y]), max(data_graph[nom_y])
     ax.set_ylim([(ymin-0.2*(ymax-ymin) if ymin < 0 else 0),
@@ -492,9 +504,11 @@ def graph_3_ans(data, pays, lissage=False):
 
     return fig
 
+
 ### V - GENERATION D'UN RAPPORT
 def rapport_pdf():
     pass
+
 
 ### VI - INTERFACES WEB
 
@@ -509,15 +523,14 @@ Baudy et Compagnie ©"""
     st.text(txt)
 
 
-
 def introduction():
     txt = """
 Les termes de recherches touristiques utilisés dans Google par les internautes
 sont comptés. Les "termes" sont des groupes de mots correspondant à un même
-concept, non nécessairement accolés aux destinations. IL sagit de mesurer si 
+concept, non nécessairement accolés aux destinations. IL s'agit de mesurer si 
 l’intérêt pour le terme analysé redémarre, indépendamment d’un lieu.
 
-Par exemple l'anayse portera sur "hôtel" et non "hôtel à Lyon" de la 
+Par exemple l'analyse portera sur "hôtel" et non "hôtel à Lyon" de la 
 rubrique « travel » de Google Trends.
 
   - Périodicité d’analyse: 2 fois par mois
@@ -535,16 +548,17 @@ Paris et Disneyland Paris (toutes catégories)."""
     st.text(txt)
 
 
-def choix_fichier_donnees():
+def choix_fichier_donnees(DATA_DRIVE):
     #my_expander = st.sidebar.beta_expander("Ouvrir", expanded=True)
     #with my_expander:
     #    st.write(u"Fichier à analyser")
     #    uploaded_file = st.file_uploader("")
 
-    uploaded_file = st.sidebar.file_uploader("Données de Google Trends:")
-    return uploaded_file
-
-
+    # uploaded_file = st.sidebar.file_uploader("Données de Google Trends:")
+    if DATA_DRIVE != None:
+        uploaded_file = st.sidebar.selectbox("Quelle requête effectuer?",
+                                             DATA_DRIVE.keys())
+        return uploaded_file
 
 
 def selection_mode_analyse():
@@ -645,8 +659,53 @@ fluctuer."""
 
     nom_x, nom_y, nom_z = "Pays", "Variation de l'indice Google Trends – %", "Semaine"
     st.pyplot(graph_volumes(var, nom_x, nom_y, nom_z))
+    
+def connexion_drive(id_dossier):
+    # Les données sont contenues dans un dossier sur le Drive de Google.
+    # Le fichier 'client_secrets.json', contenant les informations de connexion
+    # doit se trouver dans le dossier racine du projet.
+    gauth = GoogleAuth()    
+    gauth.LoadCredentialsFile("mycreds.txt")
+    if gauth.credentials is None:
+        # Authenticate if they're not there
+        gauth.LocalWebserverAuth()
+    elif gauth.access_token_expired:
+        # Refresh them if expired
+        gauth.Refresh()
+    else:
+        # Initialize the saved creds
+        gauth.Authorize()
+    # Save the current credentials to a file
+    gauth.SaveCredentialsFile("mycreds.txt")
+    
+    # gauth.LocalWebserverAuth()
+    drive = GoogleDrive(gauth)
+    # Une fois en possession du bon identifiant, c'est celui-ci qui sera inséré
+    # dans la requête, pour obtenir, cette-fois, tous les fichiers.
+    requete = "'" + id_dossier + "' in parents and trashed=false"
+    donnees = drive.ListFile({'q': requete}).GetList()
+    consultables = {}
+    # Une fois dans le bon dossier, les différents fichiers sont parcourus.
+    # S'il s'agit bien d'un csv, un tableau est créé de sa lecture puis ajouté
+    # à la liste consultable pour la lecture des données.
+    for donnee in donnees:
+        if donnee['title'][-4:] == ".csv":
+            print("Tentative de réception des données", donnee['title'])
+            try:
+                titre_brut = donnee['title'][:-4].split("-")
+                titre = titre_brut[-2]
+                consultables[titre] = donnee['id']
+            except:
+                pass 
+    # Finalement, les données globales sont définies
+    return consultables
 
 def interface():
+    # Connexion au dossier Drive lors du chargement des données
+    # L'identifiant pour y accéder directement doit être spécifié
+    DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
+    print("DATA:", DATA_DRIVE)
+    
     entete()
     if st.sidebar.checkbox("Introduction", value=True):
         introduction()
@@ -655,10 +714,10 @@ def interface():
 
     ### ANALYSE GLOBALE
     if mode == "Générique":
-        fichier = choix_fichier_donnees()
+        fichier = choix_fichier_donnees(DATA_DRIVE)
         try:
-            # données brutes
-            data = lecture_donnees(fichier)
+            # Données brutes
+            data = lecture_donnees(fichier, DATA_DRIVE)
             
             # Identification du pays sur lequel porte les données
             pays = data.index.name
@@ -685,10 +744,10 @@ def interface():
 
     ### ANALYSE PAR PAYS
     if mode == "Par pays":
-        fichier = choix_fichier_donnees()
+        fichier = choix_fichier_donnees(DATA_DRIVE)
         try:
             # données brutes
-            data = lecture_donnees(fichier)
+            data = lecture_donnees(fichier, DATA_DRIVE)
     
             # Date d'analyse
             txt = "Date d'analyse"
