@@ -38,7 +38,8 @@ def lecture_donnees(nom_tableau, DATA_DRIVE):
     # est lu, transformé en tableau, reformaté et renvoyé
     id_drive = DATA_DRIVE[nom_tableau]
     gauth = GoogleAuth()
-    gauth.LoadCredentialsFile("C:/mycreds.txt")
+    gauth.Authorize()
+    # gauth.LoadCredentialsFile("mycreds.txt")
     drive = GoogleDrive(gauth)
     fichier_source = drive.CreateFile({'id': id_drive})
     donnee_brut = fichier_source.GetContentString()
@@ -667,8 +668,8 @@ def connexion_drive(id_dossier):
     # st.secrets : le dictionnaire des variables d'environnement streamlit
     
     gauth = GoogleAuth()
-    
-    gauth.LoadCredentialsFile("C:/mycreds.txt")
+    gauth.Authorize()
+    #gauth.LoadCredentialsFile("mycreds.txt")
     # if gauth.credentials is None:
     #     # Authenticate if they're not there
     #     gauth.LocalWebserverAuth()
