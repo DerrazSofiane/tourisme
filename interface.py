@@ -681,7 +681,7 @@ def connexion_drive(id_dossier):
     #    gauth.Authorize()
     # Save the current credentials to a file
     #gauth.SaveCredentialsFile("mycreds.txt")
-    gauth.LocalWebserverAuth()
+    #gauth.LocalWebserverAuth()
     # gauth.LocalWebserverAuth()
     drive = GoogleDrive(gauth)
     # Une fois en possession du bon identifiant, c'est celui-ci qui sera inséré
