@@ -708,8 +708,8 @@ def connexion_drive(id_dossier):
 def interface():
     # Connexion au dossier Drive lors du chargement des données
     # L'identifiant pour y accéder directement doit être spécifié
-    # DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
-    # print("DATA:", DATA_DRIVE)
+    DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
+    print("DATA:", DATA_DRIVE)
     
     entete()
     if st.sidebar.checkbox("Introduction", value=True):
@@ -719,13 +719,10 @@ def interface():
 
     ### ANALYSE GLOBALE
     if mode == "Générique":
-        # fichier = choix_fichier_donnees(DATA_DRIVE)
-        path = 'https://drive.google.com/uc?export=download&id=11WgXO6loodMwwTK4BZm8cG4pQJvlEBim'
-        fichier = pd.read_csv(path, sep=";")
+        fichier = choix_fichier_donnees(DATA_DRIVE)
         try:
             # Données brutes
-            # data = lecture_donnees(fichier, DATA_DRIVE)
-            data = fichier
+            data = lecture_donnees(fichier, DATA_DRIVE)
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1 - Les tops") and fichier != "None":
                 visualisation_tops(data)
