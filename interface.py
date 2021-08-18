@@ -710,7 +710,7 @@ def interface():
     # Connexion au dossier Drive lors du chargement des données
     # L'identifiant pour y accéder directement doit être spécifié
     # DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
-    cred = gspread.service_account(filename=st.secrets['creds'])
+    cred = gspread.service_account(filename=st.secrets)
     DATA_DRIVE = ""
     fichier = cred.openb("test58.csv")
     print("DATA:", DATA_DRIVE)
@@ -726,8 +726,8 @@ def interface():
         # fichier = choix_fichier_donnees(DATA_DRIVE)
         try:
             # Données brutes
-            data = lecture_donnees(fichier, DATA_DRIVE)
-
+            # data = lecture_donnees(fichier, DATA_DRIVE)
+            data = pd.DataFrame(fichier)
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1 - Les tops") and fichier != "None":
                 visualisation_tops(data)
