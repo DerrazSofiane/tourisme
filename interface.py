@@ -37,7 +37,7 @@ def lecture_donnees(nom_tableau, DATA_DRIVE):
     # A partir des identifiants Google, le tableau choisi par l'utilisateur
     # est lu, transformé en tableau, reformaté et renvoyé
     id_drive = DATA_DRIVE[nom_tableau]
-    gauth = GoogleAuth(settings_file="settings.yaml")
+    gauth = GoogleAuth(settings_file="/app/tourisme/settings.yaml")
     #gauth.LoadCredentialsFile("mycreds.txt")
     drive = GoogleDrive(gauth)
     fichier_source = drive.CreateFile({'id': id_drive})
@@ -666,7 +666,7 @@ def connexion_drive(id_dossier):
     # /app/tourisme : dossier relatif en ligne
     # st.secrets : le dictionnaire des variables d'environnement streamlit
     
-    gauth = GoogleAuth(settings_file="settings.yaml")
+    gauth = GoogleAuth(settings_file="/app/tourisme/settings.yaml")
     
     #gauth.LoadCredentialsFile("mycreds.txt")
     # if gauth.credentials is None:
