@@ -721,7 +721,7 @@ def interface():
     if mode == "Générique":
         # fichier = choix_fichier_donnees(DATA_DRIVE)
         path = 'https://drive.google.com/uc?export=download&id=11WgXO6loodMwwTK4BZm8cG4pQJvlEBim'
-        fichier = pd.read_csv(path)
+        fichier = pd.read_csv(path, sep=";")
         try:
             # Données brutes
             # data = lecture_donnees(fichier, DATA_DRIVE)
