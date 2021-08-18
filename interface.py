@@ -663,8 +663,9 @@ def connexion_drive(id_dossier):
     # Les données sont contenues dans un dossier sur le Drive de Google.
     # Le fichier 'client_secrets.json', contenant les informations de connexion
     # doit se trouver dans le dossier racine du projet.
+    # /app/tourisme : dossier relatif en ligne
     gauth = GoogleAuth()
-    gauth.LocalWebserverAuth()
+    gauth.CommandLineAuth()
     # gauth.LoadCredentialsFile("mycreds.txt")
     # if gauth.credentials is None:
     #     # Authenticate if they're not there
