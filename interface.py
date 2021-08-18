@@ -11,6 +11,7 @@ from scipy.signal import savgol_filter
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from io import StringIO
+import os
 
 # POUR LANCER L'INTERFACE EN LOCAL:
 #   streamlit run interface.py
