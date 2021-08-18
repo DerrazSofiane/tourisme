@@ -3,3 +3,10 @@ client_config:
   client_id: 990193118921-hkq35nb7uiba7g6mv931e81ugrqu72ao.apps.googleusercontent.com
   client_secret: WXNd-jrF3pdLLF4ZuIJE74Lj
   redirect_uri: https://share.streamlit.io/lee-roymannier/tourisme/main/interface.py
+  
+save_credentials: True
+save_credentials_backend: 'file'
+save_credentials_file: 'credentials/2.dat'
+
+oauth_scope:
+  - "https://www.googleapis.com/auth/drive"
