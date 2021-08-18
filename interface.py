@@ -664,19 +664,20 @@ def connexion_drive(id_dossier):
     # Les données sont contenues dans un dossier sur le Drive de Google.
     # Le fichier 'client_secrets.json', contenant les informations de connexion
     # doit se trouver dans le dossier racine du projet.
-    gauth = GoogleAuth(settings_file=f"/creds/client_secret.json")    
-    gauth.LoadCredentialsFile("mycreds.txt")
-    if gauth.credentials is None:
-        # Authenticate if they're not there
-        gauth.LocalWebserverAuth()
-    elif gauth.access_token_expired:
-        # Refresh them if expired
-        gauth.Refresh()
-    else:
-        # Initialize the saved creds
-        gauth.Authorize()
-    # Save the current credentials to a file
-    gauth.SaveCredentialsFile("mycreds.txt")
+    gauth = GoogleAuth(settings_file="./creds/client_secret.json") 
+    gauth.LocalWebserverAuth()
+    # gauth.LoadCredentialsFile("mycreds.txt")
+    # if gauth.credentials is None:
+    #     # Authenticate if they're not there
+    #     gauth.LocalWebserverAuth()
+    # elif gauth.access_token_expired:
+    #     # Refresh them if expired
+    #     gauth.Refresh()
+    # else:
+    #     # Initialize the saved creds
+    #     gauth.Authorize()
+    # # Save the current credentials to a file
+    # gauth.SaveCredentialsFile("mycreds.txt")
     
     # gauth.LocalWebserverAuth()
     drive = GoogleDrive(gauth)
