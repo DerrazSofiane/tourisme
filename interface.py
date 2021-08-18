@@ -664,7 +664,7 @@ def connexion_drive(id_dossier):
     # Les données sont contenues dans un dossier sur le Drive de Google.
     # Le fichier 'client_secrets.json', contenant les informations de connexion
     # doit se trouver dans le dossier racine du projet.
-    gauth = GoogleAuth() 
+    gauth = GoogleAuth()
     gauth.LocalWebserverAuth()
     # gauth.LoadCredentialsFile("mycreds.txt")
     # if gauth.credentials is None:
@@ -704,7 +704,8 @@ def connexion_drive(id_dossier):
 def interface():
     # Connexion au dossier Drive lors du chargement des données
     # L'identifiant pour y accéder directement doit être spécifié
-    DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
+    # DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
+    DATA_DRIVE = "TEST"
     print("DATA:", DATA_DRIVE)
     
     entete()
