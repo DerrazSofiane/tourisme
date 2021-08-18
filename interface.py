@@ -37,9 +37,7 @@ def lecture_donnees(nom_tableau, DATA_DRIVE):
     # A partir des identifiants Google, le tableau choisi par l'utilisateur
     # est lu, transformé en tableau, reformaté et renvoyé
     id_drive = DATA_DRIVE[nom_tableau]
-    code = "cj-wJKyk7K-2OOXA-2BCTL1d"
-    gauth = GoogleAuth()
-    gauth.Auth(code)
+    gauth = GoogleAuth(settings_file="settings.yaml")
     #gauth.LoadCredentialsFile("mycreds.txt")
     drive = GoogleDrive(gauth)
     fichier_source = drive.CreateFile({'id': id_drive})
