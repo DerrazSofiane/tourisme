@@ -11,6 +11,7 @@ from scipy.signal import savgol_filter
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from io import StringIO
+import gspread
 
 # POUR LANCER L'INTERFACE EN LOCAL:
 #   streamlit run interface.py
@@ -666,6 +667,7 @@ def connexion_drive(id_dossier):
     # Le fichier 'client_secrets.json', contenant les informations de connexion
     # doit se trouver dans le dossier racine du projet.
     # /app/tourisme : dossier relatif en ligne
+    # st.secrets : le dictionnaire des variables d'environnement streamlit
     code = "cj-wJKyk7K-2OOXA-2BCTL1d"
     gauth = GoogleAuth()
     gauth.Auth(code)
@@ -707,7 +709,10 @@ def connexion_drive(id_dossier):
 def interface():
     # Connexion au dossier Drive lors du chargement des données
     # L'identifiant pour y accéder directement doit être spécifié
-    DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
+    # DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
+    cred = gspread.service_account(filename=st.secrets['creds'])
+    DATA_DRIVE = ""
+    fichier = cred.openb("test58.csv")
     print("DATA:", DATA_DRIVE)
     
     entete()
@@ -718,7 +723,7 @@ def interface():
 
     ### ANALYSE GLOBALE
     if mode == "Générique":
-        fichier = choix_fichier_donnees(DATA_DRIVE)
+        # fichier = choix_fichier_donnees(DATA_DRIVE)
         try:
             # Données brutes
             data = lecture_donnees(fichier, DATA_DRIVE)
