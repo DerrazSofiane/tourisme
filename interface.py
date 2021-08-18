@@ -33,15 +33,16 @@ noms_pays.index = pays["2CODE"]
 # Se référer à 2019 pour faire les prévisions. 
 
 ### I - LECTURE DES DONNEES 
-def lecture_donnees(nom_tableau, DATA_DRIVE):
+def lecture_donnees(nom_tableau, data_tourisme):
     # A partir des identifiants Google, le tableau choisi par l'utilisateur
     # est lu, transformé en tableau, reformaté et renvoyé
-    id_drive = DATA_DRIVE[nom_tableau]
-    gauth = GoogleAuth()
+    # id_drive = data_tourisme[nom_tableau]
+    # gauth = GoogleAuth()
     # gauth.LoadCredentialsFile("mycreds.txt")
-    drive = GoogleDrive(gauth)
-    fichier_source = drive.CreateFile({'id': id_drive})
-    donnee_brut = fichier_source.GetContentString()
+    # drive = GoogleDrive(gauth)
+    # fichier_source = drive.CreateFile({'id': id_drive})
+    # donnee_brut = fichier_source.GetContentString()
+    
     data = pd.read_csv(StringIO(donnee_brut), sep=";")
     
     # Formatage de l'index en date
@@ -547,16 +548,16 @@ Paris et Disneyland Paris (toutes catégories)."""
     st.text(txt)
 
 
-def choix_fichier_donnees(DATA_DRIVE):
+def choix_fichier_donnees(data_tourisme):
     #my_expander = st.sidebar.beta_expander("Ouvrir", expanded=True)
     #with my_expander:
     #    st.write(u"Fichier à analyser")
     #    uploaded_file = st.file_uploader("")
 
     # uploaded_file = st.sidebar.file_uploader("Données de Google Trends:")
-    if DATA_DRIVE != None:
+    if data_tourisme != None:
         uploaded_file = st.sidebar.selectbox("Quelle requête effectuer?",
-                                             DATA_DRIVE.keys())
+                                             data_tourisme.keys())
         return uploaded_file
 
 
@@ -705,8 +706,11 @@ def connexion_drive(id_dossier):
 def interface():
     # Connexion au dossier Drive lors du chargement des données
     # L'identifiant pour y accéder directement doit être spécifié
-    DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
-    print("DATA:", DATA_DRIVE)
+    # data_tourisme = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
+    data_tourisme = {}
+    for donnee_tourisme in data_tourisme:
+        data_tourisme[donnee_tourisme] = donnee_tourisme
+    print("DATA:", data_tourisme)
     
     entete()
     if st.sidebar.checkbox("Introduction", value=True):
@@ -716,10 +720,10 @@ def interface():
 
     ### ANALYSE GLOBALE
     if mode == "Générique":
-        fichier = choix_fichier_donnees(DATA_DRIVE)
+        fichier = choix_fichier_donnees(data_tourisme)
         try:
             # Données brutes
-            data = lecture_donnees(fichier, DATA_DRIVE)
+            data = lecture_donnees(fichier, data_tourisme)
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1 - Les tops") and fichier != "None":
                 visualisation_tops(data)
@@ -741,10 +745,10 @@ def interface():
 
     ### ANALYSE PAR PAYS
     if mode == "Par pays":
-        fichier = choix_fichier_donnees(DATA_DRIVE)
+        fichier = choix_fichier_donnees(data_tourisme)
         try:
             # données brutes
-            data = lecture_donnees(fichier, DATA_DRIVE)
+            data = lecture_donnees(fichier, data_tourisme)
     
             # Date d'analyse
             txt = "Date d'analyse"
