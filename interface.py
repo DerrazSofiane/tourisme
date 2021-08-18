@@ -712,7 +712,7 @@ def interface():
     # DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
     # cred = gspread.service_account(filename=st.secrets)
     # DATA_DRIVE = ""
-    fichier = st.secrets
+    fichier = st.secrets['type']
     # print("DATA:", DATA_DRIVE)
     
     entete()
