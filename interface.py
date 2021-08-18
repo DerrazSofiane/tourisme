@@ -710,10 +710,9 @@ def interface():
     # data_tourisme = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
     data_tourisme = {}
     dossier = os.listdir(os.path.join("data_tourisme"))
-    dossier
-    # for donnee_tourisme in dossier:
-    #     data_tourisme[donnee_tourisme] = donnee_tourisme
-    data_tourisme -= ""
+    for donnee_tourisme in dossier:
+        data_tourisme[donnee_tourisme] = donnee_tourisme
+    data_tourisme
     
     entete()
     if st.sidebar.checkbox("Introduction", value=True):
