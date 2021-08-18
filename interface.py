@@ -711,6 +711,7 @@ def interface():
     # L'identifiant pour y accéder directement doit être spécifié
     # DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
     cred = gspread.service_account(filename=st.secrets)
+    print(st.secrets, type(st.secrets))
     DATA_DRIVE = ""
     fichier = cred.openb("test58.csv")
     print("DATA:", DATA_DRIVE)
