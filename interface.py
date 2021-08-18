@@ -704,8 +704,7 @@ def connexion_drive(id_dossier):
 def interface():
     # Connexion au dossier Drive lors du chargement des données
     # L'identifiant pour y accéder directement doit être spécifié
-    # DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
-    DATA_DRIVE = "TEST"
+    DATA_DRIVE = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
     print("DATA:", DATA_DRIVE)
     
     entete()
