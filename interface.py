@@ -709,10 +709,11 @@ def interface():
     # L'identifiant pour y accéder directement doit être spécifié
     # data_tourisme = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
     data_tourisme = {}
-    with os.listdir(os.path.join("data_tourisme")) as dossier:
-        for donnee_tourisme in dossier:
-            data_tourisme[donnee_tourisme] = donnee_tourisme
-    data_tourisme
+    dossier = os.listdir(os.path.join("data_tourisme"))
+    dossier
+    # for donnee_tourisme in dossier:
+    #     data_tourisme[donnee_tourisme] = donnee_tourisme
+    data_tourisme -= ""
     
     entete()
     if st.sidebar.checkbox("Introduction", value=True):
