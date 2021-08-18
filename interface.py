@@ -38,10 +38,7 @@ def lecture_donnees(nom_tableau, DATA_DRIVE):
     # est lu, transformé en tableau, reformaté et renvoyé
     id_drive = DATA_DRIVE[nom_tableau]
     gauth = GoogleAuth()
-    gauth.ServiceAuth(['b2500edb83f8da04a5ccf799ebf44aae9b8267da',
-                      '117011444834100601907',
-                      'tourisme@tourisme-323108.iam.gserviceaccount.com'])
-    #gauth = GoogleAuth()
+    gauth.CommandLineAuth()
     #gauth.LoadCredentialsFile("mycreds.txt")
     drive = GoogleDrive(gauth)
     fichier_source = drive.CreateFile({'id': id_drive})
@@ -669,10 +666,8 @@ def connexion_drive(id_dossier):
     # doit se trouver dans le dossier racine du projet.
     # /app/tourisme : dossier relatif en ligne
     gauth = GoogleAuth()
-    gauth.ServiceAuth(['b2500edb83f8da04a5ccf799ebf44aae9b8267da',
-                      '117011444834100601907',
-                      'tourisme@tourisme-323108.iam.gserviceaccount.com'])
-    #gauth.LoadCredentialsFile("mycreds.txt")
+    gauth.CommandLineAuth()
+    gauth.LoadCredentialsFile("mycreds.txt")
     # if gauth.credentials is None:
     #     # Authenticate if they're not there
     #     gauth.LocalWebserverAuth()
