@@ -1,4 +1,4 @@
-client_config_backend: 'service'
+client_config_backend: 'settings'
 client_config:
   client_id: 990193118921-hkq35nb7uiba7g6mv931e81ugrqu72ao.apps.googleusercontent.com
   client_secret: WXNd-jrF3pdLLF4ZuIJE74Lj
