@@ -668,7 +668,8 @@ def connexion_drive(id_dossier):
     # st.secrets : le dictionnaire des variables d'environnement streamlit
     
     gauth = GoogleAuth()
-    gauth.CommandLineAuth()
+    lien = gauth.CommandLineAuth()
+    st.text(lien)
     #gauth.LoadCredentialsFile("mycreds.txt")
     # if gauth.credentials is None:
     #     # Authenticate if they're not there
