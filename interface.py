@@ -667,9 +667,9 @@ def connexion_drive(id_dossier):
     # doit se trouver dans le dossier racine du projet.
     # /app/tourisme : dossier relatif en ligne
     # st.secrets : le dictionnaire des variables d'environnement streamlit
-    code = "cj-wJKyk7K-2OOXA-2BCTL1d"
-    gauth = GoogleAuth()
-    gauth.Auth(code)
+    
+    gauth = GoogleAuth(settings_file="settings.yaml")
+    
     #gauth.LoadCredentialsFile("mycreds.txt")
     # if gauth.credentials is None:
     #     # Authenticate if they're not there
