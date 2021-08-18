@@ -37,8 +37,8 @@ def lecture_donnees(nom_tableau, DATA_DRIVE):
     # A partir des identifiants Google, le tableau choisi par l'utilisateur
     # est lu, transformé en tableau, reformaté et renvoyé
     id_drive = DATA_DRIVE[nom_tableau]
+    code = "cj-wJKyk7K-2OOXA-2BCTL1d"
     gauth = GoogleAuth()
-    code = gauth.GetAuthUrl()
     gauth.Auth(code)
     #gauth.LoadCredentialsFile("mycreds.txt")
     drive = GoogleDrive(gauth)
@@ -666,8 +666,8 @@ def connexion_drive(id_dossier):
     # Le fichier 'client_secrets.json', contenant les informations de connexion
     # doit se trouver dans le dossier racine du projet.
     # /app/tourisme : dossier relatif en ligne
+    code = "cj-wJKyk7K-2OOXA-2BCTL1d"
     gauth = GoogleAuth()
-    code = gauth.GetAuthUrl()
     gauth.Auth(code)
     #gauth.LoadCredentialsFile("mycreds.txt")
     # if gauth.credentials is None:
