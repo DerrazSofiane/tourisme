@@ -4,8 +4,6 @@ client_config:
   client_secret: cj-wJKyk7K-2OOXA-2BCTL1d
   redirect_uri: https://share.streamlit.io/lee-roymannier/tourisme/main/interface.py
 
-get_refresh_token: True
-
 oauth_scope:
   - https://www.googleapis.com/auth/drive.file
   - https://www.googleapis.com/auth/drive.install
