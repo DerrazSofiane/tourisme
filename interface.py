@@ -704,7 +704,7 @@ def interface():
         titre_index = 0
         type_analyse = analyse.columns[titre_index]
         data_tourisme[type_analyse] = analyse
-    data_tourisme.keys()
+        
     entete()
     
     if st.sidebar.checkbox("Introduction", value=True):
@@ -714,8 +714,8 @@ def interface():
     
     # Récupération des noms de tables d'analyse et construction de la 
     # liste déroulante
-    fichier = st.sidebar.selectbox("Quelle requête effectuer?",
-                                         data_tourisme.keys())
+    noms_analyses = list(data_tourisme.keys())
+    fichier = st.sidebar.selectbox("Quelle requête effectuer?", noms_analyses)
     data = lecture_donnees(data_tourisme[fichier])
     
     ### ANALYSE GLOBALE
