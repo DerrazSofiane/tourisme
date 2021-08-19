@@ -12,6 +12,11 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from io import StringIO
 import os
+import base64
+from fpdf import FPDF
+from pandas.plotting import table as pd_table
+import pdfkit
+import pdfcrowd
 
 # POUR LANCER L'INTERFACE EN LOCAL:
 #   streamlit run interface.py
@@ -30,22 +35,13 @@ pays = pd.read_csv("Dictionnaire_Pays.csv")
 noms_pays = pays["Country"]
 noms_pays.index = pays["2CODE"]
 
+CONTENU_GLOBAL = []
+
 # TODO: 
 # Se référer à 2019 pour faire les prévisions. 
 
 ### I - LECTURE DES DONNEES 
-def lecture_donnees(nom_tableau, data_tourisme):
-    # A partir des identifiants Google, le tableau choisi par l'utilisateur
-    # est lu, transformé en tableau, reformaté et renvoyé
-    # id_drive = data_tourisme[nom_tableau]
-    # gauth = GoogleAuth()
-    # gauth.LoadCredentialsFile("mycreds.txt")
-    # drive = GoogleDrive(gauth)
-    # fichier_source = drive.CreateFile({'id': id_drive})
-    # donnee_brut = fichier_source.GetContentString()
-    
-    data = pd.read_csv(StringIO(donnee_brut), sep=";")
-    
+def lecture_donnees(data):
     # Formatage de l'index en date
     data = data.set_index(data.columns[0])
     data.index = data.index.map(lambda x: datetime.strptime(x, "%Y-%m-%d").date())
@@ -597,6 +593,14 @@ l'indicateur de progression. Il indique les gains potentiels futurs si la tendan
 
     top3 = tops3(data, date1, date2)
     st.table(top3)
+    
+    
+    ax = plt.subplot(111, frame_on=False) # no visible frame
+    ax.xaxis.set_visible(False)  # hide the x axis
+    ax.yaxis.set_visible(False)  # hide the y axis
+    
+    conversion = pd_table(ax, top3) 
+    return conversion
 
 
 def visualisation_volumes(data):
@@ -704,17 +708,21 @@ def connexion_drive(id_dossier):
     # Finalement, les données globales sont définies
     return consultables
 
-def interface():
-    # Connexion au dossier Drive lors du chargement des données
-    # L'identifiant pour y accéder directement doit être spécifié
-    # data_tourisme = connexion_drive('1SoNgSF05srF1mDt_eBmWGa-rlEnhC02Y')
+def interface(CONTENU_GLOBAL):
+    # Construction des tables d'analyse et de leurs noms repectifs,
+    # pour fournir une liste déroulante à l'utilisateur.
     data_tourisme = {}
-    dossier = os.listdir(os.path.join("data_tourisme"))
+    emplacement = os.path.join("data_tourisme")
+    dossier = os.listdir(emplacement)
     for donnee_tourisme in dossier:
-        data_tourisme[donnee_tourisme] = donnee_tourisme
-    data_tourisme
-    
+        donnees_brut = emplacement + "/" + donnee_tourisme
+        analyse = pd.read_csv(donnees_brut, sep=";")
+        titre_index = 0
+        type_analyse = analyse.columns[titre_index]
+        data_tourisme[type_analyse] = analyse
+     
     entete()
+    
     if st.sidebar.checkbox("Introduction", value=True):
         introduction()
 
@@ -725,10 +733,12 @@ def interface():
         fichier = choix_fichier_donnees(data_tourisme)
         try:
             # Données brutes
-            data = lecture_donnees(fichier, data_tourisme)
+            data = lecture_donnees(data_tourisme[fichier])
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1 - Les tops") and fichier != "None":
-                visualisation_tops(data)
+                CONTENU_GLOBAL.append(visualisation_tops(data))
+                "ajouté"
+                CONTENU_GLOBAL
             
             ### 2 - LES VOLUMES
             if st.sidebar.checkbox("2 - Les volumes") and fichier != "None":
@@ -750,7 +760,7 @@ def interface():
         fichier = choix_fichier_donnees(data_tourisme)
         try:
             # données brutes
-            data = lecture_donnees(fichier, data_tourisme)
+            data = lecture_donnees(data_tourisme[fichier])
     
             # Date d'analyse
             txt = "Date d'analyse"
@@ -815,6 +825,37 @@ sur des périodes, de respectivement:
 
         except:
             pass
+        
+    ### EXPORT PDF
+    export_pdf = st.sidebar.button("Générer un pdf")
+    
+    def generer_lien_pdf(val, filename):
+        b64 = base64.b64encode(val)
+        message_telecharge = f'<a href="data:application/octet-stream;base64,{b64.decode()}"'
+        message_telecharge += f' download="{filename}.pdf">Télécharger le PDF</a>'
+        return message_telecharge
+    
+    if export_pdf:
+        # create the API client instance
+        client = pdfcrowd.HtmlToPdfClient('alebarq', '2e3f385600cfa2bceb925976b0b1dd04')
+        client.setUseHttp(True)
+        # run the conversion and write the result to a file
+        pdf = client.convertUrl('https://share.streamlit.io/lee-roymannier/tourisme/main/interface.py')
+        # pdf = pdfkit.from_url('http://localhost:8501/', False)
+        # pdf = FPDF()
+        # pdf.add_page()
+        # pdf.set_font('Arial', 'B', 16)
+        # pdf.image("logo_Atout_France.png", 10, 10, 100, 50)
+        # pdf.image("logo_Baudy_Co.png", 10, 10, 100, 50)
+        # for contenu in CONTENU_GLOBAL:
+        #     pdf.add_page()
+        #     image_contenu = plt.imshow(contenu)
+        #     pdf.image(image_contenu)
+        #     # pdf.cell(40, 10, contenu)
+        # lien_pdf = generer_lien_pdf(pdf.output(dest="S").encode("latin-1"),
+        #                         "Rapport analyse destinations")
+        lien_pdf = generer_lien_pdf(pdf, "Rapport analyses")
+        st.sidebar.markdown(lien_pdf, unsafe_allow_html=True)
 
 ### VI - TESTS UNITAIRES
 test = False
@@ -839,4 +880,4 @@ if test:
 
 
 ### VII - PROGRAMME PRINCIPAL
-interface()
+interface(CONTENU_GLOBAL)
