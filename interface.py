@@ -706,7 +706,7 @@ def connexion_drive(id_dossier):
     # Finalement, les données globales sont définies
     return consultables
 
-def interface(CONTENU_GLOBAL):
+def interface():
     # Construction des tables d'analyse et de leurs noms repectifs,
     # pour fournir une liste déroulante à l'utilisateur.
     data_tourisme = {}
@@ -718,7 +718,7 @@ def interface(CONTENU_GLOBAL):
         titre_index = 0
         type_analyse = analyse.columns[titre_index]
         data_tourisme[type_analyse] = analyse
-     
+    data_tourisme
     entete()
     
     if st.sidebar.checkbox("Introduction", value=True):
@@ -734,9 +734,7 @@ def interface(CONTENU_GLOBAL):
             data = lecture_donnees(data_tourisme[fichier])
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1 - Les tops") and fichier != "None":
-                CONTENU_GLOBAL.append(visualisation_tops(data))
-                "ajouté"
-                CONTENU_GLOBAL
+                visualisation_tops(data)
             
             ### 2 - LES VOLUMES
             if st.sidebar.checkbox("2 - Les volumes") and fichier != "None":
@@ -878,4 +876,4 @@ if test:
 
 
 ### VII - PROGRAMME PRINCIPAL
-interface(CONTENU_GLOBAL)
+interface()
