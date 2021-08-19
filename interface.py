@@ -13,9 +13,7 @@ from pydrive.drive import GoogleDrive
 from io import StringIO
 import os
 import base64
-from fpdf import FPDF
 from pandas.plotting import table as pd_table
-import pdfkit
 import pdfcrowd
 
 # POUR LANCER L'INTERFACE EN LOCAL:
