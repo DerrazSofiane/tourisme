@@ -704,7 +704,7 @@ def interface():
         titre_index = 0
         type_analyse = analyse.columns[titre_index]
         data_tourisme[type_analyse] = analyse
-    data_tourisme
+    data_tourisme.keys()
     entete()
     
     if st.sidebar.checkbox("Introduction", value=True):
