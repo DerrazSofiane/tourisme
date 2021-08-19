@@ -543,19 +543,6 @@ Paris et Disneyland Paris (toutes catégories)."""
     st.text(txt)
 
 
-def choix_fichier_donnees(data_tourisme):
-    #my_expander = st.sidebar.beta_expander("Ouvrir", expanded=True)
-    #with my_expander:
-    #    st.write(u"Fichier à analyser")
-    #    uploaded_file = st.file_uploader("")
-
-    # uploaded_file = st.sidebar.file_uploader("Données de Google Trends:")
-    if data_tourisme != None:
-        uploaded_file = st.sidebar.selectbox("Quelle requête effectuer?",
-                                             data_tourisme.keys())
-        return uploaded_file
-
-
 def selection_mode_analyse():
     global mode
     txt = "Type d'analyse: " 
@@ -707,8 +694,7 @@ def connexion_drive(id_dossier):
     return consultables
 
 def interface():
-    # Construction des tables d'analyse et de leurs noms repectifs,
-    # pour fournir une liste déroulante à l'utilisateur.
+    # Construction des tables d'analyse et de leurs noms repectifs
     data_tourisme = {}
     emplacement = os.path.join("data_tourisme")
     dossier = os.listdir(emplacement)
@@ -718,20 +704,24 @@ def interface():
         titre_index = 0
         type_analyse = analyse.columns[titre_index]
         data_tourisme[type_analyse] = analyse
-    data_tourisme
+    
     entete()
     
     if st.sidebar.checkbox("Introduction", value=True):
         introduction()
 
     selection_mode_analyse()
-
+    
+    # Récupération des noms de tables d'analyse et construction de la 
+    # liste déroulante
+    fichier = st.sidebar.selectbox("Quelle requête effectuer?",
+                                         data_tourisme.keys())
+    data = lecture_donnees(data_tourisme[fichier])
+    
     ### ANALYSE GLOBALE
     if mode == "Générique":
-        fichier = choix_fichier_donnees(data_tourisme)
+        # fichier = choix_fichier_donnees(data_tourisme)
         try:
-            # Données brutes
-            data = lecture_donnees(data_tourisme[fichier])
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1 - Les tops") and fichier != "None":
                 visualisation_tops(data)
@@ -753,11 +743,8 @@ def interface():
 
     ### ANALYSE PAR PAYS
     if mode == "Par pays":
-        fichier = choix_fichier_donnees(data_tourisme)
+        # fichier = choix_fichier_donnees(data_tourisme)
         try:
-            # données brutes
-            data = lecture_donnees(data_tourisme[fichier])
-    
             # Date d'analyse
             txt = "Date d'analyse"
             date2 = st.sidebar.date_input(txt,value=max(data.index))
