@@ -822,6 +822,8 @@ sur des périodes, de respectivement:
         # create the API client instance
         client = pdfcrowd.HtmlToPdfClient('alebarq', '2e3f385600cfa2bceb925976b0b1dd04')
         client.setUseHttp(True)
+        client.setPageSize('Letter')
+        client.setOrientation('landscape')
         # run the conversion and write the result to a file
         pdf = client.convertUrl('https://share.streamlit.io/lee-roymannier/tourisme/main/interface.py')
         # pdf = pdfkit.from_url('http://localhost:8501/', False)
