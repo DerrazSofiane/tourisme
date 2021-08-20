@@ -682,6 +682,12 @@ def interface(CONTENU_GLOBAL):
             # pass
             donnee_tourisme
             
+    # Pour faciliter la navigation parmi les fichiers,
+    # ces derniers sont classés par ordre alphabétique.
+    ordonne = sorted(data_tourisme.items(), key=lambda x: x[0])
+    data_tourisme = {}
+    for donnee in ordonne:
+        data_tourisme[donnee[0]] = donnee[1]
         
     entete()
     
