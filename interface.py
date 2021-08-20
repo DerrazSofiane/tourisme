@@ -448,7 +448,7 @@ def graph_volumes(data, nom_x, nom_y, nom_z):
             ax.annotate(text, (x,y), ha='center', va='top', size=8, 
                         color='red', xytext=(0,1), textcoords='offset points',
                         rotation=90)
-
+    plt.xticks(rotation=45)
     # Des limites un peu plus larges sont fixées en ordonnées afin d'être 
     # certain que les écritures précédentes ne dépassent du cadre
     ymin, ymax = min(data_graph[nom_y]), max(data_graph[nom_y])
