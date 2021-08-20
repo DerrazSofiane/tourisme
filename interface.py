@@ -671,11 +671,13 @@ def interface(CONTENU_GLOBAL):
             analyse = pd.read_csv(donnees_brut, sep=";",
                                   encoding = "ISO-8859-1",
                                   engine='python')
-            titre_index = 0
-            type_analyse = analyse.columns[titre_index]
+            titre_index = 1
+            # type_analyse = analyse.columns[titre_index]
+            type_analyse = donnee_tourisme.split("_")[titre_index]
             data_tourisme[type_analyse] = analyse
         except:
-            donnee_tourisme
+            pass
+            # donnee_tourisme
             
         
     entete()
