@@ -677,7 +677,8 @@ def interface(CONTENU_GLOBAL):
         except:
             pass
             # donnee_tourisme
-            
+    data_tourisme_pays
+    data_tourisme_generique 
     # Pour faciliter la navigation parmi les fichiers,
     # ces derniers sont classés par ordre alphabétique.
     def ordre_alpha(categorie):
