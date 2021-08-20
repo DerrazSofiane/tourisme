@@ -695,8 +695,8 @@ def interface(CONTENU_GLOBAL):
     if st.sidebar.checkbox("Introduction", value=True):
         introduction()
         
-    types_analyse = {"Générique": data_tourisme_generique,
-                     "Par pays": data_tourisme_pays}
+    types_analyse = {"Générique": "data_tourisme_generique",
+                     "Par pays": "data_tourisme_pays"}
     txt = "Type d'analyse: " 
     noms_types = list(types_analyse.keys())
     mode = st.sidebar.selectbox(txt, types_analyse)
