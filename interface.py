@@ -668,7 +668,9 @@ def interface(CONTENU_GLOBAL):
     for donnee_tourisme in dossier:
         try:
             donnees_brut = emplacement + "/" + donnee_tourisme
-            analyse = pd.read_csv(donnees_brut, sep=";", encoding = "utf-8")
+            analyse = pd.read_csv(donnees_brut, sep=";",
+                                  encoding = "ISO-8859-1",
+                                  engine='python')
             titre_index = 0
             type_analyse = analyse.columns[titre_index]
             data_tourisme[type_analyse] = analyse
