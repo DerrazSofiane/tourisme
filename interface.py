@@ -674,8 +674,11 @@ def interface(CONTENU_GLOBAL):
             # Le nom du fichier est décomposé pour former le nom qui sera affiché
             decompose = donnee_tourisme.split("_")
             type_analyse = decompose[1]
-            if type_analyse[:9] != "Generique":
-                type_analyse = decompose[0] + ": " + decompose[1]
+            type_analyse = type_analyse.split("-")
+            if type_analyse[0] != "Generique":
+                type_analyse = decompose[0] + ": " + " ".join(type_analyse[:-1])
+            else:
+                type_analyse = " ".join(type_analyse[:-1])
             # type_analyse = analyse.columns[titre_index]
             data_tourisme[type_analyse] = analyse
         except:
