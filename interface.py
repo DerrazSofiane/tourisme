@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import streamlit as st
+import streamlit.components.v1 as components
+
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -14,7 +16,7 @@ from io import StringIO
 import os
 import base64
 from pandas.plotting import table as pd_table
-import pdfcrowd
+from pdflatex import PDFLaTeX
 
 # POUR LANCER L'INTERFACE EN LOCAL:
 #   streamlit run interface.py
@@ -33,7 +35,8 @@ pays = pd.read_csv("Dictionnaire_Pays.csv")
 noms_pays = pays["Country"]
 noms_pays.index = pays["2CODE"]
 
-CONTENU_GLOBAL = []
+# On enregistrera le contenu affiché pour le rapport en pdf
+CONTENU_GLOBAL = {}
 
 # TODO: 
 # Se référer à 2019 pour faire les prévisions. 
@@ -577,15 +580,13 @@ l'indicateur de progression. Il indique les gains potentiels futurs si la tendan
     date2 = st.date_input("fin:",  value=date_2)
 
     top3 = tops3(data, date1, date2)
-    st.table(top3)
     
-    
+    st.table(top3)       
     ax = plt.subplot(111, frame_on=False) # no visible frame
     ax.xaxis.set_visible(False)  # hide the x axis
     ax.yaxis.set_visible(False)  # hide the y axis
     
-    conversion = pd_table(ax, top3) 
-    return conversion
+    return top3.to_latex()
 
 
 def visualisation_volumes(data):
@@ -602,19 +603,27 @@ mise sur les 2 denières semaines puis sur les 4 dernières semaines. """
     st.title("2 - Indice des tendances de recherches des 2 dernières semaines ")
     st.text(txt)
 
-    st.header("a - Tendances de recherche des 2 dernières semaines")
+    titre_googletrend = "a - Tendances de recherche des 2 dernières semaines"
+    st.header(titre_googletrend)
     table = data.tail(2).applymap(lambda x: "{:.1f}".format(x))
     table.index = table.index.map(lambda t: duree_str(t, t+timedelta(days=6)))
     st.write(table)
 
     nom_x, nom_y, nom_z = "Pays", "Indice Google Trends – Base 100", "Semaine"
-    st.pyplot(graph_volumes(data.tail(2), nom_x, nom_y, nom_z))
+    graph_googletrends = graph_volumes(data.tail(2), nom_x, nom_y, nom_z)
+    st.pyplot(graph_googletrends)
 
-    st.header("b - Tendances de recherche des 4 dernières semaines")
+    titre_tendances = "b - Tendances de recherche des 4 dernières semaines"
+    st.header(titre_tendances)
     table = data.tail(4).applymap(lambda x: "{:.1f}".format(x))
     table.index = table.index.map(lambda t: duree_str(t, t+timedelta(days=6)))
     st.write(table)
-    st.pyplot(graph_volumes(data.tail(4), nom_x, nom_y, nom_z))
+    graph_tendances = graph_volumes(data.tail(4), nom_x, nom_y, nom_z)
+    st.pyplot(graph_tendances)
+    
+    resultats = {titre_tendances: graph_tendances,
+                 titre_googletrend: graph_googletrends}
+    return resultats 
 
 
 def visualisation_variations(data):
@@ -693,8 +702,8 @@ def connexion_drive(id_dossier):
     # Finalement, les données globales sont définies
     return consultables
 
-def interface():
-    # Construction des tables d'analyse et de leurs noms repectifs
+def interface(CONTENU_GLOBAL):
+    # Lecture des fichiers des tables d'analyse et de leurs noms repectifs
     data_tourisme = {}
     emplacement = os.path.join("data_tourisme")
     dossier = os.listdir(emplacement)
@@ -724,12 +733,15 @@ def interface():
         try:
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1 - Les tops") and fichier != "None":
-                visualisation_tops(data)
+                top3 = visualisation_tops(data)
+                CONTENU_GLOBAL["Top3"] = top3
             
             ### 2 - LES VOLUMES
             if st.sidebar.checkbox("2 - Les volumes") and fichier != "None":
-                visualisation_volumes(data)
-    
+                # On trace les graphiques et le contenu pour le pdf est complété
+                graph_volumes = visualisation_volumes(data)
+                for graph in graph_volumes:
+                    CONTENU_GLOBAL[graph] = graph_volumes[graph]
             ### 3 - LES VARIATIONS
             if st.sidebar.checkbox("3 - Les variations") and fichier != "None":
                 visualisation_variations(data)
@@ -810,8 +822,25 @@ sur des périodes, de respectivement:
             pass
         
     ### EXPORT PDF
+    # components.html("""
+    #                 <script type="text/javascript">
+				# 
+    #                 function imprime(){
+    #                     var sections = document.getElementsByTagName("section");
+    #                     var print_div = sections[1];
+                        
+    #                     var print_area = window.open();
+    #                     print_area.document.write(print_div.innerHTML);
+    #                     print_area.document.close();
+    #                     print_area.focus();
+    #                     print_area.print();
+    #                     print_area.close();}
+    #             	</script>
+    #                 <button onClick="imprime()">TEST</button>
+    #                 """)
+
     export_pdf = st.sidebar.button("Générer un pdf")
-    
+    # CONTENU_GLOBAL
     def generer_lien_pdf(val, filename):
         b64 = base64.b64encode(val)
         message_telecharge = f'<a href="data:application/octet-stream;base64,{b64.decode()}"'
@@ -819,27 +848,35 @@ sur des périodes, de respectivement:
         return message_telecharge
     
     if export_pdf:
-        # create the API client instance
-        client = pdfcrowd.HtmlToPdfClient('alebarq', '2e3f385600cfa2bceb925976b0b1dd04')
-        client.setUseHttp(True)
-        client.setPageSize('Letter')
-        client.setOrientation('landscape')
-        # run the conversion and write the result to a file
-        pdf = client.convertUrl('https://share.streamlit.io/lee-roymannier/tourisme/main/interface.py')
-        # pdf = pdfkit.from_url('http://localhost:8501/', False)
-        # pdf = FPDF()
-        # pdf.add_page()
-        # pdf.set_font('Arial', 'B', 16)
-        # pdf.image("logo_Atout_France.png", 10, 10, 100, 50)
-        # pdf.image("logo_Baudy_Co.png", 10, 10, 100, 50)
+        # Afin de créer un rapport pdf détaillant les données choisies,
+        # une base de document latex et créée et agrémentée de tout le
+        # contenu affiché.
+        base_latex = r"""\documentclass[11pt]{article}%
+                        \begin{document}
+                            \vspace{2cm}
+                            \begin{center}
+                                \textbf{\huge "Rapport d'analyse" \\}
+                                \vspace{1cm}
+                                \textbf{\Large "Observatoire digital
+                                        des destinations" \\}
+                                \vspace{1cm}
+                            \end{center}
+                            \begin{flushright}
+                                {\large "Baudy and cie" }
+                            \end{flushright}
+                        """
+        
         # for contenu in CONTENU_GLOBAL:
-        #     pdf.add_page()
-        #     image_contenu = plt.imshow(contenu)
-        #     pdf.image(image_contenu)
-        #     # pdf.cell(40, 10, contenu)
-        # lien_pdf = generer_lien_pdf(pdf.output(dest="S").encode("latin-1"),
-        #                         "Rapport analyse destinations")
-        lien_pdf = generer_lien_pdf(pdf, "Rapport analyses")
+        #     # base_latex += str(contenu) +" "
+        #     base_latex += str(CONTENU_GLOBAL[contenu])
+        
+        base_latex += "\end{document}"
+        # base_latex
+        base_latex = bytes(base_latex, encoding='utf8')
+        # base_latex
+        conversion = PDFLaTeX.from_binarystring(base_latex, "Rapport")
+        export, log, cp = conversion.create_pdf()
+        lien_pdf = generer_lien_pdf(export, "Rapport analyse destinations")
         st.sidebar.markdown(lien_pdf, unsafe_allow_html=True)
 
 ### VI - TESTS UNITAIRES
@@ -865,4 +902,4 @@ if test:
 
 
 ### VII - PROGRAMME PRINCIPAL
-interface()
+interface(CONTENU_GLOBAL)
