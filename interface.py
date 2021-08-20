@@ -671,9 +671,11 @@ def interface(CONTENU_GLOBAL):
             analyse = pd.read_csv(donnees_brut, sep=";",
                                   encoding = "ISO-8859-1",
                                   engine='python')
-            titre_index = 1
+            decompose = donnee_tourisme.split("_")
+            type_analyse = decompose[1]
+            if type_analyse[:8] != "Générique":
+                type_analyse = decompose[0] + ": " + decompose[1]
             # type_analyse = analyse.columns[titre_index]
-            type_analyse = donnee_tourisme.split("_")[titre_index]
             data_tourisme[type_analyse] = analyse
         except:
             # pass
