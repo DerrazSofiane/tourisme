@@ -666,11 +666,15 @@ def interface(CONTENU_GLOBAL):
     emplacement = os.path.join("data_tourisme")
     dossier = os.listdir(emplacement)
     for donnee_tourisme in dossier:
-        donnees_brut = emplacement + "/" + donnee_tourisme
-        analyse = pd.read_csv(donnees_brut, sep=";")
-        titre_index = 0
-        type_analyse = analyse.columns[titre_index]
-        data_tourisme[type_analyse] = analyse
+        try:
+            donnees_brut = emplacement + "/" + donnee_tourisme
+            analyse = pd.read_csv(donnees_brut, sep=";")
+            titre_index = 0
+            type_analyse = analyse.columns[titre_index]
+            data_tourisme[type_analyse] = analyse
+        except:
+            print(donnee_tourisme)
+            pass
         
     entete()
     
