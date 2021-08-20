@@ -676,8 +676,8 @@ def interface(CONTENU_GLOBAL):
             type_analyse = donnee_tourisme.split("_")[titre_index]
             data_tourisme[type_analyse] = analyse
         except:
-            pass
-            # donnee_tourisme
+            # pass
+            donnee_tourisme
             
         
     entete()
