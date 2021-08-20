@@ -798,45 +798,44 @@ sur des périodes, de respectivement:
     #                 """)
 
     # export_pdf = st.sidebar.button("Générer un pdf")
-    export_pdf = False
     # CONTENU_GLOBAL
-    def generer_lien_pdf(val, filename):
-        b64 = base64.b64encode(val)
-        message_telecharge = f'<a href="data:application/octet-stream;base64,{b64.decode()}"'
-        message_telecharge += f' download="{filename}.pdf">Télécharger le PDF</a>'
-        return message_telecharge
+    # def generer_lien_pdf(val, filename):
+    #     b64 = base64.b64encode(val)
+    #     message_telecharge = f'<a href="data:application/octet-stream;base64,{b64.decode()}"'
+    #     message_telecharge += f' download="{filename}.pdf">Télécharger le PDF</a>'
+    #     return message_telecharge
     
-    if export_pdf:
-        # Afin de créer un rapport pdf détaillant les données choisies,
-        # une base de document latex et créée et agrémentée de tout le
-        # contenu affiché.
-        base_latex = r"""\documentclass[11pt]{article}%
-                         \begin{document}
-                            \vspace{2cm}
-                            \begin{center}
-                                \textbf{\huge "Rapport d'analyse" \\}
-                                \vspace{1cm}
-                                \textbf{\Large "Observatoire digital
-                                        des destinations" \\}
-                                \vspace{1cm}
-                            \end{center}
-                            \begin{flushright}
-                                {\large "Baudy and cie" }
-                            \end{flushright}
-                        """
+    # if export_pdf:
+    #     # Afin de créer un rapport pdf détaillant les données choisies,
+    #     # une base de document latex et créée et agrémentée de tout le
+    #     # contenu affiché.
+    #     base_latex = r"""\documentclass[11pt]{article}%
+    #                      \begin{document}
+    #                         \vspace{2cm}
+    #                         \begin{center}
+    #                             \textbf{\huge "Rapport d'analyse" \\}
+    #                             \vspace{1cm}
+    #                             \textbf{\Large "Observatoire digital
+    #                                     des destinations" \\}
+    #                             \vspace{1cm}
+    #                         \end{center}
+    #                         \begin{flushright}
+    #                             {\large "Baudy and cie" }
+    #                         \end{flushright}
+    #                     """
         
-        for contenu in CONTENU_GLOBAL:
-            # base_latex += str(contenu) +" "
-            base_latex += str(CONTENU_GLOBAL[contenu])
+    #     for contenu in CONTENU_GLOBAL:
+    #         # base_latex += str(contenu) +" "
+    #         base_latex += str(CONTENU_GLOBAL[contenu])
         
-        base_latex += "\end{document}"
-        base_latex
-        base_latex = bytes(base_latex, encoding='utf8')
-        # base_latex
-        conversion = PDFLaTeX.from_binarystring(base_latex, "Rapport")
-        export, log, cp = conversion.create_pdf()
-        lien_pdf = generer_lien_pdf(export, "Rapport analyse destinations")
-        st.sidebar.markdown(lien_pdf, unsafe_allow_html=True)
+    #     base_latex += "\end{document}"
+    #     base_latex
+    #     base_latex = bytes(base_latex, encoding='utf8')
+    #     # base_latex
+    #     conversion = PDFLaTeX.from_binarystring(base_latex, "Rapport")
+    #     export, log, cp = conversion.create_pdf()
+    #     lien_pdf = generer_lien_pdf(export, "Rapport analyse destinations")
+    #     st.sidebar.markdown(lien_pdf, unsafe_allow_html=True)
 
 ### VI - TESTS UNITAIRES
 test = False
