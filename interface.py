@@ -697,11 +697,11 @@ def interface(CONTENU_GLOBAL):
         
     types_analyse = {"Générique": "data_tourisme_generique",
                      "Par pays": "data_tourisme_pays"}
+    types_analyse
     txt = "Type d'analyse: " 
     noms_types = list(types_analyse.keys())
     mode = st.sidebar.selectbox(txt, types_analyse)
     # selection_mode_analyse()
-    types_analyse
     # Récupération des noms de tables d'analyse et construction de la 
     # liste déroulante
     noms_analyses = list(types_analyse[mode].keys())
