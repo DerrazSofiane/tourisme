@@ -677,8 +677,7 @@ def interface(CONTENU_GLOBAL):
         except:
             pass
             # donnee_tourisme
-    data_tourisme_pays
-    data_tourisme_generique 
+    
     # Pour faciliter la navigation parmi les fichiers,
     # ces derniers sont classés par ordre alphabétique.
     def ordre_alpha(categorie):
@@ -702,7 +701,7 @@ def interface(CONTENU_GLOBAL):
     noms_types = list(types_analyse.keys())
     mode = st.sidebar.selectbox(txt, types_analyse)
     # selection_mode_analyse()
-    
+    types_analyse
     # Récupération des noms de tables d'analyse et construction de la 
     # liste déroulante
     noms_analyses = list(types_analyse[mode].keys())
