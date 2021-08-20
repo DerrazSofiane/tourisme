@@ -673,6 +673,7 @@ def interface(CONTENU_GLOBAL):
                                   engine='python')
             decompose = donnee_tourisme.split("_")
             type_analyse = decompose[1]
+            type_analyse[:8]
             if type_analyse[:8] != "Generique":
                 type_analyse = decompose[0] + ": " + decompose[1]
             # type_analyse = analyse.columns[titre_index]
