@@ -545,13 +545,6 @@ Paris et Disneyland Paris (toutes catégories)."""
     st.text(txt)
 
 
-def selection_mode_analyse():
-    global mode
-    txt = "Type d'analyse: " 
-    mode = st.sidebar.selectbox(txt, ("Générique", "Par pays"))
-    #st.sidebar.success(f"Vous avez choisi le mode {mode}")
-
-
 def visualisation_tops(data):
     date_1, date_2 = max(data.index) - 4*timedelta(7), max(data.index)
     txt = f"""
@@ -660,8 +653,9 @@ fluctuer."""
 
 
 def interface(CONTENU_GLOBAL):
-    # Lecture des fichiers des tables d'analyse et de leurs noms repectifs
-    data_tourisme = {}
+    # Lecture des fichiers des tables d'analyse et de leurs noms respectifs
+    data_tourisme_pays = {}
+    data_tourisme_generique = {}
     emplacement = os.path.join("data_tourisme")
     dossier = os.listdir(emplacement)
     for donnee_tourisme in dossier:
@@ -674,39 +668,48 @@ def interface(CONTENU_GLOBAL):
             decompose = donnee_tourisme.split("_")
             type_analyse = decompose[1]
             type_analyse = type_analyse.split("-")
-            if type_analyse[0] != "Generique":
-                type_analyse = decompose[0] + ": " + " ".join(type_analyse[1:-1])
-            else:
+            if type_analyse[0] == "Generique":
                 type_analyse = " ".join(type_analyse[:-1])
-            # type_analyse = analyse.columns[titre_index]
-            data_tourisme[type_analyse] = analyse
+                data_tourisme_generique[type_analyse] = analyse
+            else:
+                type_analyse = decompose[0] + ": " + " ".join(type_analyse[1:-1])
+                data_tourisme_pays[type_analyse] = analyse
         except:
-            # pass
-            donnee_tourisme
+            pass
+            # donnee_tourisme
             
     # Pour faciliter la navigation parmi les fichiers,
     # ces derniers sont classés par ordre alphabétique.
-    ordonne = sorted(data_tourisme.items(), key=lambda x: x[0])
-    data_tourisme = {}
-    for donnee in ordonne:
-        data_tourisme[donnee[0]] = donnee[1]
-        
+    def ordre_alpha(categorie):
+        ordonne = sorted(categorie.items(), key=lambda x: x[0])
+        categorie = {}
+        for donnee in ordonne:
+            categorie[donnee[0]] = donnee[1]
+        return categorie
+            
+    # for categorie in [data_tourisme_pays, data_tourisme_generique]:
+    #     categorie = ordre_alpha(categorie)
+    
     entete()
     
     if st.sidebar.checkbox("Introduction", value=True):
         introduction()
-
-    selection_mode_analyse()
+        
+    types_analyse = {"Générique": data_tourisme_generique,
+                     "Par pays": data_tourisme_pays}
+    txt = "Type d'analyse: " 
+    noms_types = list(types_analyse.keys())
+    mode = st.sidebar.selectbox(txt, types_analyse)
+    # selection_mode_analyse()
     
     # Récupération des noms de tables d'analyse et construction de la 
     # liste déroulante
-    noms_analyses = list(data_tourisme.keys())
+    noms_analyses = list(types_analyse[mode].keys())
     fichier = st.sidebar.selectbox("Quelle requête effectuer?", noms_analyses)
-    data = lecture_donnees(data_tourisme[fichier])
-    
+   
     ### ANALYSE GLOBALE
     if mode == "Générique":
-        # fichier = choix_fichier_donnees(data_tourisme)
+        data = lecture_donnees(data_tourisme_generique[fichier])
         try:
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1 - Les tops") and fichier != "None":
@@ -732,7 +735,7 @@ def interface(CONTENU_GLOBAL):
 
     ### ANALYSE PAR PAYS
     if mode == "Par pays":
-        # fichier = choix_fichier_donnees(data_tourisme)
+        data = lecture_donnees(data_tourisme_pays[fichier])
         try:
             # Date d'analyse
             txt = "Date d'analyse"
