@@ -581,7 +581,7 @@ l'indicateur de progression. Il indique les gains potentiels futurs si la tendan
 
     top3 = tops3(data, date1, date2)
     
-    st.table(top3)       
+    st.table(top3)
     ax = plt.subplot(111, frame_on=False) # no visible frame
     ax.xaxis.set_visible(False)  # hide the x axis
     ax.yaxis.set_visible(False)  # hide the y axis
@@ -658,49 +658,7 @@ fluctuer."""
 
     nom_x, nom_y, nom_z = "Pays", "Variation de l'indice Google Trends – %", "Semaine"
     st.pyplot(graph_volumes(var, nom_x, nom_y, nom_z))
-    
-def connexion_drive(id_dossier):
-    # Les données sont contenues dans un dossier sur le Drive de Google.
-    # Le fichier 'client_secrets.json', contenant les informations de connexion
-    # doit se trouver dans le dossier racine du projet.
-    # /app/tourisme : dossier relatif en ligne
-    # st.secrets : le dictionnaire des variables d'environnement streamlit
-    
-    gauth = GoogleAuth()
-    #gauth.LoadCredentialsFile("mycreds.txt")
-    # if gauth.credentials is None:
-    #     # Authenticate if they're not there
-    #     gauth.LocalWebserverAuth()
-    # elif gauth.access_token_expired:
-    #     # Refresh them if expired
-    #     gauth.Refresh()
-    # else:
-    #     # Initialize the saved creds
-    #     gauth.Authorize()
-    # # Save the current credentials to a file
-    # gauth.SaveCredentialsFile("mycreds.txt")
-    
-    # gauth.LocalWebserverAuth()
-    drive = GoogleDrive(gauth)
-    # Une fois en possession du bon identifiant, c'est celui-ci qui sera inséré
-    # dans la requête, pour obtenir, cette-fois, tous les fichiers.
-    requete = "'" + id_dossier + "' in parents and trashed=false"
-    donnees = drive.ListFile({'q': requete}).GetList()
-    consultables = {}
-    # Une fois dans le bon dossier, les différents fichiers sont parcourus.
-    # S'il s'agit bien d'un csv, un tableau est créé de sa lecture puis ajouté
-    # à la liste consultable pour la lecture des données.
-    for donnee in donnees:
-        if donnee['title'][-4:] == ".csv":
-            print("Tentative de réception des données", donnee['title'])
-            try:
-                titre_brut = donnee['title'][:-4].split("-")
-                titre = titre_brut[-2]
-                consultables[titre] = donnee['id']
-            except:
-                pass 
-    # Finalement, les données globales sont définies
-    return consultables
+
 
 def interface(CONTENU_GLOBAL):
     # Lecture des fichiers des tables d'analyse et de leurs noms repectifs
@@ -839,7 +797,8 @@ sur des périodes, de respectivement:
     #                 <button onClick="imprime()">TEST</button>
     #                 """)
 
-    export_pdf = st.sidebar.button("Générer un pdf")
+    # export_pdf = st.sidebar.button("Générer un pdf")
+    export_pdf = False
     # CONTENU_GLOBAL
     def generer_lien_pdf(val, filename):
         b64 = base64.b64encode(val)
@@ -852,7 +811,7 @@ sur des périodes, de respectivement:
         # une base de document latex et créée et agrémentée de tout le
         # contenu affiché.
         base_latex = r"""\documentclass[11pt]{article}%
-                        \begin{document}
+                         \begin{document}
                             \vspace{2cm}
                             \begin{center}
                                 \textbf{\huge "Rapport d'analyse" \\}
@@ -866,12 +825,12 @@ sur des périodes, de respectivement:
                             \end{flushright}
                         """
         
-        # for contenu in CONTENU_GLOBAL:
-        #     # base_latex += str(contenu) +" "
-        #     base_latex += str(CONTENU_GLOBAL[contenu])
+        for contenu in CONTENU_GLOBAL:
+            # base_latex += str(contenu) +" "
+            base_latex += str(CONTENU_GLOBAL[contenu])
         
         base_latex += "\end{document}"
-        # base_latex
+        base_latex
         base_latex = bytes(base_latex, encoding='utf8')
         # base_latex
         conversion = PDFLaTeX.from_binarystring(base_latex, "Rapport")
