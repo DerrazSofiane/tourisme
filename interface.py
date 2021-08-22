@@ -401,7 +401,7 @@ def variation_mensuel(data, annee, mois, top_6_mensuel):
 
 ### IV - GRAPHQUES
 
-def graph_volumes(data, nom_x, nom_y, nom_z):
+def graph_barres(data, nom_x, nom_y, nom_z, formate_date=True):
     # Mise en forme des données (data) pour pouvoir utiliser seaborne, dans un 
     # tableau à trois colonnes (data_graph). La première est le temps, sous 
     # forme de date, la deuxième est les valeurs (volumes, variations, etc...),
@@ -419,8 +419,9 @@ def graph_volumes(data, nom_x, nom_y, nom_z):
     # semaines. Elles sont mises sous un format plus lisible.
     # Lorsque les valeurs sont des variations, les dates représentent le début
     # de la première semaine de variation 
-    dt = timedelta(days=6) # temps entre le début et la fin de la semaine 
-    data_graph[nom_z] = data_graph[nom_z].apply(lambda t: duree_str(t, t+dt))
+    if formate_date:
+        dt = timedelta(days=6) # temps entre le début et la fin de la semaine 
+        data_graph[nom_z] = data_graph[nom_z].apply(lambda t: duree_str(t, t+dt))
 
     # Les volumes sont ensuite représentés à l'aide de barres.
     # Différentes palettes de couleurs ont été testées:
@@ -453,6 +454,8 @@ def graph_volumes(data, nom_x, nom_y, nom_z):
     ymin, ymax = min(data_graph[nom_y]), max(data_graph[nom_y])
     ax.set_ylim([(ymin-0.2*(ymax-ymin) if ymin < 0 else 0),
                  (ymax+0.2*(ymax-ymin) if ymax > 0 else 0)])
+
+    plt.xticks(rotation=45)
 
     return fig
 
@@ -602,7 +605,7 @@ mise sur les 2 denières semaines puis sur les 4 dernières semaines. """
     st.write(table)
 
     nom_x, nom_y, nom_z = "Pays", "Indice Google Trends – Base 100", "Semaine"
-    graph_googletrends = graph_volumes(data.tail(2), nom_x, nom_y, nom_z)
+    graph_googletrends = graph_barres(data.tail(2), nom_x, nom_y, nom_z)
     st.pyplot(graph_googletrends)
 
     titre_tendances = "b - Tendances de recherche des 4 dernières semaines"
@@ -610,7 +613,7 @@ mise sur les 2 denières semaines puis sur les 4 dernières semaines. """
     table = data.tail(4).applymap(lambda x: "{:.1f}".format(x))
     table.index = table.index.map(lambda t: duree_str(t, t+timedelta(days=6)))
     st.write(table)
-    graph_tendances = graph_volumes(data.tail(4), nom_x, nom_y, nom_z)
+    graph_tendances = graph_barres(data.tail(4), nom_x, nom_y, nom_z)
     st.pyplot(graph_tendances)
     
     resultats = {titre_tendances: graph_tendances,
@@ -638,7 +641,7 @@ fluctuer."""
     st.write(table)
 
     nom_x, nom_y, nom_z = "Pays", "Variation de l'indice Google Trends – %", "Semaine"
-    st.pyplot(graph_volumes(var, nom_x, nom_y, nom_z))
+    st.pyplot(graph_barres(var, nom_x, nom_y, nom_z))
 
     st.header("b - Variations S-1/S-2 comparées à S-2/S-3")
     #st.text(f"{periode(-2,-1)}")
@@ -649,7 +652,7 @@ fluctuer."""
     st.write(table)
 
     nom_x, nom_y, nom_z = "Pays", "Variation de l'indice Google Trends – %", "Semaine"
-    st.pyplot(graph_volumes(var, nom_x, nom_y, nom_z))
+    st.pyplot(graph_barres(var, nom_x, nom_y, nom_z))
 
 
 def interface(CONTENU_GLOBAL):
@@ -678,9 +681,10 @@ def interface(CONTENU_GLOBAL):
             pass
             # donnee_tourisme
     
-    # Pour faciliter la navigation parmi les fichiers,
-    # ces derniers sont classés par ordre alphabétique.
+
     def ordre_alpha(categorie):
+        """ Pour faciliter la navigation parmi les fichiers, ces derniers sont
+        classés par ordre alphabétique. """
         ordonne = sorted(categorie.items(), key=lambda x: x[0])
         categorie = {}
         for donnee in ordonne:
@@ -750,6 +754,7 @@ def interface(CONTENU_GLOBAL):
                 moyennes[i] = moyennes[i].sort_values(ascending=False)
                 moyennes[i].name = "TOP "+str(i)+" SEMAINES"
 
+
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1- Les tops") and fichier != "None":
                 st.title("1 - Les tops tendances de recherche")
@@ -795,8 +800,75 @@ sur des périodes, de respectivement:
 
 
             ### 3 - LES VARIATIONS
-            if st.sidebar.checkbox("3- Les variation des 3 dernières années du top 6"):
-                st.text("En cours de refonte")
+            if st.sidebar.checkbox("3 - Les variations du top 6 d'une année sur l'autre"):
+                txt = """
+Les indices de Google Trends, moyennés au choix sur 2, 4 ou 12 dernières semaines
+précédant la date d'analyse, sont comparées aux indices sur les mêmes périodes
+des années précedentes."""
+            
+                st.title("3 - Les variations du top 6 d'une année sur l'autre")
+                st.text(txt)
+                classements = ('2 semaines', '4 semaines','12 semaines')
+                classement = st.sidebar.radio("Moyennes sur: ", classements)
+
+
+                def moyennes_annuelles(data, periode=i*timedelta(7)):
+                    date1 = date2-periode
+                    # 1 an avant la date d'analyse:
+                    date4 = date2-52*timedelta(7)
+                    date3 = date4-periode
+                    # 2 ans avant la date d'analyse
+                    date6 = date2-104*timedelta(7)
+                    date5 = date6-periode
+                    
+                    moy12 = data[(data.index>date1) & (data.index<=date2)].mean()
+                    moy34 = data[(data.index>date3) & (data.index<=date4)].mean()
+                    moy56 = data[(data.index>date5) & (data.index<=date6)].mean()
+                    df = pd.concat([moy56, moy34, moy12], axis=1)
+                    df.columns = [date6.year, date4.year, date2.year]
+                    return df.T
+
+                def variations_annuelles(data, periode=i*timedelta(7)):
+                    date1 = date2-periode
+                    # 1 an avant la date d'analyse:
+                    date4 = date2-52*timedelta(7)
+                    date3 = date4-periode
+                    # 2 ans avant la date d'analyse
+                    date6 = date2-104*timedelta(7)
+                    date5 = date6-periode
+                    
+                    moy12 = data[(data.index>date1) & (data.index<=date2)].mean()
+                    moy34 = data[(data.index>date3) & (data.index<=date4)].mean()
+                    moy56 = data[(data.index>date5) & (data.index<=date6)].mean()
+                    df = pd.concat([(moy12-moy56)/moy56*100, (moy12-moy34)/moy34*100], axis=1)
+                    #df.replace([np.inf, -np.inf], 0, inplace=True)
+                    df.columns = [str(date2.year) +" vs "+str(date6.year),
+                                  str(date2.year) +" vs "+str(date4.year)]
+                    return df.T
+
+                if classement == '2 semaines':
+                    zones = list(moyennes[2].head(6).index)
+                    moy = moyennes_annuelles(data[zones], 2*timedelta(7))
+                    var = variations_annuelles(data[zones], 2*timedelta(7))
+                if classement == '4 semaines':
+                    zones = list(moyennes[4].head(6).index)
+                    moy = moyennes_annuelles(data[zones], 4*timedelta(7))
+                    var = variations_annuelles(data[zones], 4*timedelta(7))
+                if classement == '12 semaines':
+                    zones = list(moyennes[12].head(6).index)
+                    moy = moyennes_annuelles(data[zones], 12*timedelta(7))
+                    var = variations_annuelles(data[zones], 12*timedelta(7))
+
+                st.header("a) valeurs")
+                st.table(moy.T.applymap(lambda x: "{:.1f}".format(x)))
+                nom_x, nom_z = u"Régions", "Annees"
+                nom_y = "Moyennes de l'indice Google Trends"
+                st.pyplot(graph_barres(moy, nom_x, nom_y, nom_z, formate_date=False))
+                
+                st.header("b) variations en %")
+                st.table(var.T.applymap(lambda x: "{:.1f}".format(x)))
+                nom_y = "Variation des moyennes de l'indice Google Trends - %"
+                st.pyplot(graph_barres(var, nom_x, nom_y, nom_z, formate_date=False))
 
         except:
             pass
@@ -865,7 +937,7 @@ test = False
 if test:
     print("lecture des données:")
     try:
-        fichier = "../DE-IT-NL-GB-US-BE-CH-ES-FR_Generique-Paris-Hebdo_20210607_1049.csv"
+        fichier = "../FR-IT-NL-GB-US-BE-CH-DE-ES_Generique-Avion-Hebdo_20210621_1048.csv"
         data = lecture_donnees(fichier)
     except:
         data = donnees_aleatoires(t0=datetime(2017, 6, 1), nb_semaines=4*53)
