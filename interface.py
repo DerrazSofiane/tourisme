@@ -6,17 +6,17 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import random
-#import pycountry
-#import gettext
 from datetime import datetime, timedelta
 from scipy.signal import savgol_filter
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
-from io import StringIO
+# from pydrive.auth import GoogleAuth
+# from pydrive.drive import GoogleDrive
+# from io import StringIO
 import os
-import base64
-from pandas.plotting import table as pd_table
-from pdflatex import PDFLaTeX
+# import base64
+# from pandas.plotting import table as pd_table
+# from pdflatex import PDFLaTeX
+from pptx import Presentation
+from pptx.util import Inches
 
 # POUR LANCER L'INTERFACE EN LOCAL:
 #   streamlit run interface.py
@@ -26,14 +26,6 @@ from pdflatex import PDFLaTeX
 # https://share.streamlit.io/lee-roymannier/tourisme/main/interface.py
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
-
-#français = gettext.translation('iso3166', pycountry.LOCALES_DIR, languages=['fr'])
-#français.install()
-
-# Code iso des pays traduits en noms français courts 
-pays = pd.read_csv("Dictionnaire_Pays.csv")
-noms_pays = pays["Country"]
-noms_pays.index = pays["2CODE"]
 
 # On enregistrera le contenu affiché pour le rapport en pdf
 CONTENU_GLOBAL = {}
@@ -108,16 +100,6 @@ def duree_str(date1, date2):
         return  j1+" "+m1+" "+a1+" au "+j2+" "+m2+" "+a2
 
 
-def nom_pays(code_iso):
-    """ Nom court en Français d'un pays à partir de son code iso en 2 lettres.
-    Retourne par exemple "France" pour "FR" """
-    try:
-        #return _(noms_pays[code_iso].split(" (")[0]).split(" ")[0]
-        return (noms_pays[code_iso].split(" (")[0]).split(" ")[0]
-    except:
-        return code_iso
-
-
 def arrondie_str(x):
     corps, decimales = str(x).split('.')
     return corps+','+decimales[:2]
@@ -166,7 +148,7 @@ def tops3(data, date1, date2):
         "top progression" : list(tops_variation.head(3).index),
         "top potentiel"   : list(tops_potentiel.head(3).index)}).T
 
-    tops3 = tops3.applymap(lambda x: nom_pays(x)+"("+x+")")
+    # tops3 = tops3.applymap(lambda x: nom_pays(x)+"("+x+")")
     tops3.columns = ["1er", "2ème", "3ème"]
     
     return tops3
@@ -655,7 +637,31 @@ fluctuer."""
     st.pyplot(graph_barres(var, nom_x, nom_y, nom_z))
 
 
-def interface(CONTENU_GLOBAL):
+def interface(CONTENU_GLOBAL):    
+    def ordre_alpha(categorie):
+        """ Pour faciliter la navigation parmi les fichiers, ces derniers sont
+        classés par ordre alphabétique. """
+        ordonne = sorted(categorie.items(), key=lambda x: x[0])
+        categorie = {}
+        for donnee in ordonne:
+            categorie[donnee[0]] = donnee[1]
+        return categorie
+    
+    def convertion_nom_pays(code_iso):
+        """ Nom court en Français d'un pays à partir de son code iso en 2 lettres.
+        Retourne par exemple "France" pour "FR" """
+        try:
+            nom_converti = pays.loc[code_iso]["nom_pays"]
+            return nom_converti
+        except: 
+            return code_iso
+    
+    # Code iso des pays traduits en noms français courts 
+    pays = pd.read_csv("iso-pays.csv", header=None)
+    pays = pays[[2,4]]
+    pays.columns = ["iso", "nom_pays"]
+    pays = pays.set_index("iso")
+    
     # Lecture des fichiers des tables d'analyse et de leurs noms respectifs
     data_tourisme_pays = {}
     data_tourisme_generique = {}
@@ -671,48 +677,46 @@ def interface(CONTENU_GLOBAL):
             decompose = donnee_tourisme.split("_")
             type_analyse = decompose[1]
             type_analyse = type_analyse.split("-")
+            # Les analyses générales
             if type_analyse[0] == "Generique":
-                type_analyse = " ".join(type_analyse[:-1])
-                data_tourisme_generique[type_analyse] = analyse
+                # type_analyse = " ".join(type_analyse[:-1])
+                nouv_type_analyse = type_analyse[1]
+                data_tourisme_generique[nouv_type_analyse] = analyse
+            # Les analyses par pays
             else:
-                type_analyse = decompose[0] + ": " + " ".join(type_analyse[1:-1])
-                data_tourisme_pays[type_analyse] = analyse
+                nom_pays = convertion_nom_pays(decompose[0])
+                nouv_type_analyse = type_analyse[1]
+                if not nom_pays in data_tourisme_pays.keys():
+                    data_tourisme_pays[nom_pays] = {}
+                data_tourisme_pays[nom_pays][nouv_type_analyse] = analyse
         except:
             pass
-            # donnee_tourisme
-    
-
-    def ordre_alpha(categorie):
-        """ Pour faciliter la navigation parmi les fichiers, ces derniers sont
-        classés par ordre alphabétique. """
-        ordonne = sorted(categorie.items(), key=lambda x: x[0])
-        categorie = {}
-        for donnee in ordonne:
-            categorie[donnee[0]] = donnee[1]
-        return categorie
-            
-    # for categorie in [data_tourisme_pays, data_tourisme_generique]:
-    #     categorie = ordre_alpha(categorie)
+        
+    # Réorganisation par ordre alphabétique des données
+    data_tourisme_pays = ordre_alpha(data_tourisme_pays)
+    for pays in data_tourisme_pays:
+        data_tourisme_pays[pays] = ordre_alpha(data_tourisme_pays[pays])
+    data_tourisme_generique = ordre_alpha(data_tourisme_generique)
     
     entete()
     
     if st.sidebar.checkbox("Introduction", value=True):
         introduction()
-        
+     
+    # Sélection du type d'analyse à effectuer
     types_analyse = {"Générique": data_tourisme_generique,
                      "Par pays": data_tourisme_pays}
-    
     txt = "Type d'analyse: " 
     noms_types = list(types_analyse.keys())
     mode = st.sidebar.selectbox(txt, noms_types)
-    # selection_mode_analyse()
-    # Récupération des noms de tables d'analyse et construction de la 
-    # liste déroulante
-    noms_analyses = list(types_analyse[mode].keys())
-    fichier = st.sidebar.selectbox("Quelle requête effectuer?", noms_analyses)
+    
    
     ### ANALYSE GLOBALE
     if mode == "Générique":
+        # Récupération des noms de tables d'analyse et construction de la 
+        # liste déroulante
+        noms_analyses = list(types_analyse[mode].keys())
+        fichier = st.sidebar.selectbox("Quelle analyse effectuer?", noms_analyses)
         data = lecture_donnees(data_tourisme_generique[fichier])
         try:
             ### 1 - LES TOPS
@@ -739,7 +743,12 @@ def interface(CONTENU_GLOBAL):
 
     ### ANALYSE PAR PAYS
     if mode == "Par pays":
-        data = lecture_donnees(data_tourisme_pays[fichier])
+        tous_pays = list(data_tourisme_pays.keys())
+        pays_choisi = st.sidebar.selectbox("Quel pays?", tous_pays)
+        types_analyse = list(data_tourisme_pays[pays_choisi].keys())
+        analyse_pays = st.sidebar.selectbox("Quel analyse effectuer?",
+                                           types_analyse)
+        data = lecture_donnees(data_tourisme_pays[pays_choisi][analyse_pays])
         try:
             # Date d'analyse
             txt = "Date d'analyse"
@@ -873,6 +882,85 @@ des années précedentes."""
         except:
             pass
         
+    ### EXPORT POWERPOINT
+    # export_ppt = st.sidebar.button("Générer un PowerPoint")
+    export_ppt = False # bouton d'export powerpoint caché pour l'instant
+    if export_ppt:
+        # Exportation au format pptx
+        presente = Presentation()
+        
+        # Page titre
+        page_titre = presente.slide_layouts[1]
+        slide = presente.slides.add_slide(page_titre)
+        slide.shapes.add_picture("logo_Baudy_Co.png", Inches(3), Inches(4),
+                                 width= Inches(5))
+        titre = slide.shapes.title
+        soustitre = slide.placeholders[1]
+        titre.text = "Observatoire digital des destinations"
+        soustitre.text = "Analyse des mots clés"
+        
+        # Pages d'analyse
+        # Générique
+        page_titre_generique = presente.slides.add_slide(page_titre)
+        titre_generique = page_titre_generique.shapes.title
+        titre_generique.text = "Analyse Générique"
+        for type_analyse in data_tourisme_generique:
+            page_analyse = presente.slides.add_slide(page_titre)
+            nom_analyse = page_analyse.shapes.title
+            nom_analyse.text = type_analyse
+            donnees_propres = lecture_donnees(data_tourisme_generique[type_analyse])
+            graphiques = visualisation_volumes(donnees_propres)
+            
+            decalage = 0
+            for type_graphique in graphiques:
+                try:
+                    graph = graphiques[type_graphique]
+                    nom_graph = str(type_analyse) +" "+ str(type_graphique)+".jpg"
+                    image_graph = graph.savefig(nom_graph, dpi=150)
+                    place_image = page_analyse.shapes.add_picture(nom_graph,
+                                                          Inches(decalage),
+                                                          Inches(4),
+                                                          width=Inches(5))
+                    decalage += 5
+                except:
+                    pass
+                
+        # Par pays
+        page_titre_pays = presente.slides.add_slide(page_titre)
+        titre_pays = page_titre_pays.shapes.title
+        titre_pays.text = "Analyse par Pays"
+        for pays in data_tourisme_pays:
+            page_titre_pays = presente.slides.add_slide(page_titre)
+            nom_pays = page_titre_pays.shapes.title
+            nom_pays.text = pays
+            
+            for type_analyse in data_tourisme_pays[pays]:
+                page_analyse = presente.slides.add_slide(page_titre)
+                nom_analyse = page_analyse.shapes.title
+                nom_analyse.text = pays + "  " + type_analyse
+                donnees_propres = lecture_donnees(data_tourisme_pays[pays][type_analyse])
+                graphiques = visualisation_volumes(donnees_propres)
+                
+                decalage = 0
+                for type_graphique in graphiques:
+                    try:
+                        graph = graphiques[type_graphique]
+                        nom_graph = str(pays) + " "
+                        nom_graph += str(type_analyse) + " "
+                        nom_graph += str(type_graphique)+".jpg"
+                        image_graph = graph.savefig(nom_graph, dpi=150)
+                        place_image = page_analyse.shapes.add_picture(nom_graph,
+                                                              Inches(decalage),
+                                                              Inches(4),
+                                                              width=Inches(5))
+                        decalage += 5
+                    except:
+                        pass
+            
+
+        # Finalisation
+        presente.save('Rapport analyse.pptx')
+        
     ### EXPORT PDF
     # components.html("""
     #                 <script type="text/javascript">
@@ -945,7 +1033,7 @@ if test:
     
     print("\ntest d'écriture des noms de pays à patir des codes iso:")
     for x in ['FR', 'BE', 'IT', 'CH', 'NL', 'US', 'GB']:
-        print("\tcode iso:", x, "=> nom du pays:", nom_pays(x))
+        print("\tcode iso:", x, "=> nom du pays:", x)
 
     print("\ntest d'écriture d'une durée:")
     date1 = datetime(2021, 5,  9).date()
