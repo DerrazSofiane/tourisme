@@ -765,7 +765,7 @@ def interface(CONTENU_GLOBAL):
 
 
             ### 1 - LES TOPS
-            if st.sidebar.checkbox("1- Les tops") and fichier != "None":
+            if st.sidebar.checkbox("1- Les tops") and analyse_pays != "None":
                 st.title("1 - Les tops tendances de recherche")
                 txt = f"""
 Les valeurs moyennes des tendances de recherche de Google Trends sont classées,
@@ -914,16 +914,17 @@ des années précedentes."""
             decalage = 0
             for type_graphique in graphiques:
                 try:
-                    graph = graphiques[type_graphique]
+                    # graph = graphiques[type_graphique]
                     nom_graph = str(type_analyse) +" "+ str(type_graphique)+".jpg"
-                    image_graph = graph.savefig(nom_graph, dpi=150)
+                    # image_graph = graph.savefig(nom_graph, dpi=150)
                     place_image = page_analyse.shapes.add_picture(nom_graph,
                                                           Inches(decalage),
-                                                          Inches(4),
-                                                          width=Inches(5))
+                                                          Inches(2),
+                                                          width=Inches(6))
                     decalage += 5
                 except:
                     pass
+            # break
                 
         # Par pays
         page_titre_pays = presente.slides.add_slide(page_titre)
@@ -935,27 +936,41 @@ des années précedentes."""
             nom_pays.text = pays
             
             for type_analyse in data_tourisme_pays[pays]:
-                page_analyse = presente.slides.add_slide(page_titre)
-                nom_analyse = page_analyse.shapes.title
-                nom_analyse.text = pays + "  " + type_analyse
-                donnees_propres = lecture_donnees(data_tourisme_pays[pays][type_analyse])
-                graphiques = visualisation_volumes(donnees_propres)
+                donnees_propres = lecture_donnees(data_tourisme_pays[pays][type_analyse])              
+                graphiques = {}
+                for destination in donnees_propres.columns:
+                    nouv_graph = graph_3_ans(donnees_propres, destination)
+                    graphiques[destination] = nouv_graph
                 
-                decalage = 0
-                for type_graphique in graphiques:
-                    try:
-                        graph = graphiques[type_graphique]
-                        nom_graph = str(pays) + " "
-                        nom_graph += str(type_analyse) + " "
-                        nom_graph += str(type_graphique)+".jpg"
-                        image_graph = graph.savefig(nom_graph, dpi=150)
-                        place_image = page_analyse.shapes.add_picture(nom_graph,
-                                                              Inches(decalage),
-                                                              Inches(4),
-                                                              width=Inches(5))
-                        decalage += 5
-                    except:
-                        pass
+                decalage_x = 0
+                decalage_y = 1.5
+                page = 1
+                for graph_destination in graphiques:
+                    if decalage_x == 0 and decalage_y == 1.5:
+                        page_analyse = presente.slides.add_slide(page_titre)
+                        nom_analyse = page_analyse.shapes.title
+                        nom_analyse.text = "Marché "+ pays + ":  " 
+                        nom_analyse.text += type_analyse + " " + str(page)
+                        page += 1
+                    
+                    # graph = graphiques[graph_destination]
+                    nom_graph = str(pays) + " "
+                    nom_graph += str(graph_destination)+".jpg"
+                    # image_graph = graph.savefig(nom_graph, dpi=150)
+                    place_image = page_analyse.shapes.add_picture(nom_graph,
+                                                          Inches(decalage_x),
+                                                          Inches(decalage_y),
+                                                          width=Inches(4.5))
+                    if decalage_x > 0 and decalage_y == 1.5:
+                        decalage_x = 0
+                        decalage_y += 3
+                    elif decalage_y > 1.5 and decalage_x > 0:
+                        decalage_x = 0
+                        decalage_y = 1.5
+                    else:
+                        decalage_x += 4.5
+            # break
+
             
 
         # Finalisation
