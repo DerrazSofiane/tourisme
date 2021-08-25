@@ -17,6 +17,11 @@ import os
 # from pdflatex import PDFLaTeX
 from pptx import Presentation
 from pptx.util import Inches
+from pptx.util import Pt
+from pptx.dml.color import RGBColor
+from pptx.enum.shapes import MSO_SHAPE
+from pptx.enum.text import PP_ALIGN
+
 
 # POUR LANCER L'INTERFACE EN LOCAL:
 #   streamlit run interface.py
@@ -495,8 +500,16 @@ def rapport_pdf():
 ### VI - INTERFACES WEB
 
 def entete():
-    txt = u"""Bienvenue à l’observatoire digital des destinations françaises de Atout, powered by
-Baudy et Compagnie ©"""
+    txt = u"""Bienvenue à l’observatoire digital des destinations françaises
+et européennes de Atout France – powered by BC.
+L’observatoire digital de Atout France mesure, par quinzaine, par mois 
+et par trimestre, les niveaux d’intérêts d’un marché
+dans Google Trends (rubrique « travel  ») d’une sélection de mots clés
+génériques et des destinations touristiques françaises par espaces
+(littoral, outre-mer, urbain, campagne et montagne) et propose,
+chaque trimestre, de comparer ces résultats vs les concurrentes en Europe.
+(sauf outre-mer).
+    """
     cols = st.beta_columns(2) # number of columns in each row! = 2
     cols[0].image("logo_Atout_France.png", use_column_width=True)
     cols[1].image("logo_Baudy_Co.png", use_column_width=True) 
@@ -507,33 +520,24 @@ Baudy et Compagnie ©"""
 
 def introduction():
     txt = """
-Les termes de recherches touristiques utilisés dans Google par les internautes
-sont comptés. Les "termes" sont des groupes de mots correspondant à un même
-concept, non nécessairement accolés aux destinations. IL s'agit de mesurer si 
-l’intérêt pour le terme analysé redémarre, indépendamment d’un lieu.
-
-Par exemple l'analyse portera sur "hôtel" et non "hôtel à Lyon" de la 
-rubrique « travel » de Google Trends.
-
-  - Périodicité d’analyse: 2 fois par mois
-  
-  - Marchés analysés: Allemagne (DE), Belgique (BE), Espagne (ES),
-Etats-Unis (US), France (FR), Italie (IT), Pays-Bas (NL) Royaume-Uni (UK)
-et Suisse (CH)
-
-  - Termes analysés: hôtel, résidence de tourisme, camping, chambre d’hôte,
-voyage, tout inclus, week-end, croisière, billet d’avion, billet de train,
-Paris et Disneyland Paris (toutes catégories)."""
+Mesure de l’intérêt des internautes par marché émetteur pour les destinations
+françaises (outre-mer, ville,  montagne, campagne et littoral) comparées
+entre elles dans un panel donné – rubrique « travel » de Google Trends. 
+Les 6 principaux résultats sont proposés (Top 6 – par facilité de lecture,
+les valeurs suivantes sont également disponibles) 
+- Périodicité d’analyse  : Deux  fois par mois
+- Marchés analysés : Allemagne (DE), Belgique (BE), France (FR),
+  Pays-Bas (NL) et Royaume-Uni (UK) """
 
     st.title("Introduction")
-    st.header("1- Analyse des mots clés génériques par pays")
+    st.header("1- Analyse des recherches pour les destinations françaises")
     st.text(txt)
 
 
 def visualisation_tops(data):
     date_1, date_2 = max(data.index) - 4*timedelta(7), max(data.index)
     txt = f"""
-Synthèse des classements des 3 meilleurs pays sur une période d'analyse, par défaut 
+Synthèse des classements des 3 pays les plus dynamiques sur la période donnée, par défaut 
 les 4 dernières semaines disponibles du {duree_str(date_1,date_2)}, respectivement 
 pour le 'top volume', la 'top progession' et le 'top potentiel'. 
  
@@ -577,7 +581,7 @@ sont pas des valeurs absolues mais se lisent en indices.
 La visualisation de cet indice au cours des dernières semaines permet de constater 
 les fluctuations et les éventuelles tendances de manière empirique. L'attention est 
 mise sur les 2 denières semaines puis sur les 4 dernières semaines. """
-    st.title("2 - Indice des tendances de recherches des 2 dernières semaines ")
+    st.title("2. Volume des tendances de recherches des deux et quatre dernières semaines ")
     st.text(txt)
 
     titre_googletrend = "a - Tendances de recherche des 2 dernières semaines"
@@ -608,8 +612,10 @@ def visualisation_variations(data):
     semaine =lambda i: duree_str(data.index[-i], data.index[-i]+timedelta(6))
     periode = lambda i, j: "semaine du "+semaine(i)+" à la semaine du "+semaine(j)
     txt = """
-D'une semaine à l'autre les tendances de recherche des indices de Google Trends peuvent
-fluctuer."""
+D’une semaine à l’autre, les indices des tendances de recherches de Google Trends 
+peuvent fluctuer. Les variations sont mesurées Semaine S vs Semaine S-1 et
+Semaine S-1 vs Semaine S-2. Les variations S-1 vs S-2 sont comparées à celles
+de S-2 vs S-3. """
 
     st.title("3 - Variations de l'indice")
     st.text(txt)
@@ -648,7 +654,7 @@ def interface(CONTENU_GLOBAL):
         return categorie
     
     def convertion_nom_pays(code_iso):
-        """ Nom court en Français d'un pays à partir de son code iso en 2 lettres.
+        """ Nom en Français d'un pays à partir de son code iso en 2 lettres.
         Retourne par exemple "France" pour "FR" """
         try:
             nom_converti = pays.loc[code_iso]["nom_pays"]
@@ -700,19 +706,19 @@ def interface(CONTENU_GLOBAL):
     
     entete()
     
-    if st.sidebar.checkbox("Introduction", value=True):
+    if st.sidebar.checkbox("Présentation", value=True):
         introduction()
      
     # Sélection du type d'analyse à effectuer
-    types_analyse = {"Générique": data_tourisme_generique,
-                     "Par pays": data_tourisme_pays}
-    txt = "Type d'analyse: " 
+    types_analyse = {"Mots clés génériques  par pays": data_tourisme_generique,
+                     "Destinations par pays": data_tourisme_pays}
+    txt = "Types d'analyses: " 
     noms_types = list(types_analyse.keys())
     mode = st.sidebar.selectbox(txt, noms_types)
     
    
     ### ANALYSE GLOBALE
-    if mode == "Générique":
+    if mode == "Mots clés génériques  par pays":
         # Récupération des noms de tables d'analyse et construction de la 
         # liste déroulante
         noms_analyses = list(types_analyse[mode].keys())
@@ -730,6 +736,7 @@ def interface(CONTENU_GLOBAL):
                 graph_volumes = visualisation_volumes(data)
                 for graph in graph_volumes:
                     CONTENU_GLOBAL[graph] = graph_volumes[graph]
+                    
             ### 3 - LES VARIATIONS
             if st.sidebar.checkbox("3 - Les variations") and fichier != "None":
                 visualisation_variations(data)
@@ -742,11 +749,11 @@ def interface(CONTENU_GLOBAL):
             pass
 
     ### ANALYSE PAR PAYS
-    if mode == "Par pays":
+    if mode == "Destinations par pays":
         tous_pays = list(data_tourisme_pays.keys())
         pays_choisi = st.sidebar.selectbox("Quel pays?", tous_pays)
         types_analyse = list(data_tourisme_pays[pays_choisi].keys())
-        analyse_pays = st.sidebar.selectbox("Quel analyse effectuer?",
+        analyse_pays = st.sidebar.selectbox("Quelle analyse effectuer?",
                                            types_analyse)
         data = lecture_donnees(data_tourisme_pays[pays_choisi][analyse_pays])
         try:
@@ -766,7 +773,7 @@ def interface(CONTENU_GLOBAL):
 
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1- Les tops") and analyse_pays != "None":
-                st.title("1 - Les tops tendances de recherche")
+                st.title("1 - Les tops tendances de recherche - Base : indice 100")
                 txt = f"""
 Les valeurs moyennes des tendances de recherche de Google Trends sont classées,
 sur des périodes, de respectivement:
@@ -817,9 +824,8 @@ des années précedentes."""
             
                 st.title("3 - Les variations du top 6 d'une année sur l'autre")
                 st.text(txt)
-                classements = ('2 semaines', '4 semaines','12 semaines')
+                classements = ('2 semaines', '4 semaines', '12 semaines')
                 classement = st.sidebar.radio("Moyennes sur: ", classements)
-
 
                 def moyennes_annuelles(data, periode=i*timedelta(7)):
                     date1 = date2-periode
@@ -849,89 +855,188 @@ des années précedentes."""
                     moy12 = data[(data.index>date1) & (data.index<=date2)].mean()
                     moy34 = data[(data.index>date3) & (data.index<=date4)].mean()
                     moy56 = data[(data.index>date5) & (data.index<=date6)].mean()
-                    df = pd.concat([(moy12-moy56)/moy56*100, (moy12-moy34)/moy34*100], axis=1)
+                    df = pd.concat([(moy12-moy56)/moy56*100,
+                                    (moy12-moy34)/moy34*100], axis=1)
                     #df.replace([np.inf, -np.inf], 0, inplace=True)
                     df.columns = [str(date2.year) +" vs "+str(date6.year),
                                   str(date2.year) +" vs "+str(date4.year)]
                     return df.T
 
                 if classement == '2 semaines':
+                    date1 = date2 - 2*timedelta(7)
                     zones = list(moyennes[2].head(6).index)
                     moy = moyennes_annuelles(data[zones], 2*timedelta(7))
                     var = variations_annuelles(data[zones], 2*timedelta(7))
                 if classement == '4 semaines':
+                    date1 = date2 - 4*timedelta(7)
                     zones = list(moyennes[4].head(6).index)
                     moy = moyennes_annuelles(data[zones], 4*timedelta(7))
                     var = variations_annuelles(data[zones], 4*timedelta(7))
                 if classement == '12 semaines':
+                    date1 = date2 - 12*timedelta(7)
                     zones = list(moyennes[12].head(6).index)
                     moy = moyennes_annuelles(data[zones], 12*timedelta(7))
                     var = variations_annuelles(data[zones], 12*timedelta(7))
 
-                st.header("a) valeurs")
+                titre_var = "a) Valeurs du " + duree_str(date1, date2)
+                titre_var += " comparées aux années précédentes."
+                st.header(entete)
+                
                 st.table(moy.T.applymap(lambda x: "{:.1f}".format(x)))
                 nom_x, nom_z = u"Régions", "Annees"
                 nom_y = "Moyennes de l'indice Google Trends"
-                st.pyplot(graph_barres(moy, nom_x, nom_y, nom_z, formate_date=False))
+                st.pyplot(graph_barres(moy, nom_x, nom_y, nom_z,
+                                       formate_date=False))
                 
-                st.header("b) variations en %")
+                st.header("b) Variations en %")
                 st.table(var.T.applymap(lambda x: "{:.1f}".format(x)))
                 nom_y = "Variation des moyennes de l'indice Google Trends - %"
-                st.pyplot(graph_barres(var, nom_x, nom_y, nom_z, formate_date=False))
+                st.pyplot(graph_barres(var, nom_x, nom_y, nom_z,
+                                       formate_date=False))
 
         except:
             pass
         
     ### EXPORT POWERPOINT
+    def ajout_titre(page, type_analyse="", position=0,
+                    titre="Indice hebdomadaire des tendances de recherches"):
+        """Placement du titre de page. Selon si on on précise un type d'analyse
+        ou pas, il sera composé avec une rubique ou non.
+        Le titre prend par défaut la première position, mais il est également 
+        possible de le placer en dessous d'un autre contenu, avec une position 
+        plus élevée."""
+        shape = page.shapes[position]
+        text_frame = shape.text_frame
+        p = text_frame.paragraphs[0]
+        p.margin_left = 0
+        run = p.add_run()
+        run.text = titre
+        if type_analyse != "":
+            run.text += ' . Rubrique ' + type_analyse
+        font = run.font
+        font.name = 'Calibri'
+        font.size = Pt(18)
+        font.bold = True
+        font.italic = None
+        font.color.rgb = RGBColor(0x11, 0x55, 0xCC)
+        
+    def table_ppt(page, data, nb_colonnes, nb_lignes, position=0):
+        """Création d'une table"""
+        taille = nb_colonnes * 1.5
+        x, y, cx, cy = Inches(0.5), Inches(1.5), Inches(taille), Inches(3.5)
+        shape = page.shapes.add_table(nb_lignes+1, nb_colonnes, x, y, cx, cy)       
+        table = shape.table
+        index_col = 0
+        for nom_colonne in data.columns:
+            table.cell(0, index_col).text = nom_colonne
+            index_ligne = 1
+            for valeur in data[nom_colonne].tolist():
+                table.cell(index_ligne, index_col).text = str(valeur)
+                index_ligne += 1
+            index_col += 1
+            
+        def iter_cells(table):
+            for row in table.rows:
+                for cell in row.cells:
+                    yield cell
+        
+        for cell in iter_cells(table):
+            for paragraph in cell.text_frame.paragraphs:
+                paragraph.alignment = PP_ALIGN.CENTER
+                for run in paragraph.runs:
+                    run.font.size = Pt(10)
+        
     # export_ppt = st.sidebar.button("Générer un PowerPoint")
     export_ppt = False # bouton d'export powerpoint caché pour l'instant
-    if export_ppt:
-        # Exportation au format pptx
-        presente = Presentation()
-        
-        # Page titre
-        page_titre = presente.slide_layouts[1]
-        slide = presente.slides.add_slide(page_titre)
-        slide.shapes.add_picture("logo_Baudy_Co.png", Inches(3), Inches(4),
-                                 width= Inches(5))
-        titre = slide.shapes.title
-        soustitre = slide.placeholders[1]
-        titre.text = "Observatoire digital des destinations"
-        soustitre.text = "Analyse des mots clés"
-        
+    
+    if export_ppt: 
         # Pages d'analyse
         # Générique
-        page_titre_generique = presente.slides.add_slide(page_titre)
-        titre_generique = page_titre_generique.shapes.title
-        titre_generique.text = "Analyse Générique"
-        for type_analyse in data_tourisme_generique:
-            page_analyse = presente.slides.add_slide(page_titre)
-            nom_analyse = page_analyse.shapes.title
-            nom_analyse.text = type_analyse
-            donnees_propres = lecture_donnees(data_tourisme_generique[type_analyse])
-            graphiques = visualisation_volumes(donnees_propres)
+        # presente = Presentation()
+        # page_titre = presente.slide_layouts[1]
+        # slide = presente.slides.add_slide(page_titre)
+        # slide.shapes.add_picture("logo_Atout_France.png",
+        #                           Inches(1), Inches(3),
+        #                           width = Inches(5))
+        # slide.shapes.add_picture("logo_Baudy_Co.png",
+        #                           Inches(4.5), Inches(3),
+        #                           width = Inches(5))
+        # titre = slide.shapes.title
+        # titre.text = u"""Observatoire digital des destinations
+        # Analyse Générique"""
+        
+        
+        # # Page des priorités d'action
+        # page_priorite = presente.slides.add_slide(page_titre)
+        
+        # date_1, date_2 = "", ""
+        # colonnes = ["", "Top Volume", "Top Progression", "Top Potentiel"]
+        # top_quinzaine = pd.DataFrame(columns=colonnes)
+        # for type_analyse in data_tourisme_generique:
+        #     analyse = lecture_donnees(data_tourisme_generique[type_analyse])
+        #     date_2 = max(analyse.index)
+        #     date_1 = date_2 - 2*timedelta(7)
+        #     top = tops3(analyse, date_1, date_2)
+        #     volume = ",".join(top.loc['top volume'])
+        #     progression = ",".join(top.loc['top progression'])
+        #     potentiel = ",".join(top.loc['top potentiel'])
+        #     top_quinzaine.loc[len(top_quinzaine.index)] = [type_analyse, volume,
+        #                                                    progression, potentiel]
+        # top_priorite = top_quinzaine[["", "Top Progression"]]
+        # top_priorite.columns = ["", "Priorité d'action"]
+                    
+        # titre = "La quinzaine du " + duree_str(date_1, date_2) + " en quelques mots..."
+        # ajout_titre(page_priorite, titre=titre, position=0)
+        # table_ppt(page_priorite, top_priorite, top_priorite.shape[1],
+        #           top_priorite.shape[0], 1)
+        
+        # # Page des tops de la quinzaine
+        # page_top = presente.slides.add_slide(page_titre)
+                    
+        # titre = "La quinzaine du " + duree_str(date_1, date_2) + " en quelques mots..."
+        # ajout_titre(page_top, titre=titre, position=0)
+        # table_ppt(page_top, top_quinzaine, top_quinzaine.shape[1],
+        #           top_quinzaine.shape[0], 1)
+        
+        # # Graphiques d'analyse générale
+        # for type_analyse in data_tourisme_generique:
+        #     page_analyse = presente.slides.add_slide(page_titre)
+        #     left = top = Inches(0)
+        #     width = Inches(10.0)
+        #     height = Inches(0.2)
+        #     shape = page_analyse.shapes.add_shape(
+        #         MSO_SHAPE.RECTANGLE, left, top, width, height
+        #     )
             
-            decalage = 0
-            for type_graphique in graphiques:
-                try:
-                    # graph = graphiques[type_graphique]
-                    nom_graph = str(type_analyse) +" "+ str(type_graphique)+".jpg"
-                    # image_graph = graph.savefig(nom_graph, dpi=150)
-                    place_image = page_analyse.shapes.add_picture(nom_graph,
-                                                          Inches(decalage),
-                                                          Inches(2),
-                                                          width=Inches(6))
-                    decalage += 5
-                except:
-                    pass
-            # break
+        #     ajout_titre(page_analyse, type_analyse)
+        
+        #     donnees_propres = lecture_donnees(data_tourisme_generique[type_analyse])
+        #     graphiques = visualisation_volumes(donnees_propres)
+            
+        #     decalage = 0
+        #     for type_graphique in graphiques:
+        #         try:
+        #             graph = graphiques[type_graphique]
+        #             nom_graph = str(type_analyse) +" "+ str(type_graphique)+".jpg"
+        #             image_graph = graph.savefig(nom_graph, dpi=300)
+        #             place_image = page_analyse.shapes.add_picture(nom_graph,
+        #                                                   Inches(decalage),
+        #                                                   Inches(2),
+        #                                                   width=Inches(5))
+        #             decalage += 5
+        #         except:
+        #             pass
+        #     # break # Arrêt de boucle pour test
+        # presente.save('Rapport analyse generique.pptx')
                 
         # Par pays
-        page_titre_pays = presente.slides.add_slide(page_titre)
-        titre_pays = page_titre_pays.shapes.title
-        titre_pays.text = "Analyse par Pays"
         for pays in data_tourisme_pays:
-            page_titre_pays = presente.slides.add_slide(page_titre)
+            presente_pays = Presentation()
+            page_titre = presente_pays.slide_layouts[1]
+            page_titre_pays = presente_pays.slides.add_slide(page_titre)
+            titre_pays = page_titre_pays.shapes.title
+            titre_pays.text = "Analyse par Pays"
+            page_titre_pays = presente_pays.slides.add_slide(page_titre)
             nom_pays = page_titre_pays.shapes.title
             nom_pays.text = pays
             
@@ -947,20 +1052,41 @@ des années précedentes."""
                 page = 1
                 for graph_destination in graphiques:
                     if decalage_x == 0 and decalage_y == 1.5:
-                        page_analyse = presente.slides.add_slide(page_titre)
-                        nom_analyse = page_analyse.shapes.title
-                        nom_analyse.text = "Marché "+ pays + ":  " 
-                        nom_analyse.text += type_analyse + " " + str(page)
+                        page_analyse = presente_pays.slides.add_slide(page_titre)
+                        
+                        left = top = Inches(0)
+                        width = Inches(10.0)
+                        height = Inches(0.2)
+                        shape = page_analyse.shapes.add_shape(
+                            MSO_SHAPE.RECTANGLE, left, top, width, height
+                        )
+                        
+                        shape = page_analyse.shapes[0]
+                        text_frame = shape.text_frame
+                        p = text_frame.paragraphs[0]
+                        p.margin_left = 0
+                        run = p.add_run()
+                        run.text = 'Indice hebdomadaire des tendances de recherches'
+                        run.text += ' . Rubrique ' + type_analyse
+                        run.text += ' . Marché ' + pays
+                        
+                        font = run.font
+                        font.name = 'Calibri'
+                        font.size = Pt(18)
+                        font.bold = True
+                        font.italic = None  # cause value to be inherited from theme
+                        font.color.rgb = RGBColor(0x11, 0x55, 0xCC)
+
                         page += 1
                     
-                    # graph = graphiques[graph_destination]
+                    graph = graphiques[graph_destination]
                     nom_graph = str(pays) + " "
                     nom_graph += str(graph_destination)+".jpg"
-                    # image_graph = graph.savefig(nom_graph, dpi=150)
+                    image_graph = graph.savefig(nom_graph, dpi=250)
                     place_image = page_analyse.shapes.add_picture(nom_graph,
                                                           Inches(decalage_x),
                                                           Inches(decalage_y),
-                                                          width=Inches(4.5))
+                                                          width=Inches(5))
                     if decalage_x > 0 and decalage_y == 1.5:
                         decalage_x = 0
                         decalage_y += 3
@@ -968,71 +1094,10 @@ des années précedentes."""
                         decalage_x = 0
                         decalage_y = 1.5
                     else:
-                        decalage_x += 4.5
-            # break
-
-            
-
-        # Finalisation
-        presente.save('Rapport analyse.pptx')
+                        decalage_x += 4.7
+            presente_pays.save('Rapport analyse '+pays+'.pptx')
+            break # Arrêt de boucle pour test
         
-    ### EXPORT PDF
-    # components.html("""
-    #                 <script type="text/javascript">
-				# 
-    #                 function imprime(){
-    #                     var sections = document.getElementsByTagName("section");
-    #                     var print_div = sections[1];
-                        
-    #                     var print_area = window.open();
-    #                     print_area.document.write(print_div.innerHTML);
-    #                     print_area.document.close();
-    #                     print_area.focus();
-    #                     print_area.print();
-    #                     print_area.close();}
-    #             	</script>
-    #                 <button onClick="imprime()">TEST</button>
-    #                 """)
-
-    # export_pdf = st.sidebar.button("Générer un pdf")
-    # CONTENU_GLOBAL
-    # def generer_lien_pdf(val, filename):
-    #     b64 = base64.b64encode(val)
-    #     message_telecharge = f'<a href="data:application/octet-stream;base64,{b64.decode()}"'
-    #     message_telecharge += f' download="{filename}.pdf">Télécharger le PDF</a>'
-    #     return message_telecharge
-    
-    # if export_pdf:
-    #     # Afin de créer un rapport pdf détaillant les données choisies,
-    #     # une base de document latex et créée et agrémentée de tout le
-    #     # contenu affiché.
-    #     base_latex = r"""\documentclass[11pt]{article}%
-    #                      \begin{document}
-    #                         \vspace{2cm}
-    #                         \begin{center}
-    #                             \textbf{\huge "Rapport d'analyse" \\}
-    #                             \vspace{1cm}
-    #                             \textbf{\Large "Observatoire digital
-    #                                     des destinations" \\}
-    #                             \vspace{1cm}
-    #                         \end{center}
-    #                         \begin{flushright}
-    #                             {\large "Baudy and cie" }
-    #                         \end{flushright}
-    #                     """
-        
-    #     for contenu in CONTENU_GLOBAL:
-    #         # base_latex += str(contenu) +" "
-    #         base_latex += str(CONTENU_GLOBAL[contenu])
-        
-    #     base_latex += "\end{document}"
-    #     base_latex
-    #     base_latex = bytes(base_latex, encoding='utf8')
-    #     # base_latex
-    #     conversion = PDFLaTeX.from_binarystring(base_latex, "Rapport")
-    #     export, log, cp = conversion.create_pdf()
-    #     lien_pdf = generer_lien_pdf(export, "Rapport analyse destinations")
-    #     st.sidebar.markdown(lien_pdf, unsafe_allow_html=True)
 
 ### VI - TESTS UNITAIRES
 test = False
