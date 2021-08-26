@@ -167,7 +167,7 @@ def tops_pays(recapitualif_x_semaines, fichier, str_top_semaine):
         top Volume       top Progression        Top Potentiel
     0  'FR', 'BE', 'NL'  'CH', 'IT', 'NL'  'IT', 'CH', 'NL'
     
-    recapitualif_x_semaines étant le récapitulatif du nombre de semaine
+    recapitualif_x_semaines: dataframe du classement sur x semaines
     exemple: recap_desc_2s 
     et le top_semaine étant le nom de la colonne 
     en string
@@ -207,184 +207,6 @@ def tops_pays(recapitualif_x_semaines, fichier, str_top_semaine):
     
     return top_3_pays
 
-
-def evolutions_sum_annees(fichier, annee):
-    """ Tableau les valeurs brutes des 3 dernieres année."""
-    evolution_annee = pd.DataFrame()
-    
-    for i in range(0,4):
-        N = fichier["Semaine"].map(lambda x: x.year) == annee - i
-        tableau_annee = fichier[N]
-        evolution_annee = pd.concat([evolution_annee, tableau_annee])
-
-    evolution_annee["annee"] = evolution_annee["Semaine"].apply(lambda x: str(x)[:4])
-    evolution_annee = evolution_annee.reset_index()
-    evolution_annee.drop(["index", "Semaine"], axis=1, inplace=True)
-    colonne_voulu = list(evolution_annee.columns)[::-1]
-    evolution_annee = evolution_annee[colonne_voulu]
-    
-    return evolution_annee
-
-
-def evolutions_mois_annee(fichier, mois, annee):
-    """ Tableau les valeurs brutes des 3 dernieres année."""
-    tableau_date = pd.DataFrame()
-    
-    for i in range(0,4):
-        mois_map = fichier["Semaine"].map(lambda x: x.month) == mois
-        tableau_mois = fichier[mois_map]
-        annee_map = tableau_mois["Semaine"].map(lambda x: x.year) == annee-i
-        tableau_annee_mois = tableau_mois[annee_map]
-        tableau_date = pd.concat([tableau_date, tableau_annee_mois])
-
-    tableau_date["annee"] = tableau_date["Semaine"].apply(lambda x: str(x)[:4])
-    tableau_date = tableau_date.reset_index()
-    tableau_date.drop(["index", "Semaine"], axis=1, inplace=True)
-    colonne_voulu = list(tableau_date.columns)[::-1]
-    tableau_date = tableau_date[colonne_voulu]
-    
-    return tableau_date
-
-
-def valeurs_brutes_3annees(fichier, mois, annee):
-    """ Tableau de la sommes des valeurs des pays en fonction du mois et des 
-    3 dernières années à partir de l'argument année de la fonction.
-    Exemple pour le mois 2 et l'année 2021 :
-               Tahiti (PF)  ...  Nouvelle Caledonie (NC)
-        annee               ...                         
-        2019         215.0  ...                      0.0
-        2020         127.0  ...                     25.0
-        2021          76.0  ...                      0.0
-    """
-    tableau_date = pd.DataFrame()
-    
-    for i in range(0,4):
-        mois_map = fichier["Semaine"].map(lambda x: x.month) == mois
-        tableau_mois = fichier[mois_map]
-        annee_map = tableau_mois["Semaine"].map(lambda x: x.year) == annee-i
-        tableau_annee_mois = tableau_mois[annee_map]
-        tableau_date = pd.concat([tableau_date, tableau_annee_mois])
-    
-    tableau_date["annee"] = tableau_date["Semaine"].apply(lambda x: str(x)[:4])
-    tableau_brut = tableau_date.groupby("annee").sum()
-    
-    return tableau_brut
-
-
-def valeur_trimestrielle(data, annee):
-    annee_map = data["Semaine"].map(lambda x: x.year) == annee
-    tableau_annee_mois = data[annee_map]
-    tableau_annee_mois[str(annee)] = list(tableau_annee_mois.reset_index().index)
-    
-    return tableau_annee_mois
-
-
-def moyenne_trimestrielle(data, annee, top6_trimestre):
-    """ Moyennes du trimestre T1 de l'année X par rapport a l'année X-1
-
-    Argument:
-        data => dataframe
-        annee => dernière année 
-        trimestre => le numéro du trimestre (T1 est le trimestre correspondant
-                                             au 3 premier mois)
-        top6_trimestre => tableau regroupant le top 6 trimestriel
-    """
-    tableau_moyenne = pd.DataFrame()
-    def boucle_mois(annee):
-        colonnes = list(top6_trimestre.head(6).index)
-        tableau_date = pd.DataFrame()
-        
-        for i in range(0,3):
-            mois_map = data["Semaine"].map(lambda x: x.month) == 1+i
-            tableau_mois = data[mois_map]
-            annee_map = tableau_mois["Semaine"].map(lambda x: x.year) == annee
-            tableau_annee_mois = tableau_mois[annee_map]
-            tableau_date = pd.concat([tableau_date, tableau_annee_mois])
-        return tableau_date.loc[:,colonnes]
-    
-    tableau_date = boucle_mois(annee)
-    moyenne_last_annee = tableau_date.mean()
-    tableau_moyenne[annee] = moyenne_last_annee
-    tableau_date2 = boucle_mois(annee-1)
-    moyenne_annee2 = tableau_date2.mean()
-    tableau_moyenne[annee-1] = moyenne_annee2
-    tableau_date3 = boucle_mois(annee-2)
-    moyenne_annee3 = tableau_date3.mean()
-    tableau_moyenne[annee-2] = moyenne_annee3
-    
-    return tableau_moyenne
-
-
-def variation_hebdo(data, periode, top_6_hebdo):
-    """ Fonction permettant de récupérer 4 semaines (S / S-1 et S-1 / S-2)
-    et de calculer les variations sur une période donnée
-    Exemple:
-        les 2 semaines a partir du 2021-3-21
-    retourne un tableau
-    """
-    colonnes = list(data.columns)
-    data = data[data[colonnes[0]] <= periode]
-    variation = variations(data,4)
-    variation.fillna(0, inplace=True)
-    top_6 = list(top_6_hebdo.head(6).index)
-    top_variation_hebdo = variation.loc[:,top_6]
-    
-    return top_variation_hebdo
-
-
-def variation_trimestrielle(tableau_moyenne):
-    def variation_mois_annee(x,y):
-        try:
-            var = ((x - y) / y) * 100
-        except ZeroDivisionError:
-            var = 0
-        return var
-    
-    tableau_variation = pd.DataFrame()
-    colonnes = list(tableau_moyenne.columns)
-    tableau_variation["T1 "+str(colonnes[0])+"/"+str(colonnes[1])] = tableau_moyenne.apply(lambda x: variation_mois_annee(x[colonnes[0]], x[colonnes[1]]), axis=1)
-    tableau_variation["T1 "+str(colonnes[0])+"/"+str(colonnes[2])] = tableau_moyenne.apply(lambda x: variation_mois_annee(x[colonnes[0]], x[colonnes[2]]), axis=1)
-    
-    return tableau_variation
-
-def variation_mensuel(data, annee, mois, top_6_mensuel):
-    """ Fonction permettant de récupérer 4 semaines et de calculer les 
-    variations sur une période donnée. Nous allons chercher à construire un 
-    tableau de moyenne d'un moix X et d'année Y sous la forme:
-        
-                         Moy Mai 2020    	Moy Mai 2021	
-        RÈunion (RE)	               65    	 113    	
-        Guadeloupe (GP)	           44    	 69    	
-        Martinique (LC)	           28    	 60    	
-    """
-    moyenne_region = pd.DataFrame()
-    top_region = list(top_6_mensuel.head(6).index)
-    top_region.append("Semaine")
-    data = data.loc[:,top_region]
-    for i in range(0,3):
-        tmp = pd.DataFrame()
-        # Construction du tableau pour l'année N actuel (2021 pour exemple)
-        annee_map = data["Semaine"].map(lambda x: x.year) == annee - i
-        tableau_mois = data[annee_map]
-        # Construction pour le mois M
-        mois_map = tableau_mois["Semaine"].map(lambda x: x.month) == mois
-        tableau = tableau_mois[mois_map]
-        tmp[str(mois)+" "+str(annee-i)] = tableau.head(4).mean(axis=0)
-        moyenne_region = pd.concat([moyenne_region, tmp], axis=1)
-        
-    annees = list(moyenne_region.columns)
-    variation = pd.DataFrame()
-   
-    def variation(x,y):
-        if y!=0:
-            return ((x - y) / y) * 100
-        else:
-            return 0
-    
-    variation[annees[0]+" / "+annees[1]] = moyenne_region.apply(lambda x: variation(x[annees[0]], x[annees[1]]), axis=1)
-    variation[annees[0]+" / "+annees[2]] = moyenne_region.apply(lambda x: variation(x[annees[0]], x[annees[2]]), axis=1)
-   
-    return variation
 
 ### IV - GRAPHQUES
 
@@ -439,8 +261,11 @@ def graph_barres(data, nom_x, nom_y, nom_z, formate_date=True):
     # Des limites un peu plus larges sont fixées en ordonnées afin d'être 
     # certain que les écritures précédentes ne dépassent du cadre
     ymin, ymax = min(data_graph[nom_y]), max(data_graph[nom_y])
-    ax.set_ylim([(ymin-0.2*(ymax-ymin) if ymin < 0 else 0),
-                 (ymax+0.2*(ymax-ymin) if ymax > 0 else 0)])
+    try:
+        ax.set_ylim([(ymin-0.2*(ymax-ymin) if ymin < 0 else 0),
+                     (ymax+0.2*(ymax-ymin) if ymax > 0 else 0)])
+    except:
+        pass
 
     plt.xticks(rotation=45)
 
@@ -646,7 +471,8 @@ de S-2 vs S-3. """
 def interface(CONTENU_GLOBAL):    
     def ordre_alpha(categorie):
         """ Pour faciliter la navigation parmi les fichiers, ces derniers sont
-        classés par ordre alphabétique. """
+        classés par ordre alphabétique. On réorganisera ainsi les paires de
+        clé/valeur du dictionnaire 'categorie'."""
         ordonne = sorted(categorie.items(), key=lambda x: x[0])
         categorie = {}
         for donnee in ordonne:
@@ -661,6 +487,41 @@ def interface(CONTENU_GLOBAL):
             return nom_converti
         except: 
             return code_iso
+        
+    def moyennes_annuelles(data, periode=timedelta(7)):
+        date1 = date2-periode
+        # 1 an avant la date d'analyse:
+        date4 = date2-52*timedelta(7)
+        date3 = date4-periode
+        # 2 ans avant la date d'analyse
+        date6 = date2-104*timedelta(7)
+        date5 = date6-periode
+        
+        moy12 = data[(data.index>date1) & (data.index<=date2)].mean()
+        moy34 = data[(data.index>date3) & (data.index<=date4)].mean()
+        moy56 = data[(data.index>date5) & (data.index<=date6)].mean()
+        df = pd.concat([moy56, moy34, moy12], axis=1)
+        df.columns = [date6.year, date4.year, date2.year]
+        return df.T
+
+    def variations_annuelles(data, periode=timedelta(7)):
+        date1 = date2-periode
+        # 1 an avant la date d'analyse:
+        date4 = date2-52*timedelta(7)
+        date3 = date4-periode
+        # 2 ans avant la date d'analyse
+        date6 = date2-104*timedelta(7)
+        date5 = date6-periode
+        
+        moy12 = data[(data.index>date1) & (data.index<=date2)].mean()
+        moy34 = data[(data.index>date3) & (data.index<=date4)].mean()
+        moy56 = data[(data.index>date5) & (data.index<=date6)].mean()
+        df = pd.concat([(moy12-moy56)/moy56*100,
+                        (moy12-moy34)/moy34*100], axis=1)
+        #df.replace([np.inf, -np.inf], 0, inplace=True)
+        df.columns = [str(date2.year) +" vs "+str(date6.year),
+                      str(date2.year) +" vs "+str(date4.year)]
+        return df.T
     
     # Code iso des pays traduits en noms français courts 
     pays = pd.read_csv("iso-pays.csv", header=None)
@@ -728,14 +589,14 @@ def interface(CONTENU_GLOBAL):
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1 - Les tops") and fichier != "None":
                 top3 = visualisation_tops(data)
-                CONTENU_GLOBAL["Top3"] = top3
+                # CONTENU_GLOBAL["Top3"] = top3
             
             ### 2 - LES VOLUMES
             if st.sidebar.checkbox("2 - Les volumes") and fichier != "None":
                 # On trace les graphiques et le contenu pour le pdf est complété
                 graph_volumes = visualisation_volumes(data)
-                for graph in graph_volumes:
-                    CONTENU_GLOBAL[graph] = graph_volumes[graph]
+                # for graph in graph_volumes:
+                #     CONTENU_GLOBAL[graph] = graph_volumes[graph]
                     
             ### 3 - LES VARIATIONS
             if st.sidebar.checkbox("3 - Les variations") and fichier != "None":
@@ -827,40 +688,7 @@ des années précedentes."""
                 classements = ('2 semaines', '4 semaines', '12 semaines')
                 classement = st.sidebar.radio("Moyennes sur: ", classements)
 
-                def moyennes_annuelles(data, periode=i*timedelta(7)):
-                    date1 = date2-periode
-                    # 1 an avant la date d'analyse:
-                    date4 = date2-52*timedelta(7)
-                    date3 = date4-periode
-                    # 2 ans avant la date d'analyse
-                    date6 = date2-104*timedelta(7)
-                    date5 = date6-periode
-                    
-                    moy12 = data[(data.index>date1) & (data.index<=date2)].mean()
-                    moy34 = data[(data.index>date3) & (data.index<=date4)].mean()
-                    moy56 = data[(data.index>date5) & (data.index<=date6)].mean()
-                    df = pd.concat([moy56, moy34, moy12], axis=1)
-                    df.columns = [date6.year, date4.year, date2.year]
-                    return df.T
-
-                def variations_annuelles(data, periode=i*timedelta(7)):
-                    date1 = date2-periode
-                    # 1 an avant la date d'analyse:
-                    date4 = date2-52*timedelta(7)
-                    date3 = date4-periode
-                    # 2 ans avant la date d'analyse
-                    date6 = date2-104*timedelta(7)
-                    date5 = date6-periode
-                    
-                    moy12 = data[(data.index>date1) & (data.index<=date2)].mean()
-                    moy34 = data[(data.index>date3) & (data.index<=date4)].mean()
-                    moy56 = data[(data.index>date5) & (data.index<=date6)].mean()
-                    df = pd.concat([(moy12-moy56)/moy56*100,
-                                    (moy12-moy34)/moy34*100], axis=1)
-                    #df.replace([np.inf, -np.inf], 0, inplace=True)
-                    df.columns = [str(date2.year) +" vs "+str(date6.year),
-                                  str(date2.year) +" vs "+str(date4.year)]
-                    return df.T
+                
 
                 if classement == '2 semaines':
                     date1 = date2 - 2*timedelta(7)
@@ -920,10 +748,11 @@ des années précedentes."""
         font.italic = None
         font.color.rgb = RGBColor(0x11, 0x55, 0xCC)
         
-    def table_ppt(page, data, nb_colonnes, nb_lignes, position=0):
+    def table_ppt(page, data, place_page=0, pos_y=1.5, hauteur=3.5):
         """Création d'une table"""
+        nb_colonnes, nb_lignes = data.shape[1], data.shape[0]
         taille = nb_colonnes * 1.5
-        x, y, cx, cy = Inches(0.5), Inches(1.5), Inches(taille), Inches(3.5)
+        x, y, cx, cy = Inches(0.5), Inches(pos_y), Inches(taille), Inches(hauteur)
         shape = page.shapes.add_table(nb_lignes+1, nb_colonnes, x, y, cx, cy)       
         table = shape.table
         index_col = 0
@@ -945,13 +774,33 @@ des années précedentes."""
                 paragraph.alignment = PP_ALIGN.CENTER
                 for run in paragraph.runs:
                     run.font.size = Pt(10)
+                    
+    def calcul_tops(analyses, nb_semaines):
+        """Création d'un tableau des tops volumes, progression et potentiel.
+        Paramètres:
+            analyses: Dictionnaire -> récapitulatif des DataFrames pour tous
+                        les types d'analyses: chiffres par pays ou par destination.
+            nb_semaines: Entier -> nombre de semaines depuis la dernière date
+                            pour effectuer le calcul."""
+        colonnes = ["", "Top Volume", "Top Progression", "Top Potentiel"]
+        tops = pd.DataFrame(columns=colonnes)
+        for type_analyse in analyses:
+            analyse = lecture_donnees(analyses[type_analyse])
+            date_2 = max(analyse.index)
+            date_1 = date_2 - nb_semaines*timedelta(7)
+            top = tops3(analyse, date_1, date_2)
+            volume = ",".join(top.loc['top volume'])
+            progression = ",".join(top.loc['top progression'])
+            potentiel = ",".join(top.loc['top potentiel'])
+            tops.loc[len(tops.index)] = [type_analyse, volume, progression,
+                                         potentiel]     
+        return tops
         
     # export_ppt = st.sidebar.button("Générer un PowerPoint")
     export_ppt = False # bouton d'export powerpoint caché pour l'instant
     
-    if export_ppt: 
-        # Pages d'analyse
-        # Générique
+    if export_ppt:
+        ## Générique
         # presente = Presentation()
         # page_titre = presente.slide_layouts[1]
         # slide = presente.slides.add_slide(page_titre)
@@ -987,8 +836,7 @@ des années précedentes."""
                     
         # titre = "La quinzaine du " + duree_str(date_1, date_2) + " en quelques mots..."
         # ajout_titre(page_priorite, titre=titre, position=0)
-        # table_ppt(page_priorite, top_priorite, top_priorite.shape[1],
-        #           top_priorite.shape[0], 1)
+        # table_ppt(page_priorite, top_priorite, 1)
         
         # # Page des tops de la quinzaine
         # page_top = presente.slides.add_slide(page_titre)
@@ -1029,74 +877,101 @@ des années précedentes."""
         #     # break # Arrêt de boucle pour test
         # presente.save('Rapport analyse generique.pptx')
                 
-        # Par pays
+        ## Par pays
         for pays in data_tourisme_pays:
-            presente_pays = Presentation()
-            page_titre = presente_pays.slide_layouts[1]
-            page_titre_pays = presente_pays.slides.add_slide(page_titre)
-            titre_pays = page_titre_pays.shapes.title
-            titre_pays.text = "Analyse par Pays"
-            page_titre_pays = presente_pays.slides.add_slide(page_titre)
-            nom_pays = page_titre_pays.shapes.title
-            nom_pays.text = pays
-            
-            for type_analyse in data_tourisme_pays[pays]:
-                donnees_propres = lecture_donnees(data_tourisme_pays[pays][type_analyse])              
-                graphiques = {}
-                for destination in donnees_propres.columns:
-                    nouv_graph = graph_3_ans(donnees_propres, destination)
-                    graphiques[destination] = nouv_graph
+            # Les calculs des meilleurs secteurs trimestriels, puis mensuels
+            # et enfin bi-hebdomadaires, sont effectués. Trois fichiers 
+            # correspondants seront produits.
+            periodes = ("hebdomadaire", "mensuelle", "trimestrielle")
+            nb_semaine = (2, 4, 12)
+            for periodicite, nb_semaines in zip(periodes, nb_semaine):
+                presente_pays = Presentation()
+                page_titre = presente_pays.slide_layouts[1]
+                page_titre_pays = presente_pays.slides.add_slide(page_titre)
+                left = top = Inches(0)
+                width = Inches(10.0)
+                height = Inches(0.2)
+                barre = page_titre_pays.shapes.add_shape(
+                            MSO_SHAPE.RECTANGLE, left, top, width, height
+                        )
                 
-                decalage_x = 0
-                decalage_y = 1.5
-                page = 1
-                for graph_destination in graphiques:
-                    if decalage_x == 0 and decalage_y == 1.5:
+                titre_pays = page_titre_pays.shapes.title
+                titre_pays.text = f"""Analyse {periodicite} par Pays
+                {pays}"""
+                titre = "En quelques mots..."
+                ajout_titre(page_titre_pays, position=1, titre=titre)
+                
+                tops = calcul_tops(data_tourisme_pays[pays], 2)
+                table_ppt(page_titre_pays, tops, pos_y=2.5)
+                
+                for type_analyse in data_tourisme_pays[pays]:
+                    data = lecture_donnees(data_tourisme_pays[pays][type_analyse])
+                    moyennes = {}
+                    date2 = data.index.max()
+                    for i in [2, 4, 12]:
+                        date1 = date2-i*timedelta(7)
+                        moyennes[i] = data[(data.index>date1) & (data.index<=date2)].mean()
+                        moyennes[i] = moyennes[i].sort_values(ascending=False)
+                        moyennes[i].name = "TOP "+str(i)+" SEMAINES"
+                    date1 = date2 - nb_semaines*timedelta(7)
+                    zones = list(moyennes[2].head(6).index)
+                    moy = moyennes_annuelles(data[zones], nb_semaines*timedelta(7))
+                    var = variations_annuelles(data[zones], nb_semaines*timedelta(7))
+                    
+                    # Graphiques en barres des moyennes et variations
+                    for analyse, nom_analyse in zip((moy, var), ("Moyenne", "Variation")):
                         page_analyse = presente_pays.slides.add_slide(page_titre)
-                        
                         left = top = Inches(0)
                         width = Inches(10.0)
                         height = Inches(0.2)
-                        shape = page_analyse.shapes.add_shape(
-                            MSO_SHAPE.RECTANGLE, left, top, width, height
-                        )
+                        barre = page_analyse.shapes.add_shape(
+                                    MSO_SHAPE.RECTANGLE, left, top, width, height
+                                )
+                        ajout_titre(page_analyse, position=0, type_analyse=type_analyse)
+                        nom_x, nom_z = u"Régions", "Annees"
+                        nom_y = nom_analyse + " de l'indice Google Trends"
+                        graph = graph_barres(analyse, nom_x, nom_y, nom_z,
+                                               formate_date=False)
+                        nom_graph =  " ".join([nom_analyse,periodicite,
+                                               str(type_analyse),str(pays)])+".jpg"
+                        image_graph = graph.savefig(nom_graph, dpi=300,
+                                                    bbox_inches="tight")
+                        page_analyse.shapes.add_picture(nom_graph,
+                                        Inches(1),
+                                        Inches(1.3),
+                                        width=Inches(8))
                         
-                        shape = page_analyse.shapes[0]
-                        text_frame = shape.text_frame
-                        p = text_frame.paragraphs[0]
-                        p.margin_left = 0
-                        run = p.add_run()
-                        run.text = 'Indice hebdomadaire des tendances de recherches'
-                        run.text += ' . Rubrique ' + type_analyse
-                        run.text += ' . Marché ' + pays
-                        
-                        font = run.font
-                        font.name = 'Calibri'
-                        font.size = Pt(18)
-                        font.bold = True
-                        font.italic = None  # cause value to be inherited from theme
-                        font.color.rgb = RGBColor(0x11, 0x55, 0xCC)
-
-                        page += 1
-                    
-                    graph = graphiques[graph_destination]
-                    nom_graph = str(pays) + " "
-                    nom_graph += str(graph_destination)+".jpg"
-                    image_graph = graph.savefig(nom_graph, dpi=250)
-                    place_image = page_analyse.shapes.add_picture(nom_graph,
-                                                          Inches(decalage_x),
-                                                          Inches(decalage_y),
-                                                          width=Inches(5))
-                    if decalage_x > 0 and decalage_y == 1.5:
-                        decalage_x = 0
-                        decalage_y += 3
-                    elif decalage_y > 1.5 and decalage_x > 0:
-                        decalage_x = 0
-                        decalage_y = 1.5
-                    else:
-                        decalage_x += 4.7
-            presente_pays.save('Rapport analyse '+pays+'.pptx')
-            break # Arrêt de boucle pour test
+                    # Graphique en ligne
+                    page_analyse = presente_pays.slides.add_slide(page_titre)
+                    left = top = Inches(0)
+                    width = Inches(10.0)
+                    height = Inches(0.2)
+                    barre = page_analyse.shapes.add_shape(
+                                MSO_SHAPE.RECTANGLE, left, top, width, height
+                            )
+                    ajout_titre(page_analyse, position=0, type_analyse=type_analyse)
+                    cale_gauche = 1.8
+                    cale_haut = 1.3
+                    decalage_x = cale_gauche
+                    decalage_y = cale_haut
+                    for colonne in moy.columns:
+                        graph = graph_3_ans(data, colonne)
+                        nom_graph = " ".join(("Evolution",periodicite, pays,
+                                              str(colonne))) + ".jpg"
+                        image_graph = graph.savefig(nom_graph, dpi=300,
+                                                    bbox_inches="tight")
+                        page_analyse.shapes.add_picture(nom_graph,
+                                            Inches(decalage_x),
+                                            Inches(decalage_y),
+                                            width=Inches(3))
+                        if decalage_x > cale_gauche:
+                            decalage_x = cale_gauche
+                            decalage_y += 2
+                        else:
+                            decalage_x += 3.3
+                    # break # Arret de boucle pour test
+                presente_pays.save('Rapport analyse '+periodicite+' '+pays+'.pptx')
+                # break # Arrêt de boucle pour test
         
 
 ### VI - TESTS UNITAIRES
