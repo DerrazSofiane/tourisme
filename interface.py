@@ -529,74 +529,85 @@ def interface(CONTENU_GLOBAL):
     pays.columns = ["iso", "nom_pays"]
     pays = pays.set_index("iso")
     
-    # Lecture des fichiers des tables d'analyse et de leurs noms respectifs
-    data_tourisme_pays = {}
-    data_tourisme_generique = {}
+    # Lecture des fichiers des tables d'analyse et de leurs noms respectifs.
+    # On parcoure pour cela les dossiers de données , organisés en trois
+    # principales caté"gories: les destinations françaises, toutes les
+    # destinations et une analyse génériques.
+    
+    data = {}
     emplacement = os.path.join("data_tourisme")
-    dossier = os.listdir(emplacement)
-    for donnee_tourisme in dossier:
-        try:
-            donnees_brut = emplacement + "/" + donnee_tourisme
-            analyse = pd.read_csv(donnees_brut, sep=";",
-                                  encoding = "ISO-8859-1",
-                                  engine='python')
-            # Le nom du fichier est décomposé pour former le nom qui sera affiché
-            decompose = donnee_tourisme.split("_")
-            type_analyse = decompose[1]
-            type_analyse = type_analyse.split("-")
-            # Les analyses générales
-            if type_analyse[0] == "Generique":
-                # type_analyse = " ".join(type_analyse[:-1])
-                nouv_type_analyse = type_analyse[1]
-                data_tourisme_generique[nouv_type_analyse] = analyse
-            # Les analyses par pays
-            else:
-                nom_pays = convertion_nom_pays(decompose[0])
-                nouv_type_analyse = type_analyse[1]
-                if not nom_pays in data_tourisme_pays.keys():
-                    data_tourisme_pays[nom_pays] = {}
-                data_tourisme_pays[nom_pays][nouv_type_analyse] = analyse
-        except:
-            pass
-        
+    dossier_source = os.listdir(emplacement)
+    dossiers_source = ['generiques',
+                       'Toutes_destinations',
+                        'destinations_francaises']
+    for dossier in dossiers_source:
+        data[dossier] = {}
+        source = os.path.join("data_tourisme/"+dossier)
+        sous_dossier = os.listdir(source)[-1]
+
+        data_dossier = "/".join([emplacement, dossier, sous_dossier])
+        for donnee_tourisme in os.listdir(data_dossier):
+            try:
+                donnees_brut = data_dossier + "/" + donnee_tourisme
+                analyse = pd.read_csv(donnees_brut, sep=";",
+                                      encoding = "ISO-8859-1",
+                                      engine='python')
+                # Le nom du fichier est décomposé pour former le nom qui sera affiché
+                decompose = donnee_tourisme.split("_")
+                type_analyse = decompose[1]
+                type_analyse = type_analyse.split("-")
+                # Les analyses générales
+                if type_analyse[0] == "Generique":
+                    # type_analyse = " ".join(type_analyse[:-1])
+                    nouv_type_analyse = type_analyse[1]
+                    data[dossier][nouv_type_analyse] = analyse
+                # Les analyses par pays
+                else:
+                    nom_pays = convertion_nom_pays(decompose[0])
+                    nouv_type_analyse = type_analyse[1]
+                    if not nom_pays in data[dossier].keys():
+                        data[dossier][nom_pays] = {}
+                    data[dossier][nom_pays][nouv_type_analyse] = analyse
+            except:
+                pass
     # Réorganisation par ordre alphabétique des données
-    data_tourisme_pays = ordre_alpha(data_tourisme_pays)
-    for pays in data_tourisme_pays:
-        data_tourisme_pays[pays] = ordre_alpha(data_tourisme_pays[pays])
-    data_tourisme_generique = ordre_alpha(data_tourisme_generique)
+    for type_analyse in data:
+        data[type_analyse] = ordre_alpha(data[type_analyse])
+        if type_analyse != "generiques":
+            for pays in data[type_analyse]:
+                data[type_analyse][pays] = ordre_alpha(data[type_analyse][pays])
+      
     
     entete()
     
     if st.sidebar.checkbox("Présentation", value=True):
         introduction()
-     
+    
     # Sélection du type d'analyse à effectuer
-    types_analyse = {"Mots clés génériques  par pays": data_tourisme_generique,
-                     "Destinations par pays": data_tourisme_pays}
+    types_analyse = {"Mots clés génériques par pays": data[dossiers_source[0]],
+                     "Destinations par pays": data[dossiers_source[1]],
+                     "Destinations françaises": data[dossiers_source[2]]}
     txt = "Types d'analyses: " 
     noms_types = list(types_analyse.keys())
     mode = st.sidebar.selectbox(txt, noms_types)
     
-   
-    ### ANALYSE GLOBALE
-    if mode == "Mots clés génériques  par pays":
+    ### ANALYSE GENERIQUE
+    if mode == "Mots clés génériques par pays":
         # Récupération des noms de tables d'analyse et construction de la 
         # liste déroulante
+        
         noms_analyses = list(types_analyse[mode].keys())
         fichier = st.sidebar.selectbox("Quelle analyse effectuer?", noms_analyses)
-        data = lecture_donnees(data_tourisme_generique[fichier])
+        data = lecture_donnees(types_analyse[mode][fichier])
         try:
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1 - Les tops") and fichier != "None":
                 top3 = visualisation_tops(data)
-                # CONTENU_GLOBAL["Top3"] = top3
             
             ### 2 - LES VOLUMES
             if st.sidebar.checkbox("2 - Les volumes") and fichier != "None":
-                # On trace les graphiques et le contenu pour le pdf est complété
+                # Traçage des graphiques
                 graph_volumes = visualisation_volumes(data)
-                # for graph in graph_volumes:
-                #     CONTENU_GLOBAL[graph] = graph_volumes[graph]
                     
             ### 3 - LES VARIATIONS
             if st.sidebar.checkbox("3 - Les variations") and fichier != "None":
@@ -610,20 +621,20 @@ def interface(CONTENU_GLOBAL):
             pass
 
     ### ANALYSE PAR PAYS
-    if mode == "Destinations par pays":
-        tous_pays = list(data_tourisme_pays.keys())
+    else:
+        tous_pays = list(types_analyse[mode].keys())
         pays_choisi = st.sidebar.selectbox("Quel pays?", tous_pays)
-        types_analyse = list(data_tourisme_pays[pays_choisi].keys())
+        detail_analyse = list(types_analyse[mode][pays_choisi].keys())
         analyse_pays = st.sidebar.selectbox("Quelle analyse effectuer?",
-                                           types_analyse)
-        data = lecture_donnees(data_tourisme_pays[pays_choisi][analyse_pays])
+                                           detail_analyse)
+        data = lecture_donnees(types_analyse[mode][pays_choisi][analyse_pays])
         try:
             # Date d'analyse
             txt = "Date d'analyse"
             date2 = st.sidebar.date_input(txt,value=max(data.index))
 
-            # Moyennes des volumes sur 2, 4 et 12 semaines, triés par ordre 
-            # décroissant
+            # Moyennes des volumes sur 2, 4 et 12 semaines,
+            # triés par ordre décroissant
             moyennes = {}
             for i in [2, 4, 12]:
                 date1 = date2-i*timedelta(7)
@@ -799,7 +810,7 @@ des années précedentes."""
     # export_ppt = st.sidebar.button("Générer un PowerPoint")
     export_ppt = False # bouton d'export powerpoint caché pour l'instant
     
-    if export_ppt:
+    # if export_ppt:
         ## Générique
         # presente = Presentation()
         # page_titre = presente.slide_layouts[1]
@@ -878,100 +889,100 @@ des années précedentes."""
         # presente.save('Rapport analyse generique.pptx')
                 
         ## Par pays
-        for pays in data_tourisme_pays:
-            # Les calculs des meilleurs secteurs trimestriels, puis mensuels
-            # et enfin bi-hebdomadaires, sont effectués. Trois fichiers 
-            # correspondants seront produits.
-            periodes = ("hebdomadaire", "mensuelle", "trimestrielle")
-            nb_semaine = (2, 4, 12)
-            for periodicite, nb_semaines in zip(periodes, nb_semaine):
-                presente_pays = Presentation()
-                page_titre = presente_pays.slide_layouts[1]
-                page_titre_pays = presente_pays.slides.add_slide(page_titre)
-                left = top = Inches(0)
-                width = Inches(10.0)
-                height = Inches(0.2)
-                barre = page_titre_pays.shapes.add_shape(
-                            MSO_SHAPE.RECTANGLE, left, top, width, height
-                        )
+        # for pays in data_tourisme_pays:
+        #     # Les calculs des meilleurs secteurs trimestriels, puis mensuels
+        #     # et enfin bi-hebdomadaires, sont effectués. Trois fichiers 
+        #     # correspondants seront produits.
+        #     periodes = ("hebdomadaire", "mensuelle", "trimestrielle")
+        #     nb_semaine = (2, 4, 12)
+        #     for periodicite, nb_semaines in zip(periodes, nb_semaine):
+        #         presente_pays = Presentation()
+        #         page_titre = presente_pays.slide_layouts[1]
+        #         page_titre_pays = presente_pays.slides.add_slide(page_titre)
+        #         left = top = Inches(0)
+        #         width = Inches(10.0)
+        #         height = Inches(0.2)
+        #         barre = page_titre_pays.shapes.add_shape(
+        #                     MSO_SHAPE.RECTANGLE, left, top, width, height
+        #                 )
                 
-                titre_pays = page_titre_pays.shapes.title
-                titre_pays.text = f"""Analyse {periodicite} par Pays
-                {pays}"""
-                titre = "En quelques mots..."
-                ajout_titre(page_titre_pays, position=1, titre=titre)
+        #         titre_pays = page_titre_pays.shapes.title
+        #         titre_pays.text = f"""Analyse {periodicite} par Pays
+        #         {pays}"""
+        #         titre = "En quelques mots..."
+        #         ajout_titre(page_titre_pays, position=1, titre=titre)
                 
-                tops = calcul_tops(data_tourisme_pays[pays], 2)
-                table_ppt(page_titre_pays, tops, pos_y=2.5)
+        #         tops = calcul_tops(data_tourisme_pays[pays], 2)
+        #         table_ppt(page_titre_pays, tops, pos_y=2.5)
                 
-                for type_analyse in data_tourisme_pays[pays]:
-                    data = lecture_donnees(data_tourisme_pays[pays][type_analyse])
-                    moyennes = {}
-                    date2 = data.index.max()
-                    for i in [2, 4, 12]:
-                        date1 = date2-i*timedelta(7)
-                        moyennes[i] = data[(data.index>date1) & (data.index<=date2)].mean()
-                        moyennes[i] = moyennes[i].sort_values(ascending=False)
-                        moyennes[i].name = "TOP "+str(i)+" SEMAINES"
-                    date1 = date2 - nb_semaines*timedelta(7)
-                    zones = list(moyennes[2].head(6).index)
-                    moy = moyennes_annuelles(data[zones], nb_semaines*timedelta(7))
-                    var = variations_annuelles(data[zones], nb_semaines*timedelta(7))
+        #         for type_analyse in data_tourisme_pays[pays]:
+        #             data = lecture_donnees(data_tourisme_pays[pays][type_analyse])
+        #             moyennes = {}
+        #             date2 = data.index.max()
+        #             for i in [2, 4, 12]:
+        #                 date1 = date2-i*timedelta(7)
+        #                 moyennes[i] = data[(data.index>date1) & (data.index<=date2)].mean()
+        #                 moyennes[i] = moyennes[i].sort_values(ascending=False)
+        #                 moyennes[i].name = "TOP "+str(i)+" SEMAINES"
+        #             date1 = date2 - nb_semaines*timedelta(7)
+        #             zones = list(moyennes[2].head(6).index)
+        #             moy = moyennes_annuelles(data[zones], nb_semaines*timedelta(7))
+        #             var = variations_annuelles(data[zones], nb_semaines*timedelta(7))
                     
-                    # Graphiques en barres des moyennes et variations
-                    for analyse, nom_analyse in zip((moy, var), ("Moyenne", "Variation")):
-                        page_analyse = presente_pays.slides.add_slide(page_titre)
-                        left = top = Inches(0)
-                        width = Inches(10.0)
-                        height = Inches(0.2)
-                        barre = page_analyse.shapes.add_shape(
-                                    MSO_SHAPE.RECTANGLE, left, top, width, height
-                                )
-                        ajout_titre(page_analyse, position=0, type_analyse=type_analyse)
-                        nom_x, nom_z = u"Régions", "Annees"
-                        nom_y = nom_analyse + " de l'indice Google Trends"
-                        graph = graph_barres(analyse, nom_x, nom_y, nom_z,
-                                               formate_date=False)
-                        nom_graph =  " ".join([nom_analyse,periodicite,
-                                               str(type_analyse),str(pays)])+".jpg"
-                        image_graph = graph.savefig(nom_graph, dpi=300,
-                                                    bbox_inches="tight")
-                        page_analyse.shapes.add_picture(nom_graph,
-                                        Inches(1),
-                                        Inches(1.3),
-                                        width=Inches(8))
+        #             # Graphiques en barres des moyennes et variations
+        #             for analyse, nom_analyse in zip((moy, var), ("Moyenne", "Variation")):
+        #                 page_analyse = presente_pays.slides.add_slide(page_titre)
+        #                 left = top = Inches(0)
+        #                 width = Inches(10.0)
+        #                 height = Inches(0.2)
+        #                 barre = page_analyse.shapes.add_shape(
+        #                             MSO_SHAPE.RECTANGLE, left, top, width, height
+        #                         )
+        #                 ajout_titre(page_analyse, position=0, type_analyse=type_analyse)
+        #                 nom_x, nom_z = u"Régions", "Annees"
+        #                 nom_y = nom_analyse + " de l'indice Google Trends"
+        #                 graph = graph_barres(analyse, nom_x, nom_y, nom_z,
+        #                                        formate_date=False)
+        #                 nom_graph =  " ".join([nom_analyse,periodicite,
+        #                                        str(type_analyse),str(pays)])+".jpg"
+        #                 image_graph = graph.savefig(nom_graph, dpi=300,
+        #                                             bbox_inches="tight")
+        #                 page_analyse.shapes.add_picture(nom_graph,
+        #                                 Inches(1),
+        #                                 Inches(1.3),
+        #                                 width=Inches(8))
                         
-                    # Graphique en ligne
-                    page_analyse = presente_pays.slides.add_slide(page_titre)
-                    left = top = Inches(0)
-                    width = Inches(10.0)
-                    height = Inches(0.2)
-                    barre = page_analyse.shapes.add_shape(
-                                MSO_SHAPE.RECTANGLE, left, top, width, height
-                            )
-                    ajout_titre(page_analyse, position=0, type_analyse=type_analyse)
-                    cale_gauche = 1.8
-                    cale_haut = 1.3
-                    decalage_x = cale_gauche
-                    decalage_y = cale_haut
-                    for colonne in moy.columns:
-                        graph = graph_3_ans(data, colonne)
-                        nom_graph = " ".join(("Evolution",periodicite, pays,
-                                              str(colonne))) + ".jpg"
-                        image_graph = graph.savefig(nom_graph, dpi=300,
-                                                    bbox_inches="tight")
-                        page_analyse.shapes.add_picture(nom_graph,
-                                            Inches(decalage_x),
-                                            Inches(decalage_y),
-                                            width=Inches(3))
-                        if decalage_x > cale_gauche:
-                            decalage_x = cale_gauche
-                            decalage_y += 2
-                        else:
-                            decalage_x += 3.3
-                    # break # Arret de boucle pour test
-                presente_pays.save('Rapport analyse '+periodicite+' '+pays+'.pptx')
-                # break # Arrêt de boucle pour test
+        #             # Graphique en ligne
+        #             page_analyse = presente_pays.slides.add_slide(page_titre)
+        #             left = top = Inches(0)
+        #             width = Inches(10.0)
+        #             height = Inches(0.2)
+        #             barre = page_analyse.shapes.add_shape(
+        #                         MSO_SHAPE.RECTANGLE, left, top, width, height
+        #                     )
+        #             ajout_titre(page_analyse, position=0, type_analyse=type_analyse)
+        #             cale_gauche = 1.8
+        #             cale_haut = 1.3
+        #             decalage_x = cale_gauche
+        #             decalage_y = cale_haut
+        #             for colonne in moy.columns:
+        #                 graph = graph_3_ans(data, colonne)
+        #                 nom_graph = " ".join(("Evolution",periodicite, pays,
+        #                                       str(colonne))) + ".jpg"
+        #                 image_graph = graph.savefig(nom_graph, dpi=300,
+        #                                             bbox_inches="tight")
+        #                 page_analyse.shapes.add_picture(nom_graph,
+        #                                     Inches(decalage_x),
+        #                                     Inches(decalage_y),
+        #                                     width=Inches(3))
+        #                 if decalage_x > cale_gauche:
+        #                     decalage_x = cale_gauche
+        #                     decalage_y += 2
+        #                 else:
+        #                     decalage_x += 3.3
+        #             # break # Arret de boucle pour test
+        #         presente_pays.save('Rapport analyse '+periodicite+' '+pays+'.pptx')
+        #         # break # Arrêt de boucle pour test
         
 
 ### VI - TESTS UNITAIRES
