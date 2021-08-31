@@ -390,7 +390,8 @@ par l’UNESCO, notamment) a été introduit.
 de donnée objective ou de label.
 Cette expertise métier peut être complétée par des sources telles que la présence
 dans les catalogues des grands opérateurs touristiques. On voit bien que les panels
-sont construits de façon itérative pour garder de la souplesse et enrichirles éléments au fur et à mesure."""
+sont construits de façon itérative pour garder de la souplesse et enrichirles
+éléments au fur et à mesure."""
 
     st.title("Introduction")
     st.header("1- Analyse des recherches pour les destinations françaises")
