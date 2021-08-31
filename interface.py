@@ -352,7 +352,33 @@ Les 6 principaux résultats sont proposés (Top 6 – par facilité de lecture,
 les valeurs suivantes sont également disponibles) 
 - Périodicité d’analyse  : Deux  fois par mois
 - Marchés analysés : Allemagne (DE), Belgique (BE), France (FR),
-  Pays-Bas (NL) et Royaume-Uni (UK) """
+  Pays-Bas (NL) et Royaume-Uni (UK) 
+Notre approche nous a conduit à raisonner par “marché émetteur” (par pays) de façon à rester
+“en ligne” avec la vision du consommateur final. Les marchés que nous avons choisis sont :
+BE (Belgique), CH (Suisse), DE (Allemagne), ES (Espagne), FR (France), IT (Italie), NL (Pays-Bas), UK (Royaume-Uni), US (Etats-Unis)
+
+Nous avons souhaité introduire une notion de “concurrence” entre les destinations qui correspond
+à l’arbitrage que le client final peut faire entre plusieurs destinations. Nous avons donc regroupé
+les destinations au sein de panels. Ces panels portent en eux une certaine cohérence thématique
+(exemple : capitale européenne, station balnéaire, station de ski…). Nous avons constitué des panels
+de ce que nous souhaitions comparer en termes de résultats par pays :
+- panel de mots clés génériques
+- panels de destinations européennes (toutes destinations) que nous avons organisés en « campagne », « littoral », « montagne », « outre-mer » et « urbain »
+- panels de destinations françaises (destinations FR) que nous avons organisés en « campagne », « littoral », « montagne », « outre-mer » et « urbain »
+
+Pour les destinations, la méthode de constitution des panels est la suivante :
+1. Le choix d’un critère objectif classant les objets entre eux :
+· Classement d’Eurostat (France : villes classées 3, 4, 5 et 6 • CONCURRENCE : villes classées 5 et 6).
+· Top 10 des villes françaises publié par Atout France (tourisme urbain).
+· Le niveau de fréquentation mesuré par un organisme officiel (Atout France, INSEE, EUROSTAT, par exemple):
+nombre de visiteurs, nombre de nuitées, … 
+· Le nombre d’offres proposées au marché : nombre de chambres, nombre de lits, nombre d’emplacements, …
+· Le nombre d’équipements proposés au marché : le nombre de remontées mécaniques pour les stations de ski,
+ la présence d’un aéroport international, par exemple.
+2. Ensuite, un second critère qualitatif comme le statut - le label (les capitales administratives ou économiques,
+les communes classées “balnéaire”, les sites classés par l’UNESCO, notamment) a été introduit.
+3. Enfin, l’expertise métier permet d’agrémenter ces panels lorsqu’il n’y a pas de donnée objective ou de label.
+Cette expertise métier peut être complétée par des sources telles que la présence dans les catalogues des grands opérateurs touristiques. On voit bien que les panels sont construits de façon itérative pour garder de la souplesse et enrichir les éléments au fur et à mesure."""
 
     st.title("Introduction")
     st.header("1- Analyse des recherches pour les destinations françaises")
