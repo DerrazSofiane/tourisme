@@ -570,23 +570,23 @@ def interface(CONTENU_GLOBAL):
                     data[dossier][nom_pays][nouv_type_analyse] = analyse
             except:
                 pass
+            
     # Réorganisation par ordre alphabétique des données
     for type_analyse in data:
         data[type_analyse] = ordre_alpha(data[type_analyse])
         if type_analyse != "generiques":
             for pays in data[type_analyse]:
                 data[type_analyse][pays] = ordre_alpha(data[type_analyse][pays])
-      
-    
+       
     entete()
     
     if st.sidebar.checkbox("Présentation", value=True):
         introduction()
     
-    # Sélection du type d'analyse à effectuer
+    # Sélection du type d'analyse générale à effectuer
     types_analyse = {"Mots clés génériques par pays": data[dossiers_source[0]],
-                     "Destinations par pays": data[dossiers_source[1]],
-                     "Destinations françaises": data[dossiers_source[2]]}
+                     "Toutes destinations par pays": data[dossiers_source[1]],
+                     "Destinations FR par pays": data[dossiers_source[2]]}
     txt = "Types d'analyses: " 
     noms_types = list(types_analyse.keys())
     mode = st.sidebar.selectbox(txt, noms_types)
@@ -595,7 +595,6 @@ def interface(CONTENU_GLOBAL):
     if mode == "Mots clés génériques par pays":
         # Récupération des noms de tables d'analyse et construction de la 
         # liste déroulante
-        
         noms_analyses = list(types_analyse[mode].keys())
         fichier = st.sidebar.selectbox("Quelle analyse effectuer?", noms_analyses)
         data = lecture_donnees(types_analyse[mode][fichier])
@@ -642,7 +641,6 @@ def interface(CONTENU_GLOBAL):
                 moyennes[i] = moyennes[i].sort_values(ascending=False)
                 moyennes[i].name = "TOP "+str(i)+" SEMAINES"
 
-
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1- Les tops") and analyse_pays != "None":
                 st.title("1 - Les tops tendances de recherche - Base : indice 100")
@@ -670,63 +668,88 @@ sur des périodes, de respectivement:
                 #     commentaire_2 = st.text_area("Commentaire", "")
            
             ### 2 - LES VOLUMES
-            if st.sidebar.checkbox("2 - Les volumes des 3 dernières années du top 6"):
-                st.title("2 - Comparaisons annuelles des tops 6")
-                classements = ('Top 2 semaines', 'Top 4 semaines','Top 12 semaines')
-                lissage    = st.sidebar.checkbox("Lissage") 
-                classement = st.sidebar.radio("Classement: ", classements)
-
-                if classement == 'Top 2 semaines':
-                    for zone in moyennes[2].head(6).index:
-                        st.pyplot(graph_3_ans(data, zone, lissage))
-                if classement == 'Top 4 semaines':
-                    for zone in moyennes[4].head(6).index:
-                        st.pyplot(graph_3_ans(data, zone, lissage))
-                if classement == 'Top 12 semaines':
-                    for zone in moyennes[12].head(6).index:
+            if st.sidebar.checkbox("2 - Les volumes des 3 dernières années"):
+                st.title("2 - Comparaisons annuelles des recherches")
+                # Le type d'analyse peut être traduit en un nombre de semaines
+                classements = {'2 semaines': 2, 
+                                '4 semaines': 4,
+                                '12 semaines': 12}
+                lissage = st.sidebar.checkbox("Lissage") 
+                types_classement = list(classements.keys())
+                choix_vol = st.sidebar.radio("Classement: ", types_classement)
+                
+                # Le choix est donné pour n'afficher que les destinations
+                # voulues parmi toutes celles disponibles
+                nb_semaines_vol= classements[choix_vol]
+                choix_destinations = {}
+                max_colonnes = 5
+                colonnes_volume = st.beta_columns(max_colonnes)
+                index = 0
+                for destination in moyennes[nb_semaines_vol].index:
+                    choix_destinations[destination] = colonnes_volume[index].checkbox(destination)
+                    index += 1
+                    if index == max_colonnes:
+                        index = 0
+                
+                # Seules les graphiques des destinations choisies sont affichés
+                for zone in choix_destinations:
+                    if choix_destinations[zone] == True:
                         st.pyplot(graph_3_ans(data, zone, lissage))
 
 
             ### 3 - LES VARIATIONS
-            if st.sidebar.checkbox("3 - Les variations du top 6 d'une année sur l'autre"):
-                txt = """
+            titre_variation = "3 - Les variations des recherches d'une année sur l'autre"
+            if st.sidebar.checkbox(titre_variation):
+                txt = f"""
 Les indices de Google Trends, moyennés au choix sur 2, 4 ou 12 dernières semaines
 précédant la date d'analyse, sont comparées aux indices sur les mêmes périodes
 des années précedentes."""
             
-                st.title("3 - Les variations du top 6 d'une année sur l'autre")
+                st.title(titre_variation)
                 st.text(txt)
-                classements = ('2 semaines', '4 semaines', '12 semaines')
-                classement = st.sidebar.radio("Moyennes sur: ", classements)
-
+                classements = {'2 semaines': 2,
+                               '4 semaines': 4,
+                               '12 semaines': 12}
+                types_classement = list(classements.keys())
+                choix_var = st.sidebar.radio("Moyennes sur: ", types_classement)
+                nb_semaines_var = classements[choix_var]
+                date1 = date2 - nb_semaines_var * timedelta(7)
                 
-
-                if classement == '2 semaines':
-                    date1 = date2 - 2*timedelta(7)
-                    zones = list(moyennes[2].head(6).index)
-                    moy = moyennes_annuelles(data[zones], 2*timedelta(7))
-                    var = variations_annuelles(data[zones], 2*timedelta(7))
-                if classement == '4 semaines':
-                    date1 = date2 - 4*timedelta(7)
-                    zones = list(moyennes[4].head(6).index)
-                    moy = moyennes_annuelles(data[zones], 4*timedelta(7))
-                    var = variations_annuelles(data[zones], 4*timedelta(7))
-                if classement == '12 semaines':
-                    date1 = date2 - 12*timedelta(7)
-                    zones = list(moyennes[12].head(6).index)
-                    moy = moyennes_annuelles(data[zones], 12*timedelta(7))
-                    var = variations_annuelles(data[zones], 12*timedelta(7))
-
+                # Les pays dont on souhaite visualiser les variations
+                # peuvent être sélectionnés et sont tous affichés ensemble
+                # dans deux graphiques
+                max_colonnes_var = 5
+                colonnes_variation = st.beta_columns(5)
+                index_var = 0  
+                zones = []
+                choix_variations = {}
+                for destination in moyennes[nb_semaines_var].index:
+                    choix_variations[destination] = colonnes_variation[index_var].checkbox(destination)
+                    index_var += 1
+                    if index_var == max_colonnes_var:
+                        index_var = 0
+                        
+                
+                for choix in choix_variations:
+                    if choix_variations[choix] == True:
+                        zones.append(choix)   
+                
+                moy = moyennes_annuelles(data[zones],
+                                         nb_semaines_var * timedelta(7))
+                var = variations_annuelles(data[zones],
+                                           nb_semaines_var * timedelta(7))
+                
+                # Graphique des moyennes comparées
                 titre_var = "a) Valeurs du " + duree_str(date1, date2)
                 titre_var += " comparées aux années précédentes."
-                st.header(entete)
-                
+                st.header(titre_var)                
                 st.table(moy.T.applymap(lambda x: "{:.1f}".format(x)))
                 nom_x, nom_z = u"Régions", "Annees"
                 nom_y = "Moyennes de l'indice Google Trends"
                 st.pyplot(graph_barres(moy, nom_x, nom_y, nom_z,
                                        formate_date=False))
                 
+                # Graphiques des variations
                 st.header("b) Variations en %")
                 st.table(var.T.applymap(lambda x: "{:.1f}".format(x)))
                 nom_y = "Variation des moyennes de l'indice Google Trends - %"
@@ -803,8 +826,10 @@ des années précedentes."""
             volume = ",".join(top.loc['top volume'])
             progression = ",".join(top.loc['top progression'])
             potentiel = ",".join(top.loc['top potentiel'])
-            tops.loc[len(tops.index)] = [type_analyse, volume, progression,
-                                         potentiel]     
+            tops.loc[len(tops.index)] = [type_analyse,
+                                         volume,
+                                         progression,
+                                         potentiel]
         return tops
         
     # export_ppt = st.sidebar.button("Générer un PowerPoint")
