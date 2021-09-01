@@ -32,9 +32,6 @@ from pptx.enum.text import PP_ALIGN
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-# On enregistrera le contenu affiché pour le rapport en pdf
-CONTENU_GLOBAL = {}
-
 # TODO: 
 # Se référer à 2019 pour faire les prévisions. 
 
@@ -352,46 +349,7 @@ Les 6 principaux résultats sont proposés (Top 6 – par facilité de lecture,
 les valeurs suivantes sont également disponibles) 
 - Périodicité d’analyse  : Deux  fois par mois
 - Marchés analysés : Allemagne (DE), Belgique (BE), France (FR),
-  Pays-Bas (NL) et Royaume-Uni (UK) 
-Notre approche nous a conduit à raisonner par “marché émetteur” (par pays)
-de façon à rester “en ligne” avec la vision du consommateur final.
-Les marchés que nous avons choisis sont :
-BE (Belgique), CH (Suisse), DE (Allemagne), ES (Espagne), FR (France),
-IT (Italie), NL (Pays-Bas), UK (Royaume-Uni), US (Etats-Unis)
-
-Nous avons souhaité introduire une notion de “concurrence” entre les destinations
-qui correspond à l’arbitrage que le client final peut faire entre plusieurs
-destinations. Nous avons donc regroupé les destinations au sein de panels.
-Ces panels portent en eux une certaine cohérence thématique
-(exemple: capitale européenne, station balnéaire, station de ski…).
-Nous avons constitué des panels de ce que nous souhaitions comparer
-en termes de résultats par pays :
-- panel de mots clés génériques
-- panels de destinations européennes (toutes destinations) que nous avons
-organisés en « campagne », « littoral », « montagne », « outre-mer » et « urbain »
-- panels de destinations françaises (destinations FR) que nous avons
-organisés en « campagne », « littoral », « montagne », « outre-mer » et « urbain »
-
-Pour les destinations, la méthode de constitution des panels est la suivante :
-1. Le choix d’un critère objectif classant les objets entre eux :
-· Classement d’Eurostat (France : villes classées 3, 4, 5 et 6 • CONCURRENCE :
-villes classées 5 et 6).
-· Top 10 des villes françaises publié par Atout France (tourisme urbain).
-· Le niveau de fréquentation mesuré par un organisme officiel (Atout France,
-INSEE, EUROSTAT, par exemple): nombre de visiteurs, nombre de nuitées, … 
-· Le nombre d’offres proposées au marché : nombre de chambres, nombre de lits,
-nombre d’emplacements, …
-· Le nombre d’équipements proposés au marché : le nombre de remontées mécaniques
-pour les stations de ski, la présence d’un aéroport international, par exemple.
-2. Ensuite, un second critère qualitatif comme le statut - le label (les capitales
-administratives ou économiques, les communes classées “balnéaire”, les sites classés
-par l’UNESCO, notamment) a été introduit.
-3. Enfin, l’expertise métier permet d’agrémenter ces panels lorsqu’il n’y a pas
-de donnée objective ou de label.
-Cette expertise métier peut être complétée par des sources telles que la présence
-dans les catalogues des grands opérateurs touristiques. On voit bien que les panels
-sont construits de façon itérative pour garder de la souplesse et enrichirles
-éléments au fur et à mesure."""
+  Pays-Bas (NL) et Royaume-Uni (UK) """
 
     st.title("Introduction")
     st.header("1- Analyse des recherches pour les destinations françaises")
@@ -507,7 +465,7 @@ de S-2 vs S-3. """
     st.pyplot(graph_barres(var, nom_x, nom_y, nom_z))
 
 
-def interface(CONTENU_GLOBAL):    
+def interface():
     def ordre_alpha(categorie):
         """ Pour faciliter la navigation parmi les fichiers, ces derniers sont
         classés par ordre alphabétique. On réorganisera ainsi les paires de
@@ -517,6 +475,21 @@ def interface(CONTENU_GLOBAL):
         for donnee in ordonne:
             categorie[donnee[0]] = donnee[1]
         return categorie
+    
+    # def affiche_classement(destinations):
+    #     """Remplace l'affichage du pays ('FR','US'...) par le classement 
+    #     qu'occupe la destination, dans les noms de colonne(destinations).
+    #     """
+    #     place = 1
+    #     nouv_colonnes = []
+    #     for destination in destinations:
+    #         nouv_destination = destination
+    #         remplace = destination[destination.find("(")+1 : destination.find(")")]
+    #         nouv_destination = destination.replace(remplace, str(place))
+    #         place += 1
+
+    #         nouv_colonnes.append(nouv_destination)
+    #     return nouv_colonnes
     
     def convertion_nom_pays(code_iso):
         """ Nom en Français d'un pays à partir de son code iso en 2 lettres.
@@ -557,7 +530,6 @@ def interface(CONTENU_GLOBAL):
         moy56 = data[(data.index>date5) & (data.index<=date6)].mean()
         df = pd.concat([(moy12-moy56)/moy56*100,
                         (moy12-moy34)/moy34*100], axis=1)
-        #df.replace([np.inf, -np.inf], 0, inplace=True)
         df.columns = [str(date2.year) +" vs "+str(date6.year),
                       str(date2.year) +" vs "+str(date4.year)]
         return df.T
@@ -570,12 +542,10 @@ def interface(CONTENU_GLOBAL):
     
     # Lecture des fichiers des tables d'analyse et de leurs noms respectifs.
     # On parcoure pour cela les dossiers de données , organisés en trois
-    # principales caté"gories: les destinations françaises, toutes les
-    # destinations et une analyse génériques.
-    
+    # principales catégories: les destinations françaises, toutes les
+    # destinations et une analyse génériques.  
     data = {}
     emplacement = os.path.join("data_tourisme")
-    dossier_source = os.listdir(emplacement)
     dossiers_source = ['generiques',
                        'Toutes_destinations',
                         'destinations_francaises']
@@ -589,34 +559,36 @@ def interface(CONTENU_GLOBAL):
             try:
                 donnees_brut = data_dossier + "/" + donnee_tourisme
                 analyse = pd.read_csv(donnees_brut, sep=";",
-                                      encoding = "ISO-8859-1",
+                                      encoding="ISO-8859-1",
                                       engine='python')
+                
                 # Le nom du fichier est décomposé pour former le nom qui sera affiché
                 decompose = donnee_tourisme.split("_")
                 type_analyse = decompose[1]
                 type_analyse = type_analyse.split("-")
+                nouv_type_analyse = type_analyse[1]
+                
                 # Les analyses générales
                 if type_analyse[0] == "Generique":
-                    # type_analyse = " ".join(type_analyse[:-1])
-                    nouv_type_analyse = type_analyse[1]
                     data[dossier][nouv_type_analyse] = analyse
+                    
                 # Les analyses par pays
                 else:
-                    nom_pays = convertion_nom_pays(decompose[0])
-                    nouv_type_analyse = type_analyse[1]
+                    nom_pays = convertion_nom_pays(decompose[0])                    
                     if not nom_pays in data[dossier].keys():
                         data[dossier][nom_pays] = {}
                     data[dossier][nom_pays][nouv_type_analyse] = analyse
+                    
             except:
                 pass
-            
+           
     # Réorganisation par ordre alphabétique des données
     for type_analyse in data:
         data[type_analyse] = ordre_alpha(data[type_analyse])
         if type_analyse != "generiques":
             for pays in data[type_analyse]:
                 data[type_analyse][pays] = ordre_alpha(data[type_analyse][pays])
-       
+    
     entete()
     
     if st.sidebar.checkbox("Présentation", value=True):
@@ -666,6 +638,7 @@ def interface(CONTENU_GLOBAL):
         analyse_pays = st.sidebar.selectbox("Quelle analyse effectuer?",
                                            detail_analyse)
         data = lecture_donnees(types_analyse[mode][pays_choisi][analyse_pays])
+        
         try:
             # Date d'analyse
             txt = "Date d'analyse"
@@ -675,11 +648,12 @@ def interface(CONTENU_GLOBAL):
             # triés par ordre décroissant
             moyennes = {}
             for i in [2, 4, 12]:
-                date1 = date2-i*timedelta(7)
-                moyennes[i] = data[(data.index>date1) & (data.index<=date2)].mean()
-                moyennes[i] = moyennes[i].sort_values(ascending=False)
-                moyennes[i].name = "TOP "+str(i)+" SEMAINES"
-
+                date1 = date2 - i*timedelta(7)
+                calcul_moy = data[(data.index>date1) & (data.index<=date2)].mean()
+                calcul_moy = calcul_moy.sort_values(ascending=False)
+                calcul_moy.name = "TOP " + str(i) + " SEMAINES"
+                moyennes[i] = calcul_moy
+                
             ### 1 - LES TOPS
             if st.sidebar.checkbox("1- Les tops") and analyse_pays != "None":
                 st.title("1 - Les tops tendances de recherche - Base : indice 100")
@@ -710,31 +684,36 @@ sur des périodes, de respectivement:
             if st.sidebar.checkbox("2 - Les volumes des 3 dernières années"):
                 st.title("2 - Comparaisons annuelles des recherches")
                 # Le type d'analyse peut être traduit en un nombre de semaines
-                classements = {'2 semaines': 2, 
+                classements = {'2 semaines': 2,
                                 '4 semaines': 4,
                                 '12 semaines': 12}
-                lissage = st.sidebar.checkbox("Lissage") 
                 types_classement = list(classements.keys())
                 choix_vol = st.sidebar.radio("Classement: ", types_classement)
+                lissage = st.sidebar.checkbox("Lissage")
                 
                 # Le choix est donné pour n'afficher que les destinations
                 # voulues parmi toutes celles disponibles
-                nb_semaines_vol= classements[choix_vol]
+                nb_semaines_vol = classements[choix_vol]
                 choix_destinations = {}
+                correspond_vol = {}
                 max_colonnes = 5
                 colonnes_volume = st.beta_columns(max_colonnes)
-                index = 0
+                index = 0  
+                place = 1
                 for destination in moyennes[nb_semaines_vol].index:
-                    choix_destinations[destination] = colonnes_volume[index].checkbox(destination)
+                    nom_classe = destination[:destination.find("(")]
+                    nom_classe += " (" + str(place) + ")"
+                    correspond_vol[nom_classe] = destination
+                    choix_destinations[destination] = colonnes_volume[index].checkbox(nom_classe)
                     index += 1
+                    place += 1
                     if index == max_colonnes:
                         index = 0
-                
+                        
                 # Seules les graphiques des destinations choisies sont affichés
                 for zone in choix_destinations:
                     if choix_destinations[zone] == True:
                         st.pyplot(graph_3_ans(data, zone, lissage))
-
 
             ### 3 - LES VARIATIONS
             titre_variation = "3 - Les variations des recherches d'une année sur l'autre"
@@ -759,20 +738,25 @@ des années précedentes."""
                 # dans deux graphiques
                 max_colonnes_var = 5
                 colonnes_variation = st.beta_columns(5)
-                index_var = 0  
+                index_var = 0
                 zones = []
+                correspond_var = {}
+                place = 1
                 choix_variations = {}
                 for destination in moyennes[nb_semaines_var].index:
-                    choix_variations[destination] = colonnes_variation[index_var].checkbox(destination)
+                    nom_classe = destination[:destination.find("(")]
+                    nom_classe += " (" + str(place) + ") "
+                    correspond_var[nom_classe] = destination
+                    choix_variations[destination] = colonnes_variation[index_var].checkbox(nom_classe)
                     index_var += 1
+                    place += 1
                     if index_var == max_colonnes_var:
                         index_var = 0
-                        
-                
+                                        
                 for choix in choix_variations:
                     if choix_variations[choix] == True:
-                        zones.append(choix)   
-                
+                        zones.append(choix)
+                        
                 moy = moyennes_annuelles(data[zones],
                                          nb_semaines_var * timedelta(7))
                 var = variations_annuelles(data[zones],
@@ -1072,4 +1056,4 @@ if test:
 
 
 ### VII - PROGRAMME PRINCIPAL
-interface(CONTENU_GLOBAL)
+interface()
