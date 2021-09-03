@@ -328,9 +328,8 @@ L’observatoire digital de Atout France mesure, par quinzaine, par mois
 et par trimestre, les niveaux d’intérêts d’un marché
 dans Google Trends (rubrique « travel  ») d’une sélection de mots clés
 génériques et des destinations touristiques françaises par espaces
-(littoral, outre-mer, urbain, campagne et montagne) et propose,
-chaque trimestre, de comparer ces résultats vs les concurrentes en Europe.
-(sauf outre-mer).
+(littoral, outre-mer, urbain, campagne et montagne) et propose des les
+comparer à la concurrence en Europe.
     """
     cols = st.beta_columns(2) # number of columns in each row! = 2
     cols[0].image("logo_Atout_France.png", use_column_width=True)
@@ -341,19 +340,41 @@ chaque trimestre, de comparer ces résultats vs les concurrentes en Europe.
 
 
 def introduction():
-    txt = """
-Mesure de l’intérêt des internautes par marché émetteur pour les destinations
-françaises (outre-mer, ville,  montagne, campagne et littoral) comparées
-entre elles dans un panel donné – rubrique « travel » de Google Trends. 
-Les 6 principaux résultats sont proposés (Top 6 – par facilité de lecture,
-les valeurs suivantes sont également disponibles) 
-- Périodicité d’analyse  : Deux  fois par mois
-- Marchés analysés : Allemagne (DE), Belgique (BE), France (FR),
-  Pays-Bas (NL) et Royaume-Uni (UK) """
+    txt_1 = """
+Mesure des "termes de recherches touristiques" (groupes de termes 
+correspondants à un même concept) non accolés aux destinations pour mesurer
+si l'intérêt pour le terme analysé redémarre, indépendamment du lieu
+(ex: "hôtel" et non "hôtel à Lyon") rubrique "travel" de Google Trends.
+Périodicité d'analyse: Quinzaine (2 semaines), mensuelle (4 semaines) et
+trimestrielle (12 semaines)
+Marchés analysés: hôtel, résidence de tourisme, camping, chambre d'hôte, 
+voyage, tout inclus, week-end, croisière, billet d'avion, billet de train,
+Paris et Disneyland Paris (toutes catégories)
+"""
 
     st.title("Introduction")
-    st.header("1- Analyse des recherches pour les destinations françaises")
-    st.text(txt)
+    st.header("1- Analyse des mots clé génériques par pays")
+    st.text(txt_1)
+    
+    txt_2 = """
+Mesure des destinations françaises et européennes d'un panel donné
+(destinations domestiques écartées sauf pour la France)
+Périodicité d'analyse: Quinzaine (2 semaines), mensuelle (4 semaines) et
+trimestrielle (12 semaines)
+Marchés analysés: outre-mer, campagne, littoral, urbain et montagne France et
+Europe - sauf outre-mer (monde)
+"""
+    st.header("2- Analyse toutes destinations Françaises et Européennes par pays")
+    st.text(txt_2)
+    
+    txt_3 = """
+Le lissage est une technique qui consiste à réduire les irrégularités d'une
+courbe. Cette dernière est utilisée en traitement du signal pour atténuer
+ce qui peut être considéré comme une perturbation ou un bruit de mesure.
+"""
+    st.header("3- Lissage")
+    st.text(txt_3)
+    
 
 
 def visualisation_tops(data):
@@ -547,8 +568,8 @@ def interface():
     data = {}
     emplacement = os.path.join("data_tourisme")
     dossiers_source = ['generiques',
-                       'Toutes_destinations',
-                        'destinations_francaises']
+                       'destinations_francaises',
+                       'Toutes_destinations']
     for dossier in dossiers_source:
         data[dossier] = {}
         source = os.path.join("data_tourisme/"+dossier)
@@ -593,17 +614,18 @@ def interface():
     
     if st.sidebar.checkbox("Présentation", value=True):
         introduction()
-    
+        
     # Sélection du type d'analyse générale à effectuer
-    types_analyse = {"Mots clés génériques par pays": data[dossiers_source[0]],
-                     "Toutes destinations par pays": data[dossiers_source[1]],
-                     "Destinations FR par pays": data[dossiers_source[2]]}
+    types_analyse = {"Mots clés génériques": data[dossiers_source[0]],
+                     "Destinations Françaises": data[dossiers_source[1]],
+                     "Destinations Françaises et Européennes": data[dossiers_source[2]]}
     txt = "Types d'analyses: " 
     noms_types = list(types_analyse.keys())
     mode = st.sidebar.selectbox(txt, noms_types)
     
+        
     ### ANALYSE GENERIQUE
-    if mode == "Mots clés génériques par pays":
+    if mode == noms_types[0]:
         # Récupération des noms de tables d'analyse et construction de la 
         # liste déroulante
         noms_analyses = list(types_analyse[mode].keys())
@@ -682,7 +704,7 @@ sur des périodes, de respectivement:
            
             ### 2 - LES VOLUMES
             if st.sidebar.checkbox("2 - Les volumes des 3 dernières années"):
-                st.title("2 - Comparaisons annuelles des recherches")
+                st.title("2 - Les volumes des 3 dernières années")
                 # Le type d'analyse peut être traduit en un nombre de semaines
                 classements = {'2 semaines': 2,
                                 '4 semaines': 4,
@@ -709,7 +731,7 @@ sur des périodes, de respectivement:
                     place += 1
                     if index == max_colonnes:
                         index = 0
-                        
+                
                 # Seules les graphiques des destinations choisies sont affichés
                 for zone in choix_destinations:
                     if choix_destinations[zone] == True:
