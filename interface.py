@@ -718,27 +718,29 @@ sur des périodes, de respectivement:
                 nb_semaines_vol = classements[choix_vol]
                 choix_destinations = {}
                 correspond_vol = {}
-                # max_colonnes = 5
-                # colonnes_volume = st.beta_columns(max_colonnes)
-                # index = 0  
+                max_colonnes = 5
+                colonnes_volume = st.beta_columns(max_colonnes)
+                index = 0  
                 place = 1
                 for destination in moyennes[nb_semaines_vol].index:
                     nom_classe = destination[:destination.find("(")]
                     nom_classe += " (" + str(place) + ")"
                     correspond_vol[nom_classe] = destination
-                #     choix_destinations[destination] = colonnes_volume[index].checkbox(nom_classe)
-                #     index += 1
+                    choix_destinations[destination] = colonnes_volume[index].checkbox(nom_classe)
+                    index += 1
                     place += 1
-                #     if index == max_colonnes:
-                #         index = 0
+                    if index == max_colonnes:
+                        index = 0
                 # Seules les graphiques des destinations choisies sont affichés
-                choix_vol = st.multiselect("Choisissez les données à analyser:", correspond_vol)
-                # for zone in choix_destinations:
-                #     if choix_destinations[zone] == True:
-                #         st.pyplot(graph_3_ans(data, zone, lissage))
-                for zone in correspond_vol:
-                    if zone in choix_vol:
-                        st.pyplot(graph_3_ans(data, correspond_vol[zone], lissage))
+                # choix_vol = st.multiselect("Choisissez les données à analyser:", correspond_vol)
+                
+                for zone in choix_destinations:
+                    if choix_destinations[zone] == True:
+                        st.pyplot(graph_3_ans(data, zone, lissage))
+                
+                # for zone in correspond_vol:
+                #     if zone in choix_vol:
+                #         st.pyplot(graph_3_ans(data, correspond_vol[zone], lissage))
                         
 
             ### 3 - LES VARIATIONS
