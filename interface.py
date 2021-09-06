@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import streamlit as st
-import streamlit.components.v1 as components
+# import streamlit as st
+# import streamlit.components.v1 as components
 
 import pandas as pd
 import seaborn as sns
@@ -30,7 +30,7 @@ from pptx.enum.text import PP_ALIGN
 # https://github.com/Lee-RoyMannier/tourisme
 # https://share.streamlit.io/lee-roymannier/tourisme/main/interface.py
 
-st.set_option('deprecation.showPyplotGlobalUse', False)
+# st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # TODO: 
 # Se référer à 2019 pour faire les prévisions. 
@@ -44,6 +44,81 @@ def lecture_donnees(data):
     # Formatage des nombres à vigule en flottant
     data = data.applymap(lambda x: float(x.replace(",", ".")))
 
+    return data
+
+def ordre_alpha(categorie):
+    """ Pour faciliter la navigation parmi les fichiers, ces derniers sont
+    classés par ordre alphabétique. On réorganisera ainsi les paires de
+    clé/valeur du dictionnaire 'categorie'."""
+    ordonne = sorted(categorie.items(), key=lambda x: x[0])
+    categorie = {}
+    for donnee in ordonne:
+        categorie[donnee[0]] = donnee[1]
+    return categorie
+
+def convertion_nom_pays(correspondances_pays, code_iso):
+    """ Nom en Français d'un pays à partir de son code iso en 2 lettres.
+    Retourne par exemple "France" pour "FR" """
+    try:
+        nom_converti = correspondances_pays.loc[code_iso]["nom_pays"]
+        return nom_converti
+    except: 
+        return code_iso
+
+def acquisition_donnees():
+    # Code iso des pays traduits en noms français courts 
+    pays = pd.read_csv("iso-pays.csv", header=None)
+    pays = pays[[2,4]]
+    pays.columns = ["iso", "nom_pays"]
+    pays = pays.set_index("iso")
+    
+    # Lecture des fichiers des tables d'analyse et de leurs noms respectifs.
+    # On parcoure pour cela les dossiers de données , organisés en trois
+    # principales catégories: les destinations françaises, toutes les
+    # destinations et une analyse génériques.  
+    data = {}
+    emplacement = os.path.join("data_tourisme")
+    dossiers_source = ['generiques',
+                       'destinations_francaises',
+                       'Toutes_destinations']
+    for dossier in dossiers_source:
+        data[dossier] = {}
+        source = os.path.join("data_tourisme/"+dossier)
+        sous_dossier = os.listdir(source)[-1]
+
+        data_dossier = "/".join([emplacement, dossier, sous_dossier])
+        for donnee_tourisme in os.listdir(data_dossier):
+            try:
+                donnees_brut = data_dossier + "/" + donnee_tourisme
+                analyse = pd.read_csv(donnees_brut, sep=";",
+                                      encoding="ISO-8859-1",
+                                      engine='python')
+                
+                # Le nom du fichier est décomposé pour former le nom qui sera affiché
+                decompose = donnee_tourisme.split("_")
+                type_analyse = decompose[1]
+                type_analyse = type_analyse.split("-")
+                nouv_type_analyse = type_analyse[1]
+                # Les analyses générales
+                if type_analyse[0] == "Generique":
+                    data[dossier][nouv_type_analyse] = analyse
+                    
+                # Les analyses par pays
+                else:
+                    nom_pays = convertion_nom_pays(pays, decompose[0])
+                    if not nom_pays in data[dossier].keys():
+                        data[dossier][nom_pays] = {}
+                    data[dossier][nom_pays][nouv_type_analyse] = analyse
+                    
+            except:
+                pass
+           
+    # Réorganisation par ordre alphabétique des données
+    for type_analyse in data:
+        data[type_analyse] = ordre_alpha(data[type_analyse])
+        if type_analyse != "generiques":
+            for pays in data[type_analyse]:
+                data[type_analyse][pays] = ordre_alpha(data[type_analyse][pays])
     return data
 
 
@@ -105,6 +180,40 @@ def duree_str(date1, date2):
 def arrondie_str(x):
     corps, decimales = str(x).split('.')
     return corps+','+decimales[:2]
+
+def moyennes_annuelles(data, date_depart, periode=timedelta(7)):
+    date1 = date_depart-periode
+    # 1 an avant la date d'analyse:
+    date4 = date_depart-52*timedelta(7)
+    date3 = date4-periode
+    # 2 ans avant la date d'analyse
+    date6 = date_depart-104*timedelta(7)
+    date5 = date6-periode
+    
+    moy12 = data[(data.index>date1) & (data.index<=date_depart)].mean()
+    moy34 = data[(data.index>date3) & (data.index<=date4)].mean()
+    moy56 = data[(data.index>date5) & (data.index<=date6)].mean()
+    df = pd.concat([moy56, moy34, moy12], axis=1)
+    df.columns = [date6.year, date4.year, date_depart.year]
+    return df.T
+
+def variations_annuelles(data, date_depart, periode=timedelta(7)):
+    date1 = date_depart-periode
+    # 1 an avant la date d'analyse:
+    date4 = date_depart-52*timedelta(7)
+    date3 = date4-periode
+    # 2 ans avant la date d'analyse
+    date6 = date_depart-104*timedelta(7)
+    date5 = date6-periode
+    
+    moy12 = data[(data.index>date1) & (data.index<=date_depart)].mean()
+    moy34 = data[(data.index>date3) & (data.index<=date4)].mean()
+    moy56 = data[(data.index>date5) & (data.index<=date6)].mean()
+    df = pd.concat([(moy12-moy56)/moy56*100,
+                    (moy12-moy34)/moy34*100], axis=1)
+    df.columns = [str(date_depart.year) +" vs "+str(date6.year),
+                  str(date_depart.year) +" vs "+str(date4.year)]
+    return df.T
 
 
 ### III - CALCULS
@@ -232,7 +341,7 @@ def graph_barres(data, nom_x, nom_y, nom_z, formate_date=True):
     # Les volumes sont ensuite représentés à l'aide de barres.
     # Différentes palettes de couleurs ont été testées:
     # YlGnBu RdBu OrRd PRGn Spectral YlOrBr
-    fig, ax = plt.subplots(figsize=(10,6), dpi=300)
+    fig, ax = plt.subplots(figsize=(10,6), dpi=250)
     sns.barplot(x=nom_x, y=nom_y, hue=nom_z, data=data_graph,
                 palette=sns.color_palette("YlGnBu")[-min(len(data),6):])
 
@@ -280,7 +389,7 @@ def graph_3_ans(data, pays, lissage=False):
 
     a = max(data.index).year
     j1 = data[data.index >= datetime(a, 1, 1).date()].index[0]
-    fig, ax = plt.subplots(figsize=(10,6), dpi=300)
+    fig, ax = plt.subplots(figsize=(10,6), dpi=250)
     for i in range(3):
         date1, date2 = datetime(a-i, 1, 1).date(), datetime(a-i, 12, 31).date()
         data_ = data[(data.index>date1) & (data.index<=date2)]
@@ -424,26 +533,38 @@ sont pas des valeurs absolues mais se lisent en indices.
 La visualisation de cet indice au cours des dernières semaines permet de constater 
 les fluctuations et les éventuelles tendances de manière empirique. L'attention est 
 mise sur les 2 denières semaines puis sur les 4 dernières semaines. """
-    st.title("2. Volume des tendances de recherches des deux et quatre dernières semaines ")
-    st.text(txt)
+    try:
+        st.title("2. Volume des tendances de recherches des deux et quatre dernières semaines ")
+        st.text(txt)
+    except:
+        pass
 
     titre_googletrend = "a - Tendances de recherche des 2 dernières semaines"
-    st.header(titre_googletrend)
     table = data.tail(2).applymap(lambda x: "{:.1f}".format(x))
     table.index = table.index.map(lambda t: duree_str(t, t+timedelta(days=6)))
-    st.write(table)
+    try:
+        st.header(titre_googletrend)
+        st.write(table)
+    except:
+        pass
 
     nom_x, nom_y, nom_z = "Pays", "Indice Google Trends – Base 100", "Semaine"
     graph_googletrends = graph_barres(data.tail(2), nom_x, nom_y, nom_z)
-    st.pyplot(graph_googletrends)
+    try:
+        st.pyplot(graph_googletrends)
+    except:
+        pass
 
     titre_tendances = "b - Tendances de recherche des 4 dernières semaines"
-    st.header(titre_tendances)
     table = data.tail(4).applymap(lambda x: "{:.1f}".format(x))
     table.index = table.index.map(lambda t: duree_str(t, t+timedelta(days=6)))
-    st.write(table)
     graph_tendances = graph_barres(data.tail(4), nom_x, nom_y, nom_z)
-    st.pyplot(graph_tendances)
+    try:
+        st.header(titre_tendances)
+        st.write(table)
+        st.pyplot(graph_tendances)
+    except:
+        pass
     
     resultats = {titre_tendances: graph_tendances,
                  titre_googletrend: graph_googletrends}
@@ -487,15 +608,7 @@ de S-2 vs S-3. """
 
 
 def interface():
-    def ordre_alpha(categorie):
-        """ Pour faciliter la navigation parmi les fichiers, ces derniers sont
-        classés par ordre alphabétique. On réorganisera ainsi les paires de
-        clé/valeur du dictionnaire 'categorie'."""
-        ordonne = sorted(categorie.items(), key=lambda x: x[0])
-        categorie = {}
-        for donnee in ordonne:
-            categorie[donnee[0]] = donnee[1]
-        return categorie
+
     
     # def affiche_classement(destinations):
     #     """Remplace l'affichage du pays ('FR','US'...) par le classement 
@@ -512,103 +625,7 @@ def interface():
     #         nouv_colonnes.append(nouv_destination)
     #     return nouv_colonnes
     
-    def convertion_nom_pays(code_iso):
-        """ Nom en Français d'un pays à partir de son code iso en 2 lettres.
-        Retourne par exemple "France" pour "FR" """
-        try:
-            nom_converti = pays.loc[code_iso]["nom_pays"]
-            return nom_converti
-        except: 
-            return code_iso
-        
-    def moyennes_annuelles(data, periode=timedelta(7)):
-        date1 = date2-periode
-        # 1 an avant la date d'analyse:
-        date4 = date2-52*timedelta(7)
-        date3 = date4-periode
-        # 2 ans avant la date d'analyse
-        date6 = date2-104*timedelta(7)
-        date5 = date6-periode
-        
-        moy12 = data[(data.index>date1) & (data.index<=date2)].mean()
-        moy34 = data[(data.index>date3) & (data.index<=date4)].mean()
-        moy56 = data[(data.index>date5) & (data.index<=date6)].mean()
-        df = pd.concat([moy56, moy34, moy12], axis=1)
-        df.columns = [date6.year, date4.year, date2.year]
-        return df.T
-
-    def variations_annuelles(data, periode=timedelta(7)):
-        date1 = date2-periode
-        # 1 an avant la date d'analyse:
-        date4 = date2-52*timedelta(7)
-        date3 = date4-periode
-        # 2 ans avant la date d'analyse
-        date6 = date2-104*timedelta(7)
-        date5 = date6-periode
-        
-        moy12 = data[(data.index>date1) & (data.index<=date2)].mean()
-        moy34 = data[(data.index>date3) & (data.index<=date4)].mean()
-        moy56 = data[(data.index>date5) & (data.index<=date6)].mean()
-        df = pd.concat([(moy12-moy56)/moy56*100,
-                        (moy12-moy34)/moy34*100], axis=1)
-        df.columns = [str(date2.year) +" vs "+str(date6.year),
-                      str(date2.year) +" vs "+str(date4.year)]
-        return df.T
-    
-    # Code iso des pays traduits en noms français courts 
-    pays = pd.read_csv("iso-pays.csv", header=None)
-    pays = pays[[2,4]]
-    pays.columns = ["iso", "nom_pays"]
-    pays = pays.set_index("iso")
-    
-    # Lecture des fichiers des tables d'analyse et de leurs noms respectifs.
-    # On parcoure pour cela les dossiers de données , organisés en trois
-    # principales catégories: les destinations françaises, toutes les
-    # destinations et une analyse génériques.  
-    data = {}
-    emplacement = os.path.join("data_tourisme")
-    dossiers_source = ['generiques',
-                       'destinations_francaises',
-                       'Toutes_destinations']
-    for dossier in dossiers_source:
-        data[dossier] = {}
-        source = os.path.join("data_tourisme/"+dossier)
-        sous_dossier = os.listdir(source)[-1]
-
-        data_dossier = "/".join([emplacement, dossier, sous_dossier])
-        for donnee_tourisme in os.listdir(data_dossier):
-            try:
-                donnees_brut = data_dossier + "/" + donnee_tourisme
-                analyse = pd.read_csv(donnees_brut, sep=";",
-                                      encoding="ISO-8859-1",
-                                      engine='python')
-                
-                # Le nom du fichier est décomposé pour former le nom qui sera affiché
-                decompose = donnee_tourisme.split("_")
-                type_analyse = decompose[1]
-                type_analyse = type_analyse.split("-")
-                nouv_type_analyse = type_analyse[1]
-                
-                # Les analyses générales
-                if type_analyse[0] == "Generique":
-                    data[dossier][nouv_type_analyse] = analyse
-                    
-                # Les analyses par pays
-                else:
-                    nom_pays = convertion_nom_pays(decompose[0])                    
-                    if not nom_pays in data[dossier].keys():
-                        data[dossier][nom_pays] = {}
-                    data[dossier][nom_pays][nouv_type_analyse] = analyse
-                    
-            except:
-                pass
-           
-    # Réorganisation par ordre alphabétique des données
-    for type_analyse in data:
-        data[type_analyse] = ordre_alpha(data[type_analyse])
-        if type_analyse != "generiques":
-            for pays in data[type_analyse]:
-                data[type_analyse][pays] = ordre_alpha(data[type_analyse][pays])
+    data = acquisition_donnees()
     
     entete()
     
@@ -785,9 +802,9 @@ des années précedentes."""
                     if choix_variations[choix] == True:
                         zones.append(choix)
                         
-                moy = moyennes_annuelles(data[zones],
+                moy = moyennes_annuelles(data[zones], date2,
                                          nb_semaines_var * timedelta(7))
-                var = variations_annuelles(data[zones],
+                var = variations_annuelles(data[zones], date2,
                                            nb_semaines_var * timedelta(7))
                 
                 # Graphique des moyennes comparées
@@ -810,7 +827,8 @@ des années précedentes."""
         except:
             pass
         
-    ### EXPORT POWERPOINT
+### EXPORT POWERPOINT
+def export_ppt(generation_generique=True, generation_generique_par_pays=True):
     def ajout_titre(page, type_analyse="", position=0,
                     titre="Indice hebdomadaire des tendances de recherches"):
         """Placement du titre de page. Selon si on on précise un type d'analyse
@@ -882,183 +900,195 @@ des années précedentes."""
                                          progression,
                                          potentiel]
         return tops
-        
-    # export_ppt = st.sidebar.button("Générer un PowerPoint")
-    export_ppt = False # bouton d'export powerpoint caché pour l'instant
+
+       
+    data = acquisition_donnees()
     
-    # if export_ppt:
-        ## Générique
-        # presente = Presentation()
-        # page_titre = presente.slide_layouts[1]
-        # slide = presente.slides.add_slide(page_titre)
-        # slide.shapes.add_picture("logo_Atout_France.png",
-        #                           Inches(1), Inches(3),
-        #                           width = Inches(5))
-        # slide.shapes.add_picture("logo_Baudy_Co.png",
-        #                           Inches(4.5), Inches(3),
-        #                           width = Inches(5))
-        # titre = slide.shapes.title
-        # titre.text = u"""Observatoire digital des destinations
-        # Analyse Générique"""
+    
+    # Générique
+    if generation_generique:
+        print("Génération du PowerPoint Générique")
+        presente = Presentation()
+        page_titre = presente.slide_layouts[1]
+        slide = presente.slides.add_slide(page_titre)
+        slide.shapes.add_picture("logo_Atout_France.png",
+                                  Inches(1), Inches(3),
+                                  width = Inches(5))
+        slide.shapes.add_picture("logo_Baudy_Co.png",
+                                  Inches(4.5), Inches(3),
+                                  width = Inches(5))
+        titre = slide.shapes.title
+        titre.text = u"""Observatoire digital des destinations
+        Analyse Générique"""
         
         
-        # # Page des priorités d'action
-        # page_priorite = presente.slides.add_slide(page_titre)
+        # Page des priorités d'action
+        page_priorite = presente.slides.add_slide(page_titre)
         
-        # date_1, date_2 = "", ""
-        # colonnes = ["", "Top Volume", "Top Progression", "Top Potentiel"]
-        # top_quinzaine = pd.DataFrame(columns=colonnes)
-        # for type_analyse in data_tourisme_generique:
-        #     analyse = lecture_donnees(data_tourisme_generique[type_analyse])
-        #     date_2 = max(analyse.index)
-        #     date_1 = date_2 - 2*timedelta(7)
-        #     top = tops3(analyse, date_1, date_2)
-        #     volume = ",".join(top.loc['top volume'])
-        #     progression = ",".join(top.loc['top progression'])
-        #     potentiel = ",".join(top.loc['top potentiel'])
-        #     top_quinzaine.loc[len(top_quinzaine.index)] = [type_analyse, volume,
-        #                                                    progression, potentiel]
-        # top_priorite = top_quinzaine[["", "Top Progression"]]
-        # top_priorite.columns = ["", "Priorité d'action"]
+        date_1, date_2 = "", ""
+        colonnes = ["", "Top Volume", "Top Progression", "Top Potentiel"]
+        top_quinzaine = pd.DataFrame(columns=colonnes)
+        for type_analyse in data['generiques']:
+            analyse = lecture_donnees(data['generiques'][type_analyse])
+            date_2 = max(analyse.index)
+            date_1 = date_2 - 2*timedelta(7)
+            top = tops3(analyse, date_1, date_2)
+            volume = ",".join(top.loc['top volume'])
+            progression = ",".join(top.loc['top progression'])
+            potentiel = ",".join(top.loc['top potentiel'])
+            top_quinzaine.loc[len(top_quinzaine.index)] = [type_analyse, volume,
+                                                            progression, potentiel]
+        top_priorite = top_quinzaine[["", "Top Progression"]]
+        top_priorite.columns = ["", "Priorité d'action"]
                     
-        # titre = "La quinzaine du " + duree_str(date_1, date_2) + " en quelques mots..."
-        # ajout_titre(page_priorite, titre=titre, position=0)
-        # table_ppt(page_priorite, top_priorite, 1)
+        titre = "La quinzaine du " + duree_str(date_1, date_2) + " en quelques mots..."
+        ajout_titre(page_priorite, titre=titre, position=0)
+        table_ppt(page_priorite, top_priorite, 1)
         
-        # # Page des tops de la quinzaine
-        # page_top = presente.slides.add_slide(page_titre)
+        # Page des tops de la quinzaine
+        page_top = presente.slides.add_slide(page_titre)
                     
-        # titre = "La quinzaine du " + duree_str(date_1, date_2) + " en quelques mots..."
-        # ajout_titre(page_top, titre=titre, position=0)
-        # table_ppt(page_top, top_quinzaine, top_quinzaine.shape[1],
-        #           top_quinzaine.shape[0], 1)
+        titre = "La quinzaine du " + duree_str(date_1, date_2) + " en quelques mots..."
+        ajout_titre(page_top, titre=titre, position=0)
+        table_ppt(page_top, top_quinzaine, top_quinzaine.shape[1],
+                  top_quinzaine.shape[0], 1)
         
-        # # Graphiques d'analyse générale
-        # for type_analyse in data_tourisme_generique:
-        #     page_analyse = presente.slides.add_slide(page_titre)
-        #     left = top = Inches(0)
-        #     width = Inches(10.0)
-        #     height = Inches(0.2)
-        #     shape = page_analyse.shapes.add_shape(
-        #         MSO_SHAPE.RECTANGLE, left, top, width, height
-        #     )
+        # Graphiques d'analyse générale
+        for type_analyse in data['generiques']:
+            page_analyse = presente.slides.add_slide(page_titre)
+            left = top = Inches(0)
+            width = Inches(10.0)
+            height = Inches(0.2)
+            shape = page_analyse.shapes.add_shape(
+                MSO_SHAPE.RECTANGLE, left, top, width, height
+            )
             
-        #     ajout_titre(page_analyse, type_analyse)
+            ajout_titre(page_analyse, type_analyse)
         
-        #     donnees_propres = lecture_donnees(data_tourisme_generique[type_analyse])
-        #     graphiques = visualisation_volumes(donnees_propres)
+            donnees_propres = lecture_donnees(data['generiques'][type_analyse])
+            graphiques = visualisation_volumes(donnees_propres)
             
-        #     decalage = 0
-        #     for type_graphique in graphiques:
-        #         try:
-        #             graph = graphiques[type_graphique]
-        #             nom_graph = str(type_analyse) +" "+ str(type_graphique)+".jpg"
-        #             image_graph = graph.savefig(nom_graph, dpi=300)
-        #             place_image = page_analyse.shapes.add_picture(nom_graph,
-        #                                                   Inches(decalage),
-        #                                                   Inches(2),
-        #                                                   width=Inches(5))
-        #             decalage += 5
-        #         except:
-        #             pass
-        #     # break # Arrêt de boucle pour test
-        # presente.save('Rapport analyse generique.pptx')
+            decalage = 0
+            for type_graphique in graphiques:
+                try:
+                    graph = graphiques[type_graphique]
+                    nom_graph = str(type_analyse) +" "+ str(type_graphique)+".jpg"
+                    image_graph = graph.savefig(nom_graph, dpi=300)
+                    place_image = page_analyse.shapes.add_picture(nom_graph,
+                                                          Inches(decalage),
+                                                          Inches(2),
+                                                          width=Inches(5))
+                    decalage += 5
+                except:
+                    pass
+            # break # Arrêt de boucle pour test
+        presente.save('Rapport analyse generique.pptx')
+            
+    # Par pays
+    if generation_generique_par_pays:
+        print("Génération du PowerPoint par Pays")
+        for pays in data['destinations_francaises']:
+            # Les calculs des meilleurs secteurs trimestriels, puis mensuels
+            # et enfin bi-hebdomadaires, sont effectués. Trois fichiers 
+            # correspondants seront produits.
+            periodes = ("hebdomadaire", "mensuelle", "trimestrielle")
+            nb_semaine = (2, 4, 12)
+            for periodicite, nb_semaines in zip(periodes, nb_semaine):
+                presente_pays = Presentation()
+                page_titre = presente_pays.slide_layouts[1]
+                page_titre_pays = presente_pays.slides.add_slide(page_titre)
+                left = top = Inches(0)
+                width = Inches(10.0)
+                height = Inches(0.2)
+                barre = page_titre_pays.shapes.add_shape(
+                            MSO_SHAPE.RECTANGLE, left, top, width, height
+                        )
                 
-        ## Par pays
-        # for pays in data_tourisme_pays:
-        #     # Les calculs des meilleurs secteurs trimestriels, puis mensuels
-        #     # et enfin bi-hebdomadaires, sont effectués. Trois fichiers 
-        #     # correspondants seront produits.
-        #     periodes = ("hebdomadaire", "mensuelle", "trimestrielle")
-        #     nb_semaine = (2, 4, 12)
-        #     for periodicite, nb_semaines in zip(periodes, nb_semaine):
-        #         presente_pays = Presentation()
-        #         page_titre = presente_pays.slide_layouts[1]
-        #         page_titre_pays = presente_pays.slides.add_slide(page_titre)
-        #         left = top = Inches(0)
-        #         width = Inches(10.0)
-        #         height = Inches(0.2)
-        #         barre = page_titre_pays.shapes.add_shape(
-        #                     MSO_SHAPE.RECTANGLE, left, top, width, height
-        #                 )
+                titre_pays = page_titre_pays.shapes.title
+                titre_pays.text = f"""Analyse {periodicite} par Pays
+                {pays}"""
+                titre = "En quelques mots..."
+                ajout_titre(page_titre_pays, position=1, titre=titre)
                 
-        #         titre_pays = page_titre_pays.shapes.title
-        #         titre_pays.text = f"""Analyse {periodicite} par Pays
-        #         {pays}"""
-        #         titre = "En quelques mots..."
-        #         ajout_titre(page_titre_pays, position=1, titre=titre)
+                tops = calcul_tops(data['destinations_francaises'][pays], 2)
+                table_ppt(page_titre_pays, tops, pos_y=2.5)
                 
-        #         tops = calcul_tops(data_tourisme_pays[pays], 2)
-        #         table_ppt(page_titre_pays, tops, pos_y=2.5)
-                
-        #         for type_analyse in data_tourisme_pays[pays]:
-        #             data = lecture_donnees(data_tourisme_pays[pays][type_analyse])
-        #             moyennes = {}
-        #             date2 = data.index.max()
-        #             for i in [2, 4, 12]:
-        #                 date1 = date2-i*timedelta(7)
-        #                 moyennes[i] = data[(data.index>date1) & (data.index<=date2)].mean()
-        #                 moyennes[i] = moyennes[i].sort_values(ascending=False)
-        #                 moyennes[i].name = "TOP "+str(i)+" SEMAINES"
-        #             date1 = date2 - nb_semaines*timedelta(7)
-        #             zones = list(moyennes[2].head(6).index)
-        #             moy = moyennes_annuelles(data[zones], nb_semaines*timedelta(7))
-        #             var = variations_annuelles(data[zones], nb_semaines*timedelta(7))
+                for type_analyse in data['destinations_francaises'][pays]:
+                    data_pays = lecture_donnees(data['destinations_francaises'][pays][type_analyse])
+                    moyennes = {}
+                    date2 = data_pays.index.max()
+                    for i in [2, 4, 12]:
+                        date1 = date2-i*timedelta(7)
+                        moyennes[i] = data_pays[(data_pays.index>date1) & (data_pays.index<=date2)].mean()
+                        moyennes[i] = moyennes[i].sort_values(ascending=False)
+                        moyennes[i].name = "TOP "+str(i)+" SEMAINES"
+                    date1 = date2 - nb_semaines*timedelta(7)
+                    zones = list(moyennes[2].head(6).index)
+                    moy = moyennes_annuelles(data_pays[zones], date2, nb_semaines*timedelta(7))
+                    var = variations_annuelles(data_pays[zones], date2, nb_semaines*timedelta(7))
                     
-        #             # Graphiques en barres des moyennes et variations
-        #             for analyse, nom_analyse in zip((moy, var), ("Moyenne", "Variation")):
-        #                 page_analyse = presente_pays.slides.add_slide(page_titre)
-        #                 left = top = Inches(0)
-        #                 width = Inches(10.0)
-        #                 height = Inches(0.2)
-        #                 barre = page_analyse.shapes.add_shape(
-        #                             MSO_SHAPE.RECTANGLE, left, top, width, height
-        #                         )
-        #                 ajout_titre(page_analyse, position=0, type_analyse=type_analyse)
-        #                 nom_x, nom_z = u"Régions", "Annees"
-        #                 nom_y = nom_analyse + " de l'indice Google Trends"
-        #                 graph = graph_barres(analyse, nom_x, nom_y, nom_z,
-        #                                        formate_date=False)
-        #                 nom_graph =  " ".join([nom_analyse,periodicite,
-        #                                        str(type_analyse),str(pays)])+".jpg"
-        #                 image_graph = graph.savefig(nom_graph, dpi=300,
-        #                                             bbox_inches="tight")
-        #                 page_analyse.shapes.add_picture(nom_graph,
-        #                                 Inches(1),
-        #                                 Inches(1.3),
-        #                                 width=Inches(8))
+                    # Graphiques en barres des moyennes et variations
+                    for analyse, nom_analyse in zip((moy, var), ("Moyenne", "Variation")):
+                        page_analyse = presente_pays.slides.add_slide(page_titre)
+                        left = top = Inches(0)
+                        width = Inches(10.0)
+                        height = Inches(0.2)
+                        barre = page_analyse.shapes.add_shape(
+                                    MSO_SHAPE.RECTANGLE, left, top, width, height
+                                )
+                        ajout_titre(page_analyse, position=0, type_analyse=type_analyse)
+                        nom_x, nom_z = u"Régions", "Annees"
+                        nom_y = nom_analyse + " de l'indice Google Trends"
+                        graph = graph_barres(analyse, nom_x, nom_y, nom_z,
+                                                formate_date=False)
+                        nom_graph =  " ".join([nom_analyse,periodicite,
+                                                str(type_analyse),str(pays)])+".jpg"
+                        image_graph = graph.savefig(nom_graph, dpi=250,
+                                                    bbox_inches="tight")
+                        plt.clf()
+                        plt.cla()
+                        plt.close('all')
+                        del graph
+                        page_analyse.shapes.add_picture(nom_graph,
+                                        Inches(1),
+                                        Inches(1.3),
+                                        width=Inches(8))
                         
-        #             # Graphique en ligne
-        #             page_analyse = presente_pays.slides.add_slide(page_titre)
-        #             left = top = Inches(0)
-        #             width = Inches(10.0)
-        #             height = Inches(0.2)
-        #             barre = page_analyse.shapes.add_shape(
-        #                         MSO_SHAPE.RECTANGLE, left, top, width, height
-        #                     )
-        #             ajout_titre(page_analyse, position=0, type_analyse=type_analyse)
-        #             cale_gauche = 1.8
-        #             cale_haut = 1.3
-        #             decalage_x = cale_gauche
-        #             decalage_y = cale_haut
-        #             for colonne in moy.columns:
-        #                 graph = graph_3_ans(data, colonne)
-        #                 nom_graph = " ".join(("Evolution",periodicite, pays,
-        #                                       str(colonne))) + ".jpg"
-        #                 image_graph = graph.savefig(nom_graph, dpi=300,
-        #                                             bbox_inches="tight")
-        #                 page_analyse.shapes.add_picture(nom_graph,
-        #                                     Inches(decalage_x),
-        #                                     Inches(decalage_y),
-        #                                     width=Inches(3))
-        #                 if decalage_x > cale_gauche:
-        #                     decalage_x = cale_gauche
-        #                     decalage_y += 2
-        #                 else:
-        #                     decalage_x += 3.3
-        #             # break # Arret de boucle pour test
-        #         presente_pays.save('Rapport analyse '+periodicite+' '+pays+'.pptx')
-        #         # break # Arrêt de boucle pour test
+                    # Graphique en ligne
+                    page_analyse = presente_pays.slides.add_slide(page_titre)
+                    left = top = Inches(0)
+                    width = Inches(10.0)
+                    height = Inches(0.2)
+                    barre = page_analyse.shapes.add_shape(
+                                MSO_SHAPE.RECTANGLE, left, top, width, height
+                            )
+                    ajout_titre(page_analyse, position=0, type_analyse=type_analyse)
+                    cale_gauche = 1.8
+                    cale_haut = 1.3
+                    decalage_x = cale_gauche
+                    decalage_y = cale_haut
+                    for colonne in moy.columns:
+                        graph = graph_3_ans(data_pays, colonne)
+                        nom_graph = " ".join(("Evolution",periodicite, pays,
+                                              str(colonne))) + ".jpg"
+                        image_graph = graph.savefig(nom_graph, dpi=250,
+                                                    bbox_inches="tight")
+                        plt.clf()
+                        plt.cla()
+                        plt.close('all')
+                        del graph
+                        page_analyse.shapes.add_picture(nom_graph,
+                                            Inches(decalage_x),
+                                            Inches(decalage_y),
+                                            width=Inches(3))
+                        if decalage_x > cale_gauche:
+                            decalage_x = cale_gauche
+                            decalage_y += 2
+                        else:
+                            decalage_x += 3.3
+                    # break # Arret de boucle pour test
+                presente_pays.save('Rapport analyse '+periodicite+' '+pays+'.pptx')
+                # break # Arrêt de boucle pour test
         
 
 ### VI - TESTS UNITAIRES
@@ -1084,4 +1114,5 @@ if test:
 
 
 ### VII - PROGRAMME PRINCIPAL
-interface()
+# interface()
+export_ppt(generation_generique=False)
